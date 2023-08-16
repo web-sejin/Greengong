@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -49,7 +49,11 @@ const Sample = ({navigation, route}) => {
 }
 
 const styles = StyleSheet.create({
-	safeAreaView: {flex:1,backgroundColor:'#fff'},	
+	safeAreaView: {flex:1,backgroundColor:'#fff'},
+	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
+	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
+	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
 })
 
 export default Sample

@@ -14,7 +14,13 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const DownUsed = ({navigation, route}) => {
+const MatchDownUsedView = ({navigation, route}) => {
+  const usedState = route.state;
+  let pageTitle = '도면권한 요청내역';
+  if(usedState != 1){
+    pageTitle = '도면권한 완료내역';
+  }
+
   const DATA = [
 		{
 			idx: '1',
@@ -157,38 +163,39 @@ const DownUsed = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'도면다운로드 허용'} />
-      <View style={styles.tabBox}>
-        <TouchableOpacity
-          style={styles.tabBtn}
-          activeOpacity={opacityVal}
-          onPress={()=>{fnTab(1)}}
-        > 
-          {tabState == 1 ? (
-            <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>요청</Text>
-            <View style={styles.tabLine}></View>
-            </>
-          ) : (
-            <Text style={styles.tabBtnText}>요청</Text>  
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tabBtn}
-          activeOpacity={opacityVal}
-          onPress={()=>{fnTab(2)}}
-        >
-          {tabState == 2 ? (
-            <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>완료</Text>
-            <View style={styles.tabLine}></View>
-            </>
-          ) : (
-            <Text style={styles.tabBtnText}>완료</Text>  
-          )}
-        </TouchableOpacity>
+			<Header navigation={navigation} headertitle={pageTitle} />
+      <View style={[styles.listLi]}>
+        <>
+        <AutoHeightImage width={99} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+        <View style={styles.listInfoBox}>
+          <View style={styles.listInfoTitle}>
+            <Text style={styles.listInfoTitleText}>견적 요청 드립니다.</Text>
+          </View>
+          <View style={styles.listInfoDesc}>
+            <Text style={styles.listInfoDescText}>김포시 고촌읍 · 3일전</Text>
+          </View>
+          <View style={styles.listInfoCate}>
+            <Text style={styles.listInfoCateText}>NC가공-밀링-플라스틱-도면무</Text>
+          </View>
+          <View style={styles.listInfoCnt}>
+            <View style={styles.listInfoCntBox}>
+              <AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
+              <Text style={styles.listInfoCntBoxText}>2</Text>
+            </View>
+            <View style={styles.listInfoCntBox}>
+              <AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
+              <Text style={styles.listInfoCntBoxText}>8</Text>
+            </View>
+            <View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+              <AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
+              <Text style={styles.listInfoCntBoxText}>5</Text>
+            </View>
+          </View>
+        </View>
+        </>
       </View>
-      {tabState == 1 ? (
+
+      {usedState == 1 ? (
       <View style={styles.allChkBox}>
         <TouchableOpacity
           style={styles.allChkBtn}
@@ -212,6 +219,7 @@ const DownUsed = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
       ) : null}
+
       {isLoading ? (
       <ScrollView>
         {memberList.map((item, index) => {
@@ -221,11 +229,11 @@ const DownUsed = ({navigation, route}) => {
             style={styles.memberBoxBtn}
             activeOpacity={opacityVal}
             onPress={() => {
-              {tabState == 1 ? ( handleChange(item.idx) ) : null}
+              {usedState == 1 ? ( handleChange(item.idx) ) : null}
             }}
           >
-            <View style={[styles.memberBoxBtnWrap, index==0?styles.memberBoxNotLine:null, tabState!=1?styles.memberBoxComplete:null]}>
-              {tabState == 1 ? (
+            <View style={[styles.memberBoxBtnWrap, index==0?styles.memberBoxNotLine:null, usedState!=1?styles.memberBoxComplete:null]}>
+              {usedState == 1 ? (
               <View style={[styles.chkShape, styles.chkShapeAbs, item.isChecked ? styles.chkShapeOn : null]}>
                 <AutoHeightImage width={13} source={require("../../assets/img/icon_chk_on.png")} />
               </View>
@@ -260,12 +268,32 @@ const DownUsed = ({navigation, route}) => {
 }
 
 const styles = StyleSheet.create({
-	safeAreaView: {flex:1,backgroundColor:'#fff'},
-  tabBox: {display:'flex',flexDirection:'row',backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-  tabBtn: {width:(widnowWidth/2),height:45,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},
-  tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
-  tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
-  tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
+	safeAreaView: {flex:1,backgroundColor:'#fff'},  
+  listLi: {display:'flex',flexDirection:'row',flexWrap:'wrap',padding:20,paddingBottom:0,},
+	listImg: {borderRadius:12},
+	listInfoBox: {width:(innerWidth - 99),paddingLeft:15,},
+	listInfoTitle: {},
+	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
+	listInfoDesc: {marginTop:5},
+	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#888'},
+	listInfoCate: {marginTop:5},
+	listInfoCateText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:19,color:'#353636'},
+	listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
+	listInfoCntBox: {display:'flex',flexDirection:'row',alignItems:'center',marginRight:15,},
+	listInfoCntBox2: {marginRight:0},
+	listInfoCntBoxText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#000',marginLeft:4,},
+	listInfoPriceBox: {marginTop:10},
+	listInfoPriceArea: {display:'flex',flexDirection:'row',alignItems:'center'},
+	listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,borderRadius:12,marginRight:8,},
+	listInfoPriceState1: {backgroundColor:'#31B481'},
+	listInfoPriceState2: {backgroundColor:'#F58C40'},
+	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
+	listInfoPrice: {},
+	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
+  listInfoState: {display:'flex',flexDirection:'row',marginTop:8,},
+  listInfoStateText: {display:'flex',alignItems:'center',justifyContent:'center',height:24,paddingHorizontal:10,backgroundColor:'#797979',
+  borderRadius:12,fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:29,color:'#fff',},
+  listInfoStateText2: {backgroundColor:'#31B481'}, 
   allChkBox: {height:62,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',padding:20,borderBottomWidth:1,borderBottomColor:'#E9EEF6'},
   allChkBtn: {display:'flex',flexDirection:'row',alignItems:'center',},
   chkShape: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#ccc',borderRadius:50,display:'flex',alignItems:'center',justifyContent:'center'},
@@ -293,4 +321,4 @@ const styles = StyleSheet.create({
   indicator2: {marginTop:62},
 })
 
-export default DownUsed
+export default MatchDownUsedView

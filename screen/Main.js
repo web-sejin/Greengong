@@ -56,6 +56,14 @@ import ChatRoom from './Chat/Room'; //채팅방
 import UsedSaleList from './Mypage/UsedSaleList'; //마이페이지 판매내역
 import UsedBuyList from './Mypage/UsedBuyList'; //마이페이지 구매내역
 import UsedBidList from './Mypage/UsedBidList'; //마이페이지 입찰내역
+import UsedLike from './Mypage/UsedLike'; //마이페이지 관심목록
+import UsedLikeView from './Mypage/UsedLikeView'; //마이페이지 관심목록 판매자 뷰
+import MatchReq from './Mypage/MatchReq'; //마이페이지 요청내역
+import MatchComparison from './Mypage/MatchComparison'; //마이페이지 비교내역
+import MatchComparisonView from './Mypage/MatchComparisonView'; //마이페이지 발주업체 비교내역
+import MatchOrder from './Mypage/MatchOrder'; //마이페이지 발주내역
+import MatchDownUsed from './Mypage/MatchDownUsed'; //마이페이지 도면권한요청내역
+import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 뷰
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
@@ -234,7 +242,15 @@ const StackNavigator = () => {
       <Stack.Screen name="EstimateResult" component={EstimateResult} />
       <Stack.Screen name="UsedSaleList" component={UsedSaleList} />
       <Stack.Screen name="UsedBuyList" component={UsedBuyList} />
-      <Stack.Screen name="UsedBidList" component={UsedBidList} />      
+      <Stack.Screen name="UsedBidList" component={UsedBidList} />
+      <Stack.Screen name="UsedLike" component={UsedLike} />
+      <Stack.Screen name="UsedLikeView" component={UsedLikeView} />
+      <Stack.Screen name="MatchReq" component={MatchReq} />
+      <Stack.Screen name="MatchComparison" component={MatchComparison} />
+      <Stack.Screen name="MatchComparisonView" component={MatchComparisonView} />
+      <Stack.Screen name="MatchOrder" component={MatchOrder} />
+      <Stack.Screen name="MatchDownUsed" component={MatchDownUsed} />
+      <Stack.Screen name="MatchDownUsedView" component={MatchDownUsedView} />
       
     </Stack.Navigator>
   )

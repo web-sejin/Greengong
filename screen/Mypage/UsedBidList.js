@@ -112,6 +112,7 @@ const UsedBidList = ({navigation, route}) => {
           <Text style={styles.matchPriceText2}>{item.price2}원</Text>
         </View>
       </View>
+      
       <View style={styles.btnBox}>
         {tabState == 1 ? (
         <>
@@ -163,6 +164,10 @@ const UsedBidList = ({navigation, route}) => {
           ) : null }
 
           {item.state2 == 3 ? (
+          <>
+          <View style={styles.btn3TextBox}>
+            <Text style={styles.btn3TextBoxText}>가격 입찰 제안이 수락되었습니다.</Text>
+          </View>
           <TouchableOpacity
             style={[styles.btn, styles.btn2, styles.btn3]}
             activeOpacity={opacityVal}
@@ -172,6 +177,7 @@ const UsedBidList = ({navigation, route}) => {
           >
             <Text style={styles.btnText}>채팅하기</Text>
           </TouchableOpacity>
+          </>
           ) : null }
         </>
         ) : null }
@@ -300,13 +306,14 @@ const styles = StyleSheet.create({
   matchPrice: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',backgroundColor:'#F3FAF8',borderRadius:12,paddingVertical:10,paddingHorizontal:15,marginTop:10,},
   matchPriceText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:20,color:'#353636'} ,
   matchPriceText2: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:20,color:'#31B481'},
-  btnBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',paddingHorizontal:20,marginTop:10,},
+  btnBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',flexWrap:'wrap',paddingHorizontal:20,marginTop:10,},
   btn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:"center",justifyContent:'center'},
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},
   btn4: {backgroundColor:'#fff',borderWidth:1,borderColor:'#000',},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
   btnText2: {color:'#353636',},
+  btn3TextBox: {},
 })
 
 export default UsedBidList

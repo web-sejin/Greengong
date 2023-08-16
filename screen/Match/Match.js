@@ -125,7 +125,7 @@ const Match = ({navigation, route}) => {
 			}}
 		>
 			<>
-			<AutoHeightImage width={95} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+			<AutoHeightImage width={99} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
 			<View style={styles.listInfoBox}>
 				<View style={styles.listInfoTitle}>
 					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
@@ -569,14 +569,14 @@ const styles = StyleSheet.create({
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	listImg: {borderRadius:8},
-	listInfoBox: {width:(innerWidth - 95),paddingLeft:15,},
+	listInfoBox: {width:(innerWidth - 99),paddingLeft:15,},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
-	listInfoDesc: {marginTop:8},
+	listInfoDesc: {marginTop:5},
 	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#888'},
-	listInfoCate: {marginTop:8},
+	listInfoCate: {marginTop:5},
 	listInfoCateText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:19,color:'#353636'},
-	listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:13,},
+	listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
 	listInfoCntBox: {display:'flex',flexDirection:'row',alignItems:'center',marginRight:15,},
 	listInfoCntBox2: {marginRight:0},
 	listInfoCntBoxText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#000',marginLeft:4,},

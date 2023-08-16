@@ -71,102 +71,106 @@ const MatchComplete = ({navigation, route}) => {
           </View>
         </View>
         <View style={styles.borderTop}>
-          <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst]}>                   
-            <TouchableOpacity 
-              style={[styles.compBtn]}
-              onPress={() => {
-                if(mbId && mbId==1){
-                  setMbId();
-                }else{
-                  setMbId(1);
-                }
-              }}
-            >
-              <View style={[styles.compWrap, styles.compWrapFst]}>
-                <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
-                  <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-                </View>
-                <View style={styles.compInfo}>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
-                  </View>
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>참좋은공장</Text>
-                  </View>
-                  <View style={styles.compInfoLoc}>
-                    <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                    <Text style={styles.compInfoLocText}>중3동</Text>
-                  </View>
-                </View>
-                <View style={styles.compThumb}>
-                  <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-                </View>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>가격</Text>
-                <Text style={styles.matchPriceText2}>30,000원</Text>
-              </View>            
-            </TouchableOpacity>
-            <View style={styles.btnBox}>
-              <TouchableOpacity
-                style={styles.btn}
-                activeOpacity={opacityVal}
-                onPress={()=>{}}
-              >
-                <Text style={styles.btnText}>회사소개서 받기</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn2]}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  navigation.navigate('EstimateResult', {});
+          <View style={[styles.matchCompleteMb]}>
+            <View style={[styles.matchCompleteMbWrap, styles.matchCompleteMbFst]}>
+              <TouchableOpacity 
+                style={[styles.compBtn]}
+                onPress={() => {
+                  if(mbId && mbId==1){
+                    setMbId();
+                  }else{
+                    setMbId(1);
+                  }
                 }}
               >
-                <Text style={styles.btnText}>견적서 보기</Text>
+                <View style={[styles.compWrap, styles.compWrapFst]}>
+                  <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
+                    <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
+                  </View>
+                  <View style={styles.compInfo}>
+                    <View style={styles.compInfoDate}>
+                      <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
+                    </View>
+                    <View style={styles.compInfoName}>
+                      <Text style={styles.compInfoNameText}>참좋은공장</Text>
+                    </View>
+                    <View style={styles.compInfoLoc}>
+                      <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+                      <Text style={styles.compInfoLocText}>중3동</Text>
+                    </View>
+                  </View>
+                  <View style={styles.compThumb}>
+                    <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
+                  </View>
+                </View>
+                <View style={styles.matchPrice}>
+                  <Text style={styles.matchPriceText}>가격</Text>
+                  <Text style={styles.matchPriceText2}>30,000원</Text>
+                </View>            
               </TouchableOpacity>
-            </View>
-            <View style={styles.btnBox}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn3]}
-                activeOpacity={opacityVal}
-                onPress={()=>{}}
-              >
-                <Text style={styles.btnText}>회사소개서 받기</Text>
-              </TouchableOpacity>
-            </View>   
+              <View style={styles.btnBox}>
+                <TouchableOpacity
+                  style={styles.btn}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{}}
+                >
+                  <Text style={styles.btnText}>회사소개서 받기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.btn, styles.btn2]}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{
+                    navigation.navigate('EstimateResult', {});
+                  }}
+                >
+                  <Text style={styles.btnText}>견적서 보기</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.btnBox}>
+                <TouchableOpacity
+                  style={[styles.btn, styles.btn3]}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{}}
+                >
+                  <Text style={styles.btnText}>회사소개서 받기</Text>
+                </TouchableOpacity>
+              </View>   
+            </View>    
           </View>
           <View style={styles.matchCompleteMb}>
-            <TouchableOpacity 
-              style={[styles.compBtn]}
-              onPress={() => {
-                if(mbId && mbId==2){
-                  setMbId();
-                }else{
-                  setMbId(2);
-                }
-              }}
-            >
-              <View style={styles.compWrap}>
-                <View style={[styles.compRadio, mbId==2 ? styles.comRadioChk : null]}>
-                  <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-                </View>
-                <View style={styles.compInfo}>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
+            <View style={[styles.matchCompleteMbWrap]}>
+              <TouchableOpacity 
+                style={[styles.compBtn]}
+                onPress={() => {
+                  if(mbId && mbId==2){
+                    setMbId();
+                  }else{
+                    setMbId(2);
+                  }
+                }}
+              >
+                <View style={styles.compWrap}>
+                  <View style={[styles.compRadio, mbId==2 ? styles.comRadioChk : null]}>
+                    <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
                   </View>
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>참좋은공장</Text>
+                  <View style={styles.compInfo}>
+                    <View style={styles.compInfoDate}>
+                      <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
+                    </View>
+                    <View style={styles.compInfoName}>
+                      <Text style={styles.compInfoNameText}>참좋은공장</Text>
+                    </View>
+                    <View style={styles.compInfoLoc}>
+                      <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+                      <Text style={styles.compInfoLocText}>중3동</Text>
+                    </View>
                   </View>
-                  <View style={styles.compInfoLoc}>
-                    <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                    <Text style={styles.compInfoLocText}>중3동</Text>
+                  <View style={styles.compThumb}>
+                    <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
                   </View>
                 </View>
-                <View style={styles.compThumb}>
-                  <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-                </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -322,11 +326,12 @@ const styles = StyleSheet.create({
   nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
-  matchCompleteMb: {paddingVertical:30,borderTopWidth:1,borderColor:'#E9EEF6',},
+  matchCompleteMb: {paddingHorizontal:20,},
+  matchCompleteMbWrap: {paddingVertical:30,borderTopWidth:1,borderColor:'#E9EEF6',},
   matchCompleteMbFst: {borderTopWidth:0,},
-  compBtn: {paddingHorizontal:20},
+  compBtn: {},
   compWrap: {display:'flex',flexDirection:'row',justifyContent:'space-between',position:'relative',paddingLeft:31},
-  compRadio: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,position:'absolute',top:30,left:0,display:'flex',alignItems:'center',justifyContent:'center'},
+  compRadio: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,position:'absolute',top:0,left:0,display:'flex',alignItems:'center',justifyContent:'center'},
   comRadioChk: {backgroundColor:'#31B481',borderColor:'#31B481',},
   compInfo: {width:(innerWidth-110)},
   compInfoDate: {},
@@ -352,7 +357,7 @@ const styles = StyleSheet.create({
   matchPrice: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',backgroundColor:'#F3FAF8',borderRadius:12,paddingVertical:10,paddingHorizontal:15,marginTop:15,},
   matchPriceText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:20,color:'#353636'} ,
   matchPriceText2: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:20,color:'#31B481'},
-  btnBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',paddingHorizontal:20,marginTop:10,},
+  btnBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'space-between',marginTop:10,},
   btn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#353636',borderRadius:12,display:'flex',alignItems:"center",justifyContent:'center'},
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},

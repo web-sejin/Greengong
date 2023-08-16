@@ -136,7 +136,7 @@ const Home = ({navigation, route}) => {
 			}}
 		>
 			<>
-			<AutoHeightImage width={125} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
+			<AutoHeightImage width={131} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
 			<View style={styles.listInfoBox}>
 				<View style={styles.listInfoTitle}>
 					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
@@ -629,19 +629,19 @@ const styles = StyleSheet.create({
 	filterLabelText: {fontSize:13,lineHeight:17,color:'#fff'},
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	listImg: {borderRadius:8},
-	listInfoBox: {width:(innerWidth - 125),paddingLeft:15,},
+	listImg: {borderRadius:12},
+	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
-	listInfoDesc: {marginTop:8},
+	listInfoDesc: {marginTop:5},
 	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#888'},
-	listInfoCate: {marginTop:8},
+	listInfoCate: {marginTop:5},
 	listInfoCateText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:19,color:'#353636'},
-	listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:13,},
+	listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
 	listInfoCntBox: {display:'flex',flexDirection:'row',alignItems:'center',marginRight:15,},
 	listInfoCntBox2: {marginRight:0},
 	listInfoCntBoxText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#000',marginLeft:4,},
-	listInfoPriceBox: {marginTop:10},
+	listInfoPriceBox: {marginTop:8},
 	listInfoPriceArea: {display:'flex',flexDirection:'row',alignItems:'center'},
 	listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,borderRadius:12,marginRight:8,},
 	listInfoPriceState1: {backgroundColor:'#31B481'},

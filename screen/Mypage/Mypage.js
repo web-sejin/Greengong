@@ -131,7 +131,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('UsedLike', {});
+								}}			
 							>
 								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage4.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>관심목록</Text>
@@ -147,7 +149,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('MatchReq', {});
+								}}			
 							>
 								<AutoHeightImage width={25} source={require("../../assets/img/icon_mypage5.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>요청내역</Text>
@@ -155,7 +159,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('MatchComparison', {});
+								}}				
 							>
 								<AutoHeightImage width={31} source={require("../../assets/img/icon_mypage6.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>비교내역</Text>
@@ -163,7 +169,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('MatchOrder', {});
+								}}			
 							>
 								<AutoHeightImage width={22} source={require("../../assets/img/icon_mypage7.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>발주내역</Text>
@@ -171,7 +179,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {									
+									navigation.navigate('MatchDownUsed', {});
+								}}			
 							>
 								<AutoHeightImage width={29} source={require("../../assets/img/icon_mypage8.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>도면권한</Text>

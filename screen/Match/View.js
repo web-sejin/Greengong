@@ -316,8 +316,8 @@ const MatchView = ({navigation, route}) => {
             style={[styles.nextBtn]}
             activeOpacity={opacityVal}
             onPress={() => {
-              //navigation.navigate('DownUsed', {}); //도면 다운로드 허용
-              setVisible2(true); //도면받기
+              navigation.navigate('DownUsed', {}); //도면 다운로드 허용
+              //setVisible2(true); //도면받기
             }}
           >
             <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
