@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   listInfoStateText2: {backgroundColor:'#31B481'},
   completeBox: {width:innerWidth,marginTop:15,paddingTop:10,borderTopWidth:1,borderColor:'#E3E3E4'},
   completeBoxText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000',},
-  notData: {display:'flex',alignItems:'center',padding:60,},
+  notData: {height:(widnowHeight-170),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 

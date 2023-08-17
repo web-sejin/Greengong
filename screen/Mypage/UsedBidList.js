@@ -314,6 +314,8 @@ const styles = StyleSheet.create({
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
   btnText2: {color:'#353636',},
   btn3TextBox: {},
+  notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
 export default UsedBidList

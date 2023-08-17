@@ -714,7 +714,7 @@ const styles = StyleSheet.create({
 	input2: {width:(innerWidth - 90)},
 	input3: {width:(innerWidth - 120)},
   input4: {width:((innerWidth/2)-5)},
-	textarea: {height:230,borderRadius:8,textAlignVertical:"top",padding:12,},
+	textarea: {height:230,borderRadius:12,textAlignVertical:"top",padding:12,},
 	inputContainer: {},
 	selectArr: {position:'absolute',top:25.5,right:20,},
 	certChkBtn: {width:80,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#353636',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},

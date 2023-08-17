@@ -140,29 +140,30 @@ const UsedLike = ({navigation, route}) => {
   const getList2 = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
-      <TouchableOpacity
-        style={[styles.listLi]}
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('UsedLikeView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
-        }}
-      >    
-        <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
-        <View style={[styles.listInfoBox, styles.listInfoBox2]}>
+      <View style={[styles.listLi, styles.listLi2]}>   
+        <TouchableOpacity
+          style={styles.otherPeople}
+          activeOpacity={opacityVal}
+        >
+          <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
+        </TouchableOpacity> 
+        <TouchableOpacity 
+          style={[styles.listInfoBox, styles.listInfoBox2]}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedLikeView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+          }}
+        >
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.title}
             </Text>
           </View>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.listLikeBtn, styles.listLikeBtn2]}
-        activeOpacity={opacityVal}
-        onPress={()=>{}}
-      >
-        <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
-      </TouchableOpacity>
+          <View style={[styles.listLikeBtn, styles.listLikeBtn2]}>
+            <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
+          </View>
+        </TouchableOpacity>
+      </View>      
 			</>
 		</View>
 	);
@@ -173,7 +174,7 @@ const UsedLike = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setIsLoading(false);
+				//setIsLoading(false);
         setTabState(1);
 			}
 		}else{
@@ -284,10 +285,12 @@ const styles = StyleSheet.create({
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
   listLi: {display:'flex',flexDirection:'row',alignItems:'center',padding:20,},
+  listLi2: {alignItems:'stretch',paddingVertical:0,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	listImg: {borderRadius:12},
-	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,paddingRight:50,position:'relative'},
-  listInfoBox2: {width:(innerWidth - 50),},
+  otherPeople: {paddingVertical:20,},
+	listImg: {borderRadius:50},
+	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,paddingRight:40,position:'relative',},
+  listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
 	listInfoDesc: {marginTop:5},
@@ -303,8 +306,8 @@ const styles = StyleSheet.create({
   listInfoStateBox: {width:78,height:23,backgroundColor:'#fff',borderWidth:1,borderColor:'#000',borderRadius:20,position:'absolute',right:0,bottom:0,display:'flex',alignItems:'center',justifyContent:'center',},
   listInfoStateBoxText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:21,color:'#353636',},
   listLikeBtn: {width:42,height:40,position:'absolute',top:10,right:10,display:'flex',alignItems:'center',justifyContent:'center',},
-  listLikeBtn2: {top:26,},
-	notData: {display:'flex',alignItems:'center',padding:60,},
+  listLikeBtn2: {top:25,right:0,},
+	notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 

@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   listInfoStateText: {display:'flex',alignItems:'center',justifyContent:'center',height:24,paddingHorizontal:10,backgroundColor:'#797979',
   borderRadius:12,fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:29,color:'#fff',},
   listInfoStateText2: {backgroundColor:'#31B481'},  
-  notData: {display:'flex',alignItems:'center',padding:60,},
+  notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 

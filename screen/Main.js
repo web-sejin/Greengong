@@ -64,6 +64,19 @@ import MatchComparisonView from './Mypage/MatchComparisonView'; //마이페이�
 import MatchOrder from './Mypage/MatchOrder'; //마이페이지 발주내역
 import MatchDownUsed from './Mypage/MatchDownUsed'; //마이페이지 도면권한요청내역
 import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 뷰
+import Keyword from './Mypage/Keyword'; //마이페이지 키워드 등록
+import Message from './Mypage/Message'; //마이페이지 자주쓰는메세지
+import MessageWrite from './Mypage/Message_write'; //마이페이지 자주쓰는메세지 작성
+import MessageModify from './Mypage/MessageModify'; //마이페이지 자주쓰는메세지 수정
+import BlockList from './Mypage/BlockList'; //마이페이지 차단사용자관리
+import LikeList from './Mypage/LikeList'; //마이페이지 관심사용자관리
+import FaqList from './Mypage/FaqList'; //마이페이지 고객센터1
+import FaqList2 from './Mypage/FaqList2'; //마이페이지 고객센터2
+import FaqView from './Mypage/FaqView'; //마이페이지 고객센터 뷰
+import Privacy from './Mypage/Privacy'; //마이페이지 약관
+import QnaList from './Mypage/QnaList'; //마이페이지 1:1문의
+import NoticeList from './Mypage/NoticeList'; //마이페이지 공지사항
+import NoticeView from './Mypage/NoticeView'; //마이페이지 공지사항 뷰
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
@@ -251,6 +264,17 @@ const StackNavigator = () => {
       <Stack.Screen name="MatchOrder" component={MatchOrder} />
       <Stack.Screen name="MatchDownUsed" component={MatchDownUsed} />
       <Stack.Screen name="MatchDownUsedView" component={MatchDownUsedView} />
+      <Stack.Screen name="Keyword" component={Keyword} />
+      <Stack.Screen name="Message" component={Message} />
+      <Stack.Screen name="MessageWrite" component={MessageWrite} />
+      <Stack.Screen name="MessageModify" component={MessageModify} />
+      <Stack.Screen name="BlockList" component={BlockList} />
+      <Stack.Screen name="LikeList" component={LikeList} />
+      <Stack.Screen name="FaqList" component={FaqList} />
+      <Stack.Screen name="FaqList2" component={FaqList2} />
+      <Stack.Screen name="FaqView" component={FaqView} />
+      <Stack.Screen name="Privacy" component={Privacy} />
+      <Stack.Screen name="QnaList" component={QnaList} />
       
     </Stack.Navigator>
   )

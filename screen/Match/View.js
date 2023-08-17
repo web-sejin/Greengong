@@ -214,7 +214,14 @@ const MatchView = ({navigation, route}) => {
         </Swiper>
         <View style={[styles.viewBox1]}>
           <View style={styles.profileBox}>
-            <AutoHeightImage width={58} source={require("../../assets/img/profile_img.png")} />
+            <TouchableOpacity
+              activeOpacity={opacityVal}
+              onPress={()=>{
+                
+              }}
+            >
+              <AutoHeightImage width={58} source={require("../../assets/img/profile_img.png")} />
+            </TouchableOpacity>
             <View style={styles.profileBoxInfo}>
               <View style={styles.profileName}>
                 <Text style={styles.profileNameText}>홍길동</Text>

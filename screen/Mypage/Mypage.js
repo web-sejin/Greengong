@@ -197,28 +197,36 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {									
+									navigation.navigate('Keyword', {});
+								}}
 							>
 								<Text style={styles.mypageLinkListBtnText}>키워드 등록</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('Message', {});
+								}}			
 							>
 								<Text style={styles.mypageLinkListBtnText}>자주 쓰는 메세지</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('BlockList', {});
+								}}			
 							>
 								<Text style={styles.mypageLinkListBtnText}>차단 사용자 관리</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('LikeList', {});
+								}}		
 							>
 								<Text style={styles.mypageLinkListBtnText}>관심 사용자 관리</Text>
 							</TouchableOpacity>
@@ -233,7 +241,9 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('FaqList', {});
+								}}	
 							>
 								<Text style={styles.mypageLinkListBtnText}>고객센터</Text>
 							</TouchableOpacity>
@@ -247,23 +257,29 @@ const Mypage = ({navigation, route}) => {
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('Privacy', {tit:'서비스 이용약관', para:1});
+								}}			
 							>
 								<Text style={styles.mypageLinkListBtnText}>서비스 이용약관</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('Privacy', {tit:'개인정보 처리방침', para:2});
+								}}			
 							>
 								<Text style={styles.mypageLinkListBtnText}>개인정보 처리방침</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {}}			
+								onPress={() => {
+									navigation.navigate('Privacy', {tit:'위치기반 서비스', para:3});
+								}}			
 							>
-								<Text style={styles.mypageLinkListBtnText}>위치기반서비스</Text>
+								<Text style={styles.mypageLinkListBtnText}>위치기반 서비스</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}

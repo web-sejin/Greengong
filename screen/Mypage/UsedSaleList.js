@@ -169,7 +169,7 @@ const SaleList = ({navigation, route}) => {
   useEffect(() => {
     setTimeout(function(){
       setIsLoading(true);
-    }, 2000);
+    }, 1000);
   }, []);
 
   function fnTab(v){
@@ -177,7 +177,7 @@ const SaleList = ({navigation, route}) => {
     setTabState(v);
     setTimeout(function(){
       setIsLoading(true);
-    }, 2000);
+    }, 1000);
   }
 
   function fnDelete(){
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#323232'},
   listInfoDate: {},
   listInfoDateText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#B5B5B5'},
-	notData: {height:widnowHeight-200,display:'flex',alignItems:'center',justifyContent:'center',},
+	notData: {height:widnowHeight-220,display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},

@@ -112,21 +112,22 @@ const UsedLikeView = ({navigation, route}) => {
         renderItem={(getList)}
         keyExtractor={item => item.id}
         ListHeaderComponent={
-          <View style={[styles.listLi, styles.borderBot]}>
-            <>   
-            <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
+          <View style={[styles.listLi, styles.listLi2, styles.borderBot]}>
+            <>
+            <TouchableOpacity
+              style={styles.otherPeople}
+              activeOpacity={opacityVal}
+            >
+              <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
+            </TouchableOpacity>
             <View style={[styles.listInfoBox, styles.listInfoBox2]}>
               <View style={styles.listInfoTitle}>
                 <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>참좋은공장</Text>
               </View>
-            </View>
-            <TouchableOpacity
-              style={[styles.listLikeBtn, styles.listLikeBtn2]}
-              activeOpacity={opacityVal}
-              onPress={()=>{}}
-            >
-              <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
-            </TouchableOpacity>
+              <View style={[styles.listLikeBtn, styles.listLikeBtn2]}>
+                <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
+              </View>
+            </View>            
             </>
           </View>
         }
@@ -148,10 +149,12 @@ const styles = StyleSheet.create({
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
   listLi: {display:'flex',flexDirection:'row',alignItems:'center',padding:20,},
+  listLi2: {alignItems:'stretch',paddingVertical:0,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	listImg: {borderRadius:12},
+  otherPeople: {paddingVertical:20,},
+	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,position:'relative'},
-  listInfoBox2: {width:(innerWidth - 50),paddingRight:50,},
+  listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},
   listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
   listInfoPriceBox: {marginTop:5},
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
   listInfoStateBox: {width:78,height:23,backgroundColor:'#fff',borderWidth:1,borderColor:'#000',borderRadius:20,position:'absolute',right:0,bottom:0,display:'flex',alignItems:'center',justifyContent:'center',},
   listInfoStateBoxText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:21,color:'#353636',},
   listLikeBtn: {width:42,height:40,position:'absolute',top:10,right:10,display:'flex',alignItems:'center',justifyContent:'center',},
-  listLikeBtn2: {top:26,},
+  listLikeBtn2: {top:25,right:0,},
 })
 
 export default UsedLikeView

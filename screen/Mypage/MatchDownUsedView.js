@@ -164,7 +164,7 @@ const MatchDownUsedView = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={pageTitle} />
-      <View style={[styles.listLi]}>
+      <View style={[styles.listLi, usedState != 1 ? styles.listLi2 : null]}>
         <>
         <AutoHeightImage width={99} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
         <View style={styles.listInfoBox}>
@@ -270,6 +270,7 @@ const MatchDownUsedView = ({navigation, route}) => {
 const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},  
   listLi: {display:'flex',flexDirection:'row',flexWrap:'wrap',padding:20,paddingBottom:0,},
+  listLi2: {paddingBottom:20,borderBottomWidth:1,borderBottomColor:'#E9EEF6'},
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 99),paddingLeft:15,},
 	listInfoTitle: {},
