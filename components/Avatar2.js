@@ -17,6 +17,7 @@ import Font from "../assets/common/Font";
 
 const widnowWidth = Dimensions.get('window').width;
 const widnowHeight = Dimensions.get('window').height;
+const opacityVal = 0.8;
 
 interface AvatarProps extends ImageProps {
   onChange?: (file: ImageOrVideo) => void;
@@ -63,12 +64,14 @@ export const Avatar2 = (props: AvatarProps) => {
 		<View style={styles.avatarBtnBox}>
       <TouchableOpacity 
 				style={styles.avatarBtn}
+        activeOpacity={opacityVal}
 				onPress={openCamera}
 			>
         <Text style={styles.avatarBtnText}>카메라</Text>
       </TouchableOpacity>
       <TouchableOpacity 
 				style={[styles.avatarBtn, styles.avatarBtn2]}
+        activeOpacity={opacityVal}
 				onPress={chooseImage}
 			>
         <Text style={[styles.avatarBtnText, styles.avatarBtnText2]}>앨범</Text>

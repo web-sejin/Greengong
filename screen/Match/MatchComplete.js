@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   compInfoLocText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:15,color:'#000',marginLeft:5,},
   compThumb: {width:79,height:79,borderRadius:50,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'},
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
-	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
+	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},	
   modalCont2: {top:((widnowHeight/2)-166)},
   avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
 	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},

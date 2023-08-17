@@ -575,6 +575,7 @@ const styles = StyleSheet.create({
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
+  
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},
   modalCont2: {width:innerWidth,borderRadius:10,position:'absolute',left:20,bottom:35},
@@ -586,7 +587,7 @@ const styles = StyleSheet.create({
 	cancel: {backgroundColor:'#fff',borderRadius:12,marginTop:10,},
 	modalCont2BtnText: {fontFamily:Font.NotoSansMedium,fontSize:19,color:'#007AFF'},
 	modalCont2BtnText2: {color:'#DF4339'},
-  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-120)},
+  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},
   modalCont4: {top:((widnowHeight/2)-160)},
   avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
 	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},

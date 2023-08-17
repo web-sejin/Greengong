@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   boView: {padding:20,paddingBottom:20,},
   boViewTit: {},
   boViewTitText: {fontFamily:Font.NotoSansBold,fontSize:18,lineHeight:23,color:'#191919',},
-  boViewCont: {padding:20,backgroundColor:'#fdfdfd',borderTopWidth:2,borderTopColor:'#191919',borderBottomWidth:1,borderBottomColor:'#ECECEC',marginTop:20,},
+  boViewCont: {padding:20,paddingBottom:30,backgroundColor:'#fdfdfd',borderTopWidth:2,borderTopColor:'#191919',borderBottomWidth:1,borderBottomColor:'#ECECEC',marginTop:20,},
   boViewContText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:23,color:'#000'},
   boBackBtn: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#000',borderRadius:12,display:'flex', alignItems:'center', justifyContent:'center',marginTop:35,},
   boBackBtnText:{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:22,color:'#000'},

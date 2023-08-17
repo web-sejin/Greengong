@@ -16,6 +16,7 @@ import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import Font from "../assets/common/Font";
 
 const widnowWidth = Dimensions.get('window').width;
+const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
@@ -23,7 +24,7 @@ interface AvatarProps extends ImageProps {
   onChange?: (file: ImageOrVideo) => void;
 }
 
-export const Avatar = (props: AvatarProps) => {
+export const Avatar3 = (props: AvatarProps) => {
   const [uri, setUri] = React.useState(props.source?.uri || undefined);
   const [visible, setVisible] = React.useState(false);
   const close = () => setVisible(false);
@@ -58,35 +59,28 @@ export const Avatar = (props: AvatarProps) => {
 
   return (
     <>
-    <View style={styles.avatarTitle}>
-      <Text style={styles.avatarTitleText}>사업자등록증 사진</Text>
-    </View>
-		<View style={styles.avatarBtnBox}>
-      <TouchableOpacity 
-				style={styles.avatarBtn}
-        activeOpacity={opacityVal}
-				onPress={openCamera}
-			>
-        <Text style={styles.avatarBtnText}>카메라</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-				style={[styles.avatarBtn, styles.avatarBtn2]}
-        activeOpacity={opacityVal}
-				onPress={chooseImage}
-			>
-        <Text style={[styles.avatarBtnText, styles.avatarBtnText2]}>앨범</Text>
-      </TouchableOpacity>
-		</View>    
+    <TouchableOpacity 
+      style={[styles.modalCont2Btn, styles.choice]}
+      onPress={openCamera}
+    >
+      <Text style={styles.modalCont2BtnText}>카메라</Text>
+    </TouchableOpacity>
+    <TouchableOpacity 
+      style={[styles.modalCont2Btn, styles.modify]}
+      onPress={chooseImage}
+    >
+      <Text style={[styles.modalCont2BtnText]}>앨범</Text>
+    </TouchableOpacity>  
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  avatarTitle: {},
-	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'},
-	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:15,},
-	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#F3FAF8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
-	avatarBtn2: {backgroundColor:'#31B481'},
-	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#000'},
-	avatarBtnText2: {color:'#fff'},
+  modalCont2Btn: {width:innerWidth,height:58,backgroundColor:'#F1F1F1',display:'flex',alignItems:'center',justifyContent:'center',},
+	choice: {borderTopLeftRadius:12,borderTopRightRadius:12,borderBottomWidth:1,borderColor:'#B1B1B1'},
+	modify: {borderBottomWidth:1,borderColor:'#B1B1B1'},
+	delete: {borderBottomLeftRadius:12,borderBottomRightRadius:12,},
+	cancel: {backgroundColor:'#fff',borderRadius:12,marginTop:10,},
+	modalCont2BtnText: {fontFamily:Font.NotoSansMedium,fontSize:19,color:'#007AFF'},
+	modalCont2BtnText2: {color:'#DF4339'},
 });

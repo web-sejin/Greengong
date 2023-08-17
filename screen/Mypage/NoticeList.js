@@ -39,7 +39,26 @@ const NoticeList = ({navigation, route}) => {
   const dataLen = DATA.length;
 
   const getList = ({item, index}) => (    
-    <View><Text>test</Text></View>
+    <TouchableOpacity
+      style={styles.noticeBtn}
+      activeOpacity={opacityVal}
+      onPress={()=>{
+        navigation.navigate('NoticeView', {idx:item.id})
+      }}
+    >
+      <View style={[styles.noticeWrap]}>
+        <View style={styles.noticeListCont}>
+          <View style={styles.noticeTit}>
+            <Text style={styles.noticeTitSort}>[공지]</Text>
+            <Text style={styles.noticeTitText}>시스템 점검 안내</Text>
+          </View>
+          <View style={styles.noticeDate}>
+            <Text style={styles.noticeDateText}>2023.02.02</Text>
+          </View>
+        </View>
+        <AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} />
+      </View>
+    </TouchableOpacity>
 	);
 
 	const isFocused = useIsFocused();
@@ -67,15 +86,17 @@ const NoticeList = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'공지사항'} />
-			<ScrollView>
-        <View style={styles.noticeList}>
-          <TouchableOpacity>
-            <View>
-              <Text>[공지]</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+			<FlatList
+				data={DATA}
+				renderItem={(getList)}
+				keyExtractor={item => item.id}		
+				ListEmptyComponent={
+					<View style={styles.notData}>
+						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+						<Text style={styles.notDataText}>등록된 공지사항이 없습니다.</Text>
+					</View>
+				}
+      />
 		</SafeAreaView>
 	)
 }
@@ -86,6 +107,16 @@ const styles = StyleSheet.create({
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
 	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
+  notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
+  noticeBtn: {paddingHorizontal:20,},
+  noticeWrap: {paddingVertical:20,borderBottomWidth:1,borderColor:'#EDEDED',display:'flex',flexDirection:'row',alignItems:'center'},
+  noticeListCont: {width:(innerWidth-17),},
+  noticeTit: {display:'flex',flexDirection:'row',alignItems:'center'},
+  noticeTitSort: {width:45,fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:22,color:'#000'},
+  noticeTitText: {width:(innerWidth-62),fontFamily:Font.NotoSansMedium,fontSize:16,lineHeight:22,color:'#000'},
+  noticeDate: {marginTop:12,},
+  noticeDateText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#9C9C9C'},
 })
 
 export default NoticeList

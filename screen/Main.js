@@ -75,8 +75,12 @@ import FaqList2 from './Mypage/FaqList2'; //마이페이지 고객센터2
 import FaqView from './Mypage/FaqView'; //마이페이지 고객센터 뷰
 import Privacy from './Mypage/Privacy'; //마이페이지 약관
 import QnaList from './Mypage/QnaList'; //마이페이지 1:1문의
+import QnaView from './Mypage/QnaView'; //마이페이지 1:1문의 뷰
+import QnaWrite from './Mypage/QnaWrite'; //마이페이지 1:1문의 작성
+import QnaModify from './Mypage/QnaModify'; //마이페이지 1:1문의 수정
 import NoticeList from './Mypage/NoticeList'; //마이페이지 공지사항
 import NoticeView from './Mypage/NoticeView'; //마이페이지 공지사항 뷰
+import Profile from './Mypage/Profile'; //마이페이지 프로필 설정
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
@@ -275,6 +279,12 @@ const StackNavigator = () => {
       <Stack.Screen name="FaqView" component={FaqView} />
       <Stack.Screen name="Privacy" component={Privacy} />
       <Stack.Screen name="QnaList" component={QnaList} />
+      <Stack.Screen name="QnaView" component={QnaView} />
+      <Stack.Screen name="QnaWrite" component={QnaWrite} />
+      <Stack.Screen name="QnaModify" component={QnaModify} />
+      <Stack.Screen name="NoticeList" component={NoticeList} />
+      <Stack.Screen name="NoticeView" component={NoticeView} />
+      <Stack.Screen name="Profile" component={Profile} />
       
     </Stack.Navigator>
   )

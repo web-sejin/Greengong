@@ -141,7 +141,7 @@ const FaqList = ({navigation, route}) => {
 						navigation.navigate('QnaList');
 					}}
 				>
-					<Text style={styles.nextBtnText}>문의하기</Text>
+					<Text style={styles.nextBtnText}>1:1문의</Text>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>

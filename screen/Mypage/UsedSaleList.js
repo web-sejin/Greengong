@@ -321,11 +321,11 @@ const SaleList = ({navigation, route}) => {
 				></Pressable>
 				<View style={styles.modalCont3}>
 					<View style={styles.avatarTitle}>
-            <Text style={styles.avatarTitleText}>도면받기</Text>
+            <Text style={styles.avatarTitleText}>삭제</Text>
           </View>
           <View style={styles.avatarDesc}>
-            <Text style={styles.avatarDescText}>도면을 받아서 검토후 견적서를 발송하시겠습니까?</Text>
-            <Text style={styles.avatarDescText}>도면은 회원님의 메일로 발송이 됩니다.</Text>
+            <Text style={styles.avatarDescText}>삭제를 하면 다시 복구되지 않습니다.</Text>
+            <Text style={styles.avatarDescText}>채팅도 불가능하게 됩니다.</Text>
           </View>
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},
   modalCont2: {width:innerWidth,borderRadius:10,position:'absolute',left:20,bottom:35},
-  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-120)},
+  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},
 	modalCont2Box: {},
 	modalCont2Btn: {width:innerWidth,height:58,backgroundColor:'#F1F1F1',display:'flex',alignItems:'center',justifyContent:'center',},
 	choice: {borderTopLeftRadius:12,borderTopRightRadius:12,borderBottomWidth:1,borderColor:'#B1B1B1'},
