@@ -1,13 +1,11 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Image, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList,} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import Geolocation from 'react-native-geolocation-service';
 import Postcode from '@actbase/react-daum-postcode';
-import Toast from 'react-native-toast-message'
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -19,39 +17,24 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-let t1;
-let tcounter;
-let temp;
-
-const Register2 = ({navigation, route}) => {
+const MyCompany = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-
-	const [modal1, setModal1] = useState(false); //비밀번호 설정
-	const [modal2, setModal2] = useState(false); //공장 및 인증 정보 설정
-	const [modal3, setModal3] = useState(false); //내 공장1 정보 등록
+  const [visible, setVisible] = useState(false);
+  const [modal3, setModal3] = useState(false); //내 공장1 정보 등록
 	const [modal4, setModal4] = useState(false); //카메라,갤러리 선택
 	const [modal5, setModal5] = useState(false); //내 공장1 선택,등록,수정,삭제
 	const [modal6, setModal6] = useState(false); //내 공장2 정보 등록
 	const [modal7, setModal7] = useState(false); //내 공장2 선택,등록,수정,삭제
 	const [toastModal, setToastModal] = useState(false);
 	const [toastText, setToastText] = useState('');
-
-	const [mbHp, setMbHp] = useState('');
-	const [certNumber, setCertNumber] = useState('');
-	const [mbEmail, setMbEmail] = useState('');
-	const [mbNickname, setMbNickname] = useState('');
-	const [pw, setPw] = useState('');
-	const [pw2, setPw2] = useState('');
-	const [mbcompanyNumber, setMbCompanyNumber] = useState('');
+  const [mbcompanyNumber, setMbCompanyNumber] = useState('');
 	const [mbcompanyName, setMbCompanyName] = useState('');
 	const [mbName, setMbName] = useState('');
 	const [mbCompanyAddr, setMbCompanyAddr] = useState('');	
-	const [timeStamp, setTimeStamp] = useState('');
-	const [phoneIntervel, setPhoneInterval] = useState(false);
-	const [picture, setPickture] = useState('');	
-	const [state, setState] = useState(false);
-	const [factName1, setFactName1] = useState('');
+  const [picture, setPickture] = useState('');	
+  const [state, setState] = useState(true);
+  const [factName1, setFactName1] = useState('');
 	const [factCode1, setFactCode1] = useState('');
 	const [factAddr1, setFactAddr1] = useState('');
 	const [factAddrDt1, setFactAddrDt1] = useState('');
@@ -66,35 +49,24 @@ const Register2 = ({navigation, route}) => {
 	const [my1, setMy1] = useState(false);
 	const [my2, setMy2] = useState(false);
 
-	const isFocused = useIsFocused();
+  const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
 
 		if(!isFocused){
-			if(!pageSt){
-				setModal1(false);
-				setModal2(false);
-				setModal3(false);
+			if(!pageSt){			
+        setVisible(false);
+        setModal3(false);
 				setModal4(false);
 				setModal5(false);
 				setModal6(false);
-				setModal7(false);				
-				setToastModal(false);
-				setToastText('');
-				setMbHp('');
-				setCertNumber('');
-				setMbEmail('');
-				setMbNickname('');
-				setPw('');
-				setPw2('');
-				setMbCompanyNumber('');
+				setModal7(false);	
+        setMbCompanyNumber('');
 				setMbCompanyName('');
 				setMbName('');
 				setMbCompanyAddr('');
-				setPickture();
-				setState(false);
-				setTimeStamp('');
-				setPhoneInterval(false);
+        setPickture('');
+				setState(false);				
 				setLocation('');
 				setPostcodeOn(false);
 				setFactName1('');
@@ -121,104 +93,14 @@ const Register2 = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-	const timer_start = () => {
-		tcounter = 180;
-		t1 = setInterval(Timer, 1000);
-		//console.log(t1);
-	};
-
-	const Timer = () => {
-		//setPhoneInterval(false);
-		tcounter = tcounter - 1;
-		// temp = Math.floor(tcounter / 60);
-		// temp = temp + (tcounter % 60);
-
-		temp = Math.floor(tcounter/60);
-		if(Math.floor(tcounter/60) < 10)  temp = '0'+temp;
-		temp = temp + ":";
-		if((tcounter % 60) < 10)temp = temp + '0';
-		temp = temp + (tcounter % 60);
-
-		//console.log(temp);
-		setTimeStamp(temp);
-		//setIntervals(true); //실행중
-
-
-		if (tcounter <= 0) {
-				//timer_stop();
-				setPhoneInterval(false);
-		}
-	};
-
-	const _sendSmsButton = () => {
-		// console.log('sms');
-		if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
-			return false;
-		}
-
-		// timer_start();
-		if(phoneIntervel){
-			ToastMessage(tcounter + '초 후에 재발송할 수 있습니다.');
-			return false;
-		}
-
-		//setSmsRandNumber(randomNumber(6));
-		setPhoneInterval(true);
-	}
-
-	const _authComplete = () => {
-		if(tcounter <= 0){
-			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
-			return false;
-		 }
-		 timer_stop();
-		//  if(smsRandNumber == ransoo){
-		// 	setAuthTitle('인증확인');
-		// 	setPhoneInterval(false);
-		// 	setAuthButtonState(true);//인증버튼 비활성화
-		// 	ToastMessage('본인인증이 완료되었습니다.\n다음단계로 이동하세요.');
-		// 	setNextButtonState(false);
-		// 	return true;
-		//  }else{
-		// 	setAuthTitle('인증완료');
-		// 	setAuthButtonState(false); //인증버튼 비활성화
-		// 	ToastMessage('인증번호가 일치하지 않습니다.');
-		// 	setNextButtonState(true);
-		// 	return false;
-		//  }
-	}
-
-	const timer_stop = () => {
-		clearInterval(t1);
-		setTimeStamp('');
-		setPhoneInterval(false);
-	};
-
-	useEffect(()=>{
-		if(!phoneIntervel){
-			timer_stop();
-		}else{
-			timer_start();
-		}
-	},[phoneIntervel]);
-
-	const onAvatarChange = (image: ImageOrVideo) => {
+  const onAvatarChange = (image: ImageOrVideo) => {
     console.log(image);
 		setModal4(false);
 		setPickture(image.path);
     // upload image to server here 
   };
 
-	function nextStep(){
-		setModal1(true);
-	}
-
-	function nextStep2(){
-		setModal2(true);
-	}
-
-	function findMyPosition(v){
+  function findMyPosition(v){
 		Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
@@ -313,391 +195,253 @@ const Register2 = ({navigation, route}) => {
 
 	function submitRegist(){
 
-	}
+	}	
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'휴대폰, 이메일 설정'} />
+			<Header navigation={navigation} headertitle={'공장 및 인증 정보 설정'} />
 			<KeyboardAwareScrollView>
-				<View style={styles.registArea}>
-					<View style={[styles.registBox, styles.registBox3, styles.borderBot]}>
-						<View style={styles.alertBox}>
-							<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-							<Text style={styles.alertBoxText}>등록된 휴대폰 번호로 거래를 하실 수 있습니다.</Text>
-						</View>
+        <View style={styles.registArea}>
+          <View style={[styles.registBox, styles.registBox3]}>
+            <View style={styles.alertBox}>
+              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+              <Text style={styles.alertBoxText}>내 공장은 최대 2개 등록 가능합니다.</Text>
+              <Text style={[styles.alertBoxText, styles.alertBoxText2]}>최소 1개 등록 해야 하며, 가입 후 변경 가능합니다.</Text>
+            </View>
 
-						<View style={[styles.typingBox, styles.mgTop30]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>휴대폰 번호</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={mbHp}
-									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
-									placeholder={"휴대폰번호를 입력해 주세요."}
-									style={[styles.input, styles.input2]}
-									placeholderTextColor={"#8791A1"}
-									maxLength={11}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {_sendSmsButton()}}
-								>
-									<Text style={styles.certChkBtnText}>인증번호</Text>
-								</TouchableOpacity>
-							</View>
-							<View style={[styles.typingInputBox]}>
-								<TextInput
-									value={certNumber}
-									keyboardType = 'numeric'
-									onChangeText={(v) => {setCertNumber(v)}}
-									placeholder={"인증번호 입력"}
-									style={[styles.input]}
-									placeholderTextColor={"#8791A1"}
-									maxLength={11}
-								/>
-								<View style={styles.timeBox}>
-									<Text style={styles.timeBoxText}>
-										{timeStamp}
-									</Text>
-								</View>
-								<TouchableOpacity 
-									style={styles.certChkBtn2}
-									activeOpacity={opacityVal}
-									onPress={() => {_authComplete()}}
-								>
-									<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</View>
+            <View style={[styles.typingBox, styles.mgTop30]}>
+              <View style={styles.typingTitle}>
+                <Text style={styles.typingTitleText}>선택된 공장</Text>
+              </View>
 
-					<View style={[styles.registBox, styles.borderTop, styles.paddBot13]}>
-						<View style={[styles.typingBox]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>이메일</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									keyboardType='email-address'
-									value={mbEmail}
-									onChangeText={(v) => {setMbEmail(v)}}
-									placeholder={'이메일을 입력해 주세요.'}
-									placeholderTextColor="#C5C5C6"
-									style={[styles.input, styles.input2]}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {}}
-								>
-									<Text style={styles.certChkBtnText}>중복확인</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
+              {my1 ? (
+              <TouchableOpacity 
+                style={[styles.typingInputBox, styles.typingFactory, factActive=='1' ? styles.typingFactoryOn : null]}
+                activeOpacity={opacityVal}
+                onPress={()=>{setModal5(true)}}
+              >
+                <Text style={[styles.myFactoryText, styles.myFactoryText2, factActive=='1' ? styles.myFactoryTextOn : null]}>
+                  {factName1}
+                </Text>
+                <AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} style={styles.myFactoryArr} />
+              </TouchableOpacity>
+              ) : (
+              <TouchableOpacity 
+                style={[styles.typingInputBox, styles.typingFactory]}
+                activeOpacity={opacityVal}
+                onPress={()=>{setModal3(true)}}
+              >
+                <Text style={styles.myFactoryText}>
+                  내 공장1 등록하기
+                </Text>
+                <AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} style={styles.myFactoryArr} />
+              </TouchableOpacity>
+              )}
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>닉네임</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={mbNickname}									
-									onChangeText={(v) => {setMbNickname(v)}}
-									placeholder={"닉네임을 입력해 주세요."}
-									style={[styles.input, styles.input2]}
-									placeholderTextColor={"#8791A1"}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {}}
-								>
-									<Text style={styles.certChkBtnText}>중복확인</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</View>
+              {my2 ? (
+              <TouchableOpacity 
+                style={[styles.typingInputBox, styles.typingFactory, factActive=='2' ? styles.typingFactoryOn : null]}
+                activeOpacity={opacityVal}
+                onPress={()=>{setModal7(true)}}
+              >
+                <Text style={[styles.myFactoryText, styles.myFactoryText2, factActive=='2' ? styles.myFactoryTextOn : null]}>
+                  {factName2}
+                </Text>
+                <AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} style={styles.myFactoryArr} />
+              </TouchableOpacity>
+              ) : (
+              <TouchableOpacity 
+                style={[styles.typingInputBox, styles.typingFactory]}
+                activeOpacity={opacityVal}
+                onPress={()=>{setModal6(true)}}
+              >
+                <Text style={styles.myFactoryText}>
+                내 공장2 등록하기
+                </Text>
+                <AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} style={styles.myFactoryArr} />
+              </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={[styles.alertBox, styles.mgTop35]}>
+              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+              
+              {/* 공장및인증정보설정,미등록 */}
+              {/* <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text> */}
+              
+              {/* 사업자등록번호 정상 등록되어 있을 때 */}
+              <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text>
+
+              {/* 사업자등록증 관리자인증중 */}
+              {/* <Text style={styles.alertBoxText}>사업자등록증 인증중입니다.</Text> */}
+
+              {/* 사업자등록증 반려 */}
+              {/* <Text style={styles.alertBoxText}>사업자등록증이 반려되었습니다.</Text> */}
+            </View>
+            <View style={styles.inputAlert}>
+              <AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
+              <Text style={styles.inputAlertText}>사유 : 정상적인 사업자 번호가 아닙니다.</Text>
+            </View>
+
+            {!state ? (
+            <TouchableOpacity
+              style={styles.addBtn}
+              activeOpacity={opacityVal}
+              onPress={() => {setState(true)}}
+            >
+              <AutoHeightImage width={13} source={require("../../assets/img/icon_plus.png")} style={styles.icon_add} />
+              <Text style={styles.addBtnText}>등록</Text>
+            </TouchableOpacity>
+            ) : null}
+          </View>
+          {state ? (
+          <View style={[styles.registBox, styles.registBox2]}>
+            <View style={[styles.typingBox]}>
+              <View style={[styles.typingTitle, styles.typingTitleFlex]}>
+                <Text style={styles.typingTitleText}>사업자 번호</Text>
+                <TouchableOpacity 
+                  style={styles.resetBtn}
+                  activeOpacity={opacityVal}
+                  onPress={() => {setMbCompanyNumber()}}
+                >
+                  <AutoHeightImage width={13} source={require("../../assets/img/icon_reset.png")} style={styles.icon_reset} />
+                  <Text style={styles.resetBtnText}>초기화</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.typingInputBox]}>
+                <TextInput
+                  keyboardType='email-address'
+                  value={mbcompanyNumber}
+                  onChangeText={(v) => {setMbCompanyNumber(v)}}
+                  placeholder={'사업자 번호를 입력해 주세요.'}
+                  placeholderTextColor="#8791A1"
+                  style={[styles.input]}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.typingBox, styles.mgTop35]}>
+              <View style={styles.typingTitle}>
+                <Text style={styles.typingTitleText}>상호(법인명)</Text>
+              </View>
+              <View style={[styles.typingInputBox]}>
+                <TextInput
+                  value={mbcompanyName}									
+                  onChangeText={(v) => {setMbCompanyName(v)}}
+                  placeholder={"상호(법인명)을 입력해 주세요."}
+                  style={[styles.input]}
+                  placeholderTextColor={"#8791A1"}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.typingBox, styles.mgTop35]}>
+              <View style={styles.typingTitle}>
+                <Text style={styles.typingTitleText}>성명</Text>
+              </View>
+              <View style={[styles.typingInputBox]}>
+                <TextInput
+                  value={mbName}									
+                  onChangeText={(v) => {setMbName(v)}}
+                  placeholder={"성명을 입력해 주세요."}
+                  style={[styles.input]}
+                  placeholderTextColor={"#8791A1"}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.typingBox, styles.mgTop35]}>
+              <View style={styles.typingTitle}>
+                <Text style={styles.typingTitleText}>사업장 소재지</Text>
+              </View>
+              <View style={[styles.typingInputBox]}>
+                <TextInput
+                  value={mbCompanyAddr}									
+                  onChangeText={(v) => {setMbCompanyAddr(v)}}
+                  placeholder={"사업장 소재지를 입력해 주세요."}
+                  style={[styles.input]}
+                  placeholderTextColor={"#8791A1"}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.typingBox, styles.mgTop35]}>
+              <View style={styles.typingTitle}>
+                <Text style={styles.typingTitleText}>사업자등록증 사진</Text>
+              </View>
+              <View style={styles.compImgBox}>
+                <TouchableOpacity
+                  activeOpacity={opacityVal}						
+                  onPress={() => {setModal4(true);}}
+                >
+                  {picture ? (
+                    <AutoHeightImage width={102} source={{uri: picture}} />
+                  ) : (
+                    <AutoHeightImage 
+                      width={102} 
+                      source={require("../../assets/img/pick_photo.jpg")}
+                      style={[styles.photoBox]}
+                    />
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.compImgBoxDelete}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{setVisible(true)}}
+                >
+                  <AutoHeightImage width={25} source={require("../../assets/img/icon_delete2.png")} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          ) : null}
+        </View>
+      </KeyboardAwareScrollView>
+      <View style={styles.nextFix}>
+        <TouchableOpacity 
+          style={styles.nextBtn}
+          activeOpacity={opacityVal}
+          onPress={() => submitRegist()}
+        >
+          <Text style={styles.nextBtnText}>수정</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={visible}
+				transparent={true}
+				onRequestClose={() => {setVisible(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVisible(false)}}
+				></Pressable>
+				<View style={[styles.modalCont3]}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>사업자등록증 삭제</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>삭제하면 서비스에 제한이 있습니다.</Text>
+						<Text style={styles.avatarDescText}>그래도 삭제하시겠습니까?</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {setVisible(false)}}
+            >
+              <Text style={styles.avatarBtnText}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+              onPress={() => {}}
+            >
+              <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
 				</View>
-			</KeyboardAwareScrollView>
-			<View style={styles.nextFix}>
-				<TouchableOpacity 
-					style={styles.nextBtn}
-					activeOpacity={opacityVal}
-					onPress={() => nextStep()}
-				>
-					<Text style={styles.nextBtnText}>다음</Text>
-				</TouchableOpacity>
-			</View>
+      </Modal>
 
-			<Modal
-				visible={modal1}
-				animationType={"slide"}
-				onRequestClose={() => {setModal1(false)}}
-			>
-				<View style={styles.header}>
-					<>
-					<TouchableOpacity 
-						style={styles.headerBackBtn}
-						activeOpacity={opacityVal}
-						onPress={() => (setModal1(false))}
-					>
-						<AutoHeightImage width={9} source={require("../../assets/img/icon_header_back.png")} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle}>비밀번호 설정</Text>
-					</>
-				</View>
-				<KeyboardAwareScrollView>
-					<View style={styles.registArea}>
-						<View style={[styles.registBox, styles.registBox3]}>
-							<View style={styles.alertBox}>
-								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-								<Text style={styles.alertBoxText}>비밀번호는 일반 로그인에 사용됩니다.</Text>
-								<Text style={[styles.alertBoxText, styles.alertBoxText2]}>6자 이상 영문, 숫자, 특수문자만 가능합니다.</Text>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop30]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>비밀번호</Text>
-								</View>
-								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-									<TextInput
-										secureTextEntry={true}
-										value={pw}
-										onChangeText={(v) => {setPw(v)}}
-										placeholder={'비밀번호 입력(6자 이상 영문, 숫자, 특수문자)'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										secureTextEntry={true}
-										value={pw2}
-										onChangeText={(v) => {setPw2(v)}}
-										placeholder={'비밀번호 재입력'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-							</View>
-						</View>
-					</View>
-				</KeyboardAwareScrollView>
-				<View style={styles.nextFix}>
-					<TouchableOpacity 
-						style={styles.nextBtn}
-						activeOpacity={opacityVal}
-						onPress={() => nextStep2()}
-					>
-						<Text style={styles.nextBtnText}>다음</Text>
-					</TouchableOpacity>
-				</View>
-			</Modal>
-
-			<Modal
-				visible={modal2}
-				animationType={"slide"}
-				onRequestClose={() => {setModal2(false)}}
-			>
-				<View style={styles.header}>
-					<>
-					<TouchableOpacity
-					 onPress={() => (setModal2(false))} 
-					 activeOpacity={opacityVal}
-					 style={styles.headerBackBtn}
-					>
-						<AutoHeightImage width={9} source={require("../../assets/img/icon_header_back.png")} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle}>공장 및 인증 정보 설정</Text>
-					</>
-				</View>
-				<KeyboardAwareScrollView>
-					<View style={styles.registArea}>
-						<View style={[styles.registBox, styles.registBox3]}>
-							<View style={styles.alertBox}>
-								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-								<Text style={styles.alertBoxText}>내 공장은 최대 2개 등록 가능합니다.</Text>
-								<Text style={[styles.alertBoxText, styles.alertBoxText2]}>최소 1개 등록 해야 하며, 가입 후 변경 가능합니다.</Text>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop30]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>선택된 공장</Text>
-								</View>
-
-								{my1 ? (
-								<TouchableOpacity 
-									style={[styles.typingInputBox, styles.typingFactory, factActive=='1' ? styles.typingFactoryOn : null]}
-									activeOpacity={opacityVal}
-									onPress={()=>{setModal5(true)}}
-								>
-									<Text style={[styles.myFactoryText, styles.myFactoryText2, factActive=='1' ? styles.myFactoryTextOn : null]}>
-										{factName1}
-									</Text>
-									<AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} style={styles.myFactoryArr} />
-								</TouchableOpacity>
-								) : (
-								<TouchableOpacity 
-									style={[styles.typingInputBox, styles.typingFactory]}
-									activeOpacity={opacityVal}
-									onPress={()=>{setModal3(true)}}
-								>
-									<Text style={styles.myFactoryText}>
-										내 공장1 등록하기
-									</Text>
-									<AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} style={styles.myFactoryArr} />
-								</TouchableOpacity>
-								)}
-
-								{my2 ? (
-								<TouchableOpacity 
-									style={[styles.typingInputBox, styles.typingFactory, factActive=='2' ? styles.typingFactoryOn : null]}
-									activeOpacity={opacityVal}
-									onPress={()=>{setModal7(true)}}
-								>
-									<Text style={[styles.myFactoryText, styles.myFactoryText2, factActive=='2' ? styles.myFactoryTextOn : null]}>
-										{factName2}
-									</Text>
-									<AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} style={styles.myFactoryArr} />
-								</TouchableOpacity>
-								) : (
-								<TouchableOpacity 
-									style={[styles.typingInputBox, styles.typingFactory]}
-									activeOpacity={opacityVal}
-									onPress={()=>{setModal6(true)}}
-								>
-									<Text style={styles.myFactoryText}>
-									내 공장2 등록하기
-									</Text>
-									<AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} style={styles.myFactoryArr} />
-								</TouchableOpacity>
-								)}
-							</View>
-
-							<View style={[styles.alertBox, styles.mgTop35]}>
-								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-								<Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요. 가입 후에도 등록 가능합니다.</Text>
-							</View>
-							{!state ? (
-							<TouchableOpacity
-								style={styles.addBtn}
-								activeOpacity={opacityVal}
-								onPress={() => {setState(true)}}
-							>
-								<AutoHeightImage width={13} source={require("../../assets/img/icon_plus.png")} style={styles.icon_add} />
-								<Text style={styles.addBtnText}>등록</Text>
-							</TouchableOpacity>
-							) : null}
-						</View>
-						{state ? (
-						<View style={[styles.registBox, styles.registBox2]}>
-							<View style={[styles.typingBox]}>
-								<View style={[styles.typingTitle, styles.typingTitleFlex]}>
-									<Text style={styles.typingTitleText}>사업자 번호</Text>
-									<TouchableOpacity 
-										style={styles.resetBtn}
-										activeOpacity={opacityVal}
-										onPress={() => {setMbCompanyNumber()}}
-									>
-										<AutoHeightImage width={13} source={require("../../assets/img/icon_reset.png")} style={styles.icon_reset} />
-										<Text style={styles.resetBtnText}>초기화</Text>
-									</TouchableOpacity>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										keyboardType='email-address'
-										value={mbcompanyNumber}
-										onChangeText={(v) => {setMbCompanyNumber(v)}}
-										placeholder={'사업자 번호를 입력해 주세요.'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop35]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>상호(법인명)</Text>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										value={mbcompanyName}									
-										onChangeText={(v) => {setMbCompanyName(v)}}
-										placeholder={"상호(법인명)을 입력해 주세요."}
-										style={[styles.input]}
-										placeholderTextColor={"#8791A1"}
-									/>
-								</View>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop35]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>성명</Text>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										value={mbName}									
-										onChangeText={(v) => {setMbName(v)}}
-										placeholder={"성명을 입력해 주세요."}
-										style={[styles.input]}
-										placeholderTextColor={"#8791A1"}
-									/>
-								</View>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop35]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>사업장 소재지</Text>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										value={mbCompanyAddr}									
-										onChangeText={(v) => {setMbCompanyAddr(v)}}
-										placeholder={"사업장 소재지를 입력해 주세요."}
-										style={[styles.input]}
-										placeholderTextColor={"#8791A1"}
-									/>
-								</View>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop35]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>사업자등록증 사진</Text>
-								</View>
-								<TouchableOpacity
-									activeOpacity={opacityVal}						
-									onPress={() => {setModal4(true);}}
-								>
-									{picture ? (
-										<AutoHeightImage width={102} source={{uri: picture}} />
-									) : (
-										<AutoHeightImage 
-											width={102} 
-											source={require("../../assets/img/pick_photo.jpg")}
-											style={[styles.photoBox]}
-										/>
-									)}
-								</TouchableOpacity>
-							</View>
-						</View>
-						) : null}
-					</View>
-				</KeyboardAwareScrollView>
-				<View style={styles.nextFix}>
-					<TouchableOpacity 
-						style={styles.nextBtn}
-						activeOpacity={opacityVal}
-						onPress={() => submitRegist()}
-					>
-						<Text style={styles.nextBtnText}>가입완료</Text>
-					</TouchableOpacity>
-				</View>				
-			</Modal>
-
-			<Modal
+      <Modal
         visible={modal3}
 				animationType={"slide"}
 				onRequestClose={() => {setModal3(false)}}
@@ -872,7 +616,7 @@ const Register2 = ({navigation, route}) => {
 								setFactAddr1('')
 								setFactAddrDt1('')
 								setModal5(false)
-								setMy1(false);
+                setMy1(false);
 							}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제</Text>
@@ -1048,7 +792,7 @@ const Register2 = ({navigation, route}) => {
 								setFactAddr2('')
 								setFactAddrDt2('')
 								setModal7(false)
-								setMy2(false)
+                setMy2(false);
 							}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제</Text>
@@ -1102,6 +846,11 @@ const Register2 = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
+	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
+	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
+	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
+  safeAreaView: {flex:1,backgroundColor:'#fff'},
 	safeAreaView2: {},
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E1E8F0'},
@@ -1169,6 +918,21 @@ const styles = StyleSheet.create({
 	cancel: {backgroundColor:'#fff',borderRadius:12,marginTop:10,},
 	modalCont2BtnText: {fontFamily:Font.NotoSansMedium,fontSize:19,color:'#007AFF'},
 	modalCont2BtnText2: {color:'#DF4339'},
-});
+  compImgBox: {width:102,position:'relative',},
+  compImgBoxDelete: {position:'absolute',bottom:-10,right:-10,},
 
-export default Register2
+  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},
+  avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
+	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
+  avatarDesc: {marginTop:20,},
+  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919'},
+	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
+	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	avatarBtn2: {backgroundColor:'#31B481'},
+	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
+
+  inputAlert: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
+	inputAlertText: {width:(innerWidth-14),paddingLeft:7,fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#ED0000'},
+})
+
+export default MyCompany

@@ -81,7 +81,7 @@ const Profile = ({navigation, route}) => {
                   style={styles.mypageLinkListBtn}
                   activeOpacity={opacityVal}
                   onPress={() => {									
-                    //navigation.navigate('Keyword', {});
+                    navigation.navigate('MyInfo', {});
                   }}
                 >
                   <Text style={styles.mypageLinkListBtnText}>계정정보 설정</Text>
@@ -90,7 +90,7 @@ const Profile = ({navigation, route}) => {
                   style={styles.mypageLinkListBtn}
                   activeOpacity={opacityVal}
                   onPress={() => {
-                    //navigation.navigate('Message', {});
+                    navigation.navigate('MyPassword', {});
                   }}			
                 >
                   <Text style={styles.mypageLinkListBtnText}>비밀번호 설정</Text>
@@ -107,7 +107,7 @@ const Profile = ({navigation, route}) => {
                   style={styles.mypageLinkListBtn}
                   activeOpacity={opacityVal}
                   onPress={() => {
-                    //navigation.navigate('FaqList', {});
+                    navigation.navigate('MyCompany', {});
                   }}	
                 >
                   <Text style={styles.mypageLinkListBtnText}>공장 및 인증정보관리</Text>
@@ -116,7 +116,7 @@ const Profile = ({navigation, route}) => {
                   style={styles.mypageLinkListBtn}
                   activeOpacity={opacityVal}
                   onPress={() => {
-                    //navigation.navigate('NoticeList');
+                    navigation.navigate('Distance');
                   }}	
                 >
                   <Text style={styles.mypageLinkListBtnText}>반경 설정</Text>

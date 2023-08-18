@@ -80,13 +80,19 @@ import QnaWrite from './Mypage/QnaWrite'; //마이페이지 1:1문의 작성
 import QnaModify from './Mypage/QnaModify'; //마이페이지 1:1문의 수정
 import NoticeList from './Mypage/NoticeList'; //마이페이지 공지사항
 import NoticeView from './Mypage/NoticeView'; //마이페이지 공지사항 뷰
-import Profile from './Mypage/Profile'; //마이페이지 프로필 설정
+import Profile from './member/Profile'; //프로필 설정
+import MyInfo from './member/MyInfo'; //프로필 계정정보 설정
+import MyPassword from './member/MyPassword'; //프로필 비밀번호 설정
+import MyCompany from './member/MyCompany'; //프로필 공장 및 인증정보 관리
+import Distance from './member/Distance'; //프로필 반경 설정
+import Setting from './member/Setting'; //설정
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const opacityVal = 0.8;
 
 const TabBarMenu = (props) => {
   const {state, navigation, optionsNum} = props;
@@ -96,6 +102,7 @@ const TabBarMenu = (props) => {
     <View style={styles.TabBarMainContainer}>
       <TouchableOpacity 
         style={styles.TabBarBtn} 
+        activeOpacity={opacityVal}
         onPress={() => {
           navigation.navigate('TabNavigator', {
             screen: 'Home',
@@ -120,6 +127,7 @@ const TabBarMenu = (props) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.TabBarBtn} 
+        activeOpacity={opacityVal}
         onPress={() => {
           navigation.navigate('TabNavigator', {
             screen: 'Match',
@@ -144,6 +152,7 @@ const TabBarMenu = (props) => {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.TabBarBtn} 
+        activeOpacity={opacityVal}
         onPress={() => {
           navigation.navigate('TabNavigator', {
             screen: 'Chat',
@@ -168,6 +177,7 @@ const TabBarMenu = (props) => {
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.TabBarBtn} 
+        activeOpacity={opacityVal}
         onPress={() => {
           navigation.navigate('TabNavigator', {
             screen: 'Mypage',
@@ -285,6 +295,11 @@ const StackNavigator = () => {
       <Stack.Screen name="NoticeList" component={NoticeList} />
       <Stack.Screen name="NoticeView" component={NoticeView} />
       <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="MyInfo" component={MyInfo} />
+      <Stack.Screen name="MyPassword" component={MyPassword} />
+      <Stack.Screen name="MyCompany" component={MyCompany} />
+      <Stack.Screen name="Distance" component={Distance} />
+      <Stack.Screen name="Setting" component={Setting} />
       
     </Stack.Navigator>
   )

@@ -185,7 +185,7 @@ const Register = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},	
-	chkArea: {padding:20,paddingTop:30,paddingBottom:15,},
+	chkArea: {padding:20,paddingBottom:15,},
 	allChkBox: {},
 	allChkBtn: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderRadius:12,borderColor:'#ECECEC',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},
 	chkIcon: {position:'absolute',left:20,top:22},

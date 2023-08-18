@@ -43,19 +43,22 @@ const Mypage = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			{/* <TouchableOpacity
+			<TouchableOpacity
 				onPress={() => {
 					setPageSt(true);
 					navigation.navigate('Login')
 				}}
 			>
 				<Text style={{color:'#000',padding:30}}>로그인</Text>
-			</TouchableOpacity> */}
+			</TouchableOpacity>
 			<View style={styles.header}>		
 				<Text style={styles.headerTitle}>마이페이지</Text>
 				<TouchableOpacity
 					style={styles.headerGear}
-					onPress={() => {}}			
+					activeOpacity={opacityVal}
+					onPress={() => {
+						navigation.navigate('Setting');
+					}}			
 				>
 					<AutoHeightImage width={21} source={require("../../assets/img/icon_gear.png")} />
 				</TouchableOpacity>
