@@ -275,7 +275,9 @@ const Match = ({navigation, route}) => {
 				<TouchableOpacity 
 					style={styles.headerBtn2}
 					activeOpacity={opacityVal}
-					onPress={() => {}}
+					onPress={() => {
+						navigation.navigate('AlimList');
+					}}
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
@@ -292,7 +294,7 @@ const Match = ({navigation, route}) => {
 							<TouchableOpacity
 							 style={styles.goToSch}
 							 activeOpacity={opacityVal}
-							 onPress={() => {navigation.navigate('Search')}}
+							 onPress={() => {navigation.navigate('SearchList', {backPage:'Match', tab:2})}}
 							>
 								<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
 							</TouchableOpacity>

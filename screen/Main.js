@@ -28,6 +28,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 import Font from '../assets/common/Font';
 import Home from './Home'; //메인-중고상품 리스트
+import AlimList from './AlimList'; //알림 리스트
 import Login from './member/Login'; //로그인
 import Register from './member/Register'; //약관
 import Register2 from './member/Register2'; //회원가입
@@ -36,7 +37,7 @@ import Findpw from './member/Findpw'; //비밀번호 찾기
 import Match from './Match/Match';
 import Chat from './Chat/Chat';
 import Mypage from './Mypage/Mypage';
-import Search from './Search'; //검색 리스트
+import SearchList from './Search'; //검색 리스트
 import UsedWrite1 from './usedArticle/Write1'; //스크랩 글쓰기
 import UsedWrite2 from './usedArticle/Write2'; //중고자재 글쓰기
 import UsedWrite3 from './usedArticle/Write3'; //중고기계/장비 글쓰기
@@ -86,6 +87,10 @@ import MyPassword from './member/MyPassword'; //프로필 비밀번호 설정
 import MyCompany from './member/MyCompany'; //프로필 공장 및 인증정보 관리
 import Distance from './member/Distance'; //프로필 반경 설정
 import Setting from './member/Setting'; //설정
+import Alim from './member/Alim'; //설정 알림
+import Other from './Other/Other'; //다른 회원 프로필
+import OtherUsed from './Other/OtherUsed'; //다른 회원 판매상품
+import OtherMatch from './Other/OtherMatch'; //다른 회원 매칭
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
@@ -244,13 +249,14 @@ const StackNavigator = () => {
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       }}
     >
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />      
+      <Stack.Screen name="AlimList" component={AlimList} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Register2" component={Register2} />
       <Stack.Screen name="Findid" component={Findid} />
       <Stack.Screen name="Findpw" component={Findpw} />
-      <Stack.Screen name="Search" component={Search} />
+      <Stack.Screen name="SearchList" component={SearchList} />
       <Stack.Screen name="UsedWrite1" component={UsedWrite1} />
       <Stack.Screen name="UsedWrite2" component={UsedWrite2} />
       <Stack.Screen name="UsedWrite3" component={UsedWrite3} />
@@ -300,6 +306,10 @@ const StackNavigator = () => {
       <Stack.Screen name="MyCompany" component={MyCompany} />
       <Stack.Screen name="Distance" component={Distance} />
       <Stack.Screen name="Setting" component={Setting} />
+      <Stack.Screen name="Alim" component={Alim} />
+      <Stack.Screen name="Other" component={Other} />
+      <Stack.Screen name="OtherUsed" component={OtherUsed} />
+      <Stack.Screen name="OtherMatch" component={OtherMatch} />
       
     </Stack.Navigator>
   )

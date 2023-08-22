@@ -48,6 +48,9 @@ const LikeList = ({navigation, route}) => {
 					<TouchableOpacity
 						style={styles.otherPeople}
 						activeOpacity={opacityVal}
+						onPress={()=>{
+							navigation.navigate('Other', {});
+						}}
 					>
 						<AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
 					</TouchableOpacity>
@@ -71,6 +74,9 @@ const LikeList = ({navigation, route}) => {
 					<TouchableOpacity
 						style={styles.otherPeople}
 						activeOpacity={opacityVal}
+						onPress={()=>{
+							navigation.navigate('Other', {});
+						}}
 					>
 						<AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
 					</TouchableOpacity>
@@ -94,6 +100,9 @@ const LikeList = ({navigation, route}) => {
 					<TouchableOpacity
 						style={styles.otherPeople}
 						activeOpacity={opacityVal}
+						onPress={()=>{
+							navigation.navigate('Other', {});
+						}}
 					>
 						<AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
 					</TouchableOpacity>

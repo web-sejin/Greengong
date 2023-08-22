@@ -99,9 +99,15 @@ const UsedBidList = ({navigation, route}) => {
               <Text style={styles.compInfoLocText}>입찰기간 : {item.period}</Text>
             </View>
           </View>
-          <View style={styles.compThumb}>
+          <TouchableOpacity 
+            style={styles.compThumb}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('Other', {});
+            }}
+          >
             <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.matchPrice}>
           <Text style={styles.matchPriceText}>판매가</Text>

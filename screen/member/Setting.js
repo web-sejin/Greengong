@@ -17,6 +17,8 @@ const opacityVal = 0.8;
 const Setting = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [visible2, setVisible2] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -24,7 +26,8 @@ const Setting = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+				setVisible(false);
+        setVisible2(false);
 			}
 		}else{
 			//console.log("isFocused");
@@ -42,8 +45,117 @@ const Setting = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'기본양식'} />
-			<ScrollView></ScrollView>
+			<Header navigation={navigation} headertitle={'설정'} />
+			<ScrollView>
+        <View style={styles.settingBox}>
+
+          <View style={[styles.paddBot15, styles.borderBot]}>
+              <View style={styles.mypageTit}>
+                <Text style={styles.mypageTitText}>알림 설정</Text>
+              </View>
+              <View style={styles.mypageLinkList}>
+                <TouchableOpacity
+                  style={styles.mypageLinkListBtn}
+                  activeOpacity={opacityVal}
+                  onPress={() => {									
+                    navigation.navigate('Alim', {});
+                  }}
+                >
+                  <Text style={styles.mypageLinkListBtnText}>알림 설정</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={[styles.paddTop30]}>
+              <View style={styles.mypageTit}>
+                <Text style={styles.mypageTitText}>사용자 설정</Text>
+              </View>
+              <View style={styles.mypageLinkList}>
+                <TouchableOpacity
+                  style={styles.mypageLinkListBtn}
+                  activeOpacity={opacityVal}
+                  onPress={() => {setVisible(true)}}			
+                >
+                  <Text style={styles.mypageLinkListBtnText}>로그아웃</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.mypageLinkListBtn}
+                  activeOpacity={opacityVal}
+                  onPress={() => {setVisible2(true)}}			
+                >
+                  <Text style={styles.mypageLinkListBtnText}>회원탈퇴</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+        </View>
+
+        <Modal
+          visible={visible}
+          transparent={true}
+          onRequestClose={() => {setVisible(false)}}
+        >
+          <Pressable 
+            style={styles.modalBack}
+            onPress={() => {setVisible(false)}}
+          ></Pressable>
+          <View style={[styles.modalCont3, styles.modalCont4]}>
+            <View style={styles.avatarTitle}>
+              <Text style={styles.avatarTitleText}>로그아웃</Text>
+            </View>
+            <View style={styles.avatarDesc}>
+              <Text style={styles.avatarDescText}>로그아웃을 진행하시겠습니까?</Text>
+            </View>
+            <View style={styles.avatarBtnBox}>
+              <TouchableOpacity 
+                style={styles.avatarBtn}
+                onPress={() => {setVisible(false)}}
+              >
+                <Text style={styles.avatarBtnText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.avatarBtn, styles.avatarBtn2]}
+                onPress={() => {}}
+              >
+                <Text style={styles.avatarBtnText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={visible2}
+          transparent={true}
+          onRequestClose={() => {setVisible2(false)}}
+        >
+          <Pressable 
+            style={styles.modalBack}
+            onPress={() => {setVisible2(false)}}
+          ></Pressable>
+          <View style={[styles.modalCont3]}>
+            <View style={styles.avatarTitle}>
+              <Text style={styles.avatarTitleText}>회원탈퇴</Text>
+            </View>
+            <View style={styles.avatarDesc}>
+              <Text style={styles.avatarDescText}>회원탈퇴를 진행하시겠습니까?</Text>
+              <Text style={styles.avatarDescText}>모든 정보가 사라지게 됩니다.</Text>
+            </View>
+            <View style={styles.avatarBtnBox}>
+              <TouchableOpacity 
+                style={styles.avatarBtn}
+                onPress={() => {setVisible2(false)}}
+              >
+                <Text style={styles.avatarBtnText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.avatarBtn, styles.avatarBtn2]}
+                onPress={() => {}}
+              >
+                <Text style={styles.avatarBtnText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
 		</SafeAreaView>
 	)
 }
@@ -54,6 +166,44 @@ const styles = StyleSheet.create({
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
 	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
+  paddTop20: {paddingTop:20},
+	paddTop30: {paddingTop:30},
+	paddBot15: {paddingBottom:15},
+	paddBot30: {paddingBottom:30},
+  settingBox: {paddingVertical:30,paddingHorizontal:20},  
+  mypageTit: {},
+	mypageTitText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000',},
+  mypageLinkList: {marginTop:5},
+	mypageLinkListBtn: {paddingVertical:15,},
+	mypageLinkListBtnText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#000',},
+
+  modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
+	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},
+  modalCont2: {width:innerWidth,borderRadius:10,position:'absolute',left:20,bottom:35},
+	modalCont2Box: {},
+	modalCont2Btn: {width:innerWidth,height:58,backgroundColor:'#F1F1F1',display:'flex',alignItems:'center',justifyContent:'center',},
+	choice: {borderTopLeftRadius:12,borderTopRightRadius:12,borderBottomWidth:1,borderColor:'#B1B1B1'},
+	modify: {borderBottomWidth:1,borderColor:'#B1B1B1'},
+	delete: {borderBottomLeftRadius:12,borderBottomRightRadius:12,},
+	cancel: {backgroundColor:'#fff',borderRadius:12,marginTop:10,},
+	modalCont2BtnText: {fontFamily:Font.NotoSansMedium,fontSize:19,color:'#007AFF'},
+	modalCont2BtnText2: {color:'#DF4339'},
+  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},
+  modalCont4: {top:((widnowHeight/2)-120)},
+  avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
+	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
+  avatarDesc: {marginTop:20,},
+  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
+	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
+	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	avatarBtn2: {backgroundColor:'#31B481'},
+	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
+  typingInputBox: {marginTop:20,position:'relative'},
+	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',},
+	input: {width:(innerWidth-130),height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
+  certChkBtn: {width:80,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	certChkBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
+  indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10,backgroundColor:'rgba(0,0,0,0.5)'},
 })
 
 export default Setting

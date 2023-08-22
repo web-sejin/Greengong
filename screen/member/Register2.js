@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Image, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList,} from 'react-native';
+import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Image, Pressable, Platform, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -8,11 +8,14 @@ import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import Geolocation from 'react-native-geolocation-service';
 import Postcode from '@actbase/react-daum-postcode';
 import Toast from 'react-native-toast-message'
-
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import {Avatar} from '../../components/Avatar';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -39,8 +42,11 @@ const Register2 = ({navigation, route}) => {
 
 	const [mbHp, setMbHp] = useState('');
 	const [certNumber, setCertNumber] = useState('');
+	const [certNumberSt, setCertNumberSt] = useState(false);
 	const [mbEmail, setMbEmail] = useState('');
+	const [mbEmailSt, setMbEmailSt] = useState(false);
 	const [mbNickname, setMbNickname] = useState('');
+	const [mbNicknameSt, setMbNicknameSt] = useState(false);
 	const [pw, setPw] = useState('');
 	const [pw2, setPw2] = useState('');
 	const [mbcompanyNumber, setMbCompanyNumber] = useState('');
@@ -60,11 +66,13 @@ const Register2 = ({navigation, route}) => {
 	const [factAddr2, setFactAddr2] = useState('');
 	const [factAddrDt2, setFactAddrDt2] = useState('');
 	const [location, setLocation] = useState('');
+	const [location2, setLocation2] = useState('');
 	const [postcodeOn, setPostcodeOn] = useState(false);
 	const [postcodeOn2, setPostcodeOn2] = useState(false);
 	const [factActive, setFactActive] = useState();
 	const [my1, setMy1] = useState(false);
 	const [my2, setMy2] = useState(false);
+	const [ransoo, setRansoo] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -83,8 +91,11 @@ const Register2 = ({navigation, route}) => {
 				setToastText('');
 				setMbHp('');
 				setCertNumber('');
+				setCertNumberSt(false);
 				setMbEmail('');
+				setMbEmailSt(false);
 				setMbNickname('');
+				setMbNicknameSt(false);
 				setPw('');
 				setPw2('');
 				setMbCompanyNumber('');
@@ -96,6 +107,7 @@ const Register2 = ({navigation, route}) => {
 				setTimeStamp('');
 				setPhoneInterval(false);
 				setLocation('');
+				setLocation2('');
 				setPostcodeOn(false);
 				setFactName1('');
 				setFactCode1('');
@@ -106,6 +118,7 @@ const Register2 = ({navigation, route}) => {
 				setFactAddr2('');
 				setFactAddrDt2('');
 				setFactActive();
+				setRansoo('');
 			}
 		}else{
 			//console.log("isFocused");
@@ -152,8 +165,8 @@ const Register2 = ({navigation, route}) => {
 
 	const _sendSmsButton = () => {
 		// console.log('sms');
-		if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
@@ -163,36 +176,58 @@ const Register2 = ({navigation, route}) => {
 			return false;
 		}
 
-		//setSmsRandNumber(randomNumber(6));
-		setPhoneInterval(true);
+		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: 'join'}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+					console.log('출력확인..', responseJson);
+					setRansoo(responseJson.ce_num);
+					setPhoneInterval(true);
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
 	}
 
-	const _authComplete = () => {
+	const _authComplete = () => {		
+		//console.log(ransoo);
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
+			return false;
+		}
+
+		if(certNumber == ""){
+			ToastMessage('인증번호를 입력해 주세요.');
+			return false;
+		}
+
 		if(tcounter <= 0){
 			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
 			return false;
 		 }
-		 timer_stop();
-		//  if(smsRandNumber == ransoo){
-		// 	setAuthTitle('인증확인');
-		// 	setPhoneInterval(false);
-		// 	setAuthButtonState(true);//인증버튼 비활성화
-		// 	ToastMessage('본인인증이 완료되었습니다.\n다음단계로 이동하세요.');
-		// 	setNextButtonState(false);
-		// 	return true;
-		//  }else{
-		// 	setAuthTitle('인증완료');
-		// 	setAuthButtonState(false); //인증버튼 비활성화
-		// 	ToastMessage('인증번호가 일치하지 않습니다.');
-		// 	setNextButtonState(true);
-		// 	return false;
-		//  }
+
+		 if(ransoo == certNumber){
+			ToastMessage('본인인증이 완료되었습니다.');
+			setCertNumberSt(true);
+			timer_stop();
+		 }else{
+			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
+			return false;
+		 }
 	}
 
 	const timer_stop = () => {
 		clearInterval(t1);
 		setTimeStamp('');
 		setPhoneInterval(false);
+		setRansoo('');
+		tcounter = 0;
+		temp = '';
 	};
 
 	useEffect(()=>{
@@ -211,10 +246,80 @@ const Register2 = ({navigation, route}) => {
   };
 
 	function nextStep(){
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
+			return false;
+		}
+
+		if(certNumber == ""){
+			ToastMessage('인증번호를 입력해 주세요.');
+			return false;
+		}
+
+		if(!certNumberSt){
+			ToastMessage('인증번호 확인을 완료해 주세요.');
+			return false;
+		}
+
+		if(mbEmail == ""){
+			ToastMessage('이메일을 입력해 주세요.');
+			return false;
+		}
+
+		const emailChk = email_check(mbEmail);
+		if(!emailChk){
+			ToastMessage('이메일을 정확히 입력해 주세요.');
+			return false;
+		}
+
+		if(!mbEmailSt){
+			ToastMessage('이메일 중복확인을 완료해 주세요.');
+			return false;
+		}
+
+		if(mbNickname == ""){
+			ToastMessage('닉네임을 입력해 주세요.');
+			return false;
+		}
+
+		if(!mbNicknameSt){
+			ToastMessage('닉네임 중복확인을 완료해 주세요.');
+			return false;
+		}
+
 		setModal1(true);
 	}
 
 	function nextStep2(){
+		if(pw == ""){
+			setToastText('비밀번호를 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		const pwChk = pwd_check(pw);
+		if(!pwChk || pw.length < 6){
+			setToastText('비밀번호는 6자 이상 영문,숫자,특수문자를 조합해서 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		if(pw2 == ""){
+			setToastText('비밀번호를 한 번 더 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		if(pw != pw2){
+			setToastText('비밀번호가 일치하지 않습니다.\n다시 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
 		setModal2(true);
 	}
 
@@ -222,10 +327,18 @@ const Register2 = ({navigation, route}) => {
 		Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        setLocation({
-          latitude,
-          longitude,
-        });
+				if(v == "1"){
+					setLocation({
+						latitude,
+						longitude,
+					});
+				}else{
+					setLocation2({
+						latitude,
+						longitude,
+					});
+				}
+				findMyAddr(latitude, longitude, v);
       },
       error => {
         console.log(error.code, error.message);
@@ -234,34 +347,63 @@ const Register2 = ({navigation, route}) => {
     );
 	}
 
+	function findMyAddr(lat, lng, v){
+		Api.send('GET', '	gps_to_addr', {lat:lat, lng:lng, is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+					//console.log('출력확인..', responseJson);
+					if(v == "1"){
+						setPostcodeOn(false);
+						setFactCode1((responseJson.si_idx).toString());
+						setFactAddr1(responseJson.sido+" "+responseJson.sigungu+" "+responseJson.dong);
+						setFactAddrDt1('');
+					}else{
+						setPostcodeOn2(false);
+						setFactCode2((responseJson.si_idx).toString());
+						setFactAddr2(responseJson.sido+" "+responseJson.sigungu+" "+responseJson.dong);
+						setFactAddrDt2('');
+					}
+
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
+	}
+
 	function chkFactoryInfo(v){
 		if(v == "1"){
 			if(factName1 == ''){
 				setToastText('공장명을 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factCode1 == ''){
 				setToastText('우편번호를 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factAddr1 == ''){
 				setToastText('주소를 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factAddrDt1 == ''){
-				setToastText('상세주소를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
-				return false;
+				//setToastText('상세 주소를 입력해 주세요.');
+				//setToastModal(true);
+				//setTimeout(()=>{ setToastModal(false) },2000);
+				//return false;
 			}			
 
 			if(!factActive){
@@ -277,29 +419,29 @@ const Register2 = ({navigation, route}) => {
 			if(factName2 == ''){
 				setToastText('공장명을 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factCode2 == ''){
 				setToastText('우편번호를 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factAddr2 == ''){
 				setToastText('주소를 입력해 주세요.');
 				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(factAddrDt2 == ''){
-				setToastText('상세주소를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },1000);
-				return false;
+				//setToastText('상세 주소를 입력해 주세요.');
+				//setToastModal(true);
+				//setTimeout(()=>{ setToastModal(false) },2000);
+				//return false;
 			}
 
 			setPostcodeOn2(false)
@@ -311,8 +453,162 @@ const Register2 = ({navigation, route}) => {
 		setModal3(false);
 	}
 
-	function submitRegist(){
+	function resetCompany(){
+		setState(!state);
+		setMbCompanyNumber('');
+		setMbCompanyName('');
+		setMbName('');
+		setMbCompanyAddr('');
+		setPickture();	
+	}
 
+	function emailChk(){
+		if(mbEmail == ""){
+			ToastMessage('이메일을 입력해 주세요.');
+			return false;
+		}
+
+		const emailChk = email_check(mbEmail);
+		if(!emailChk){
+			ToastMessage('이메일을 정확히 입력해 주세요.');
+			return false;
+		}		
+
+		Api.send('GET', '	validation_email', {email: mbEmail, is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+				//console.log('출력확인..', responseJson);
+				setMbEmailSt(true);
+				ToastMessage('사용가능한 이메일입니다.');
+			}else if(responseJson.result === 'error'){
+				setMbEmailSt(false);
+				ToastMessage(responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(resultItem.message);
+			}
+		});
+	}
+
+	function nickChk(){
+		if(mbNickname == ""){
+			ToastMessage('닉네임을 입력해 주세요.');
+			return false;
+		}
+
+		Api.send('GET', '	validation_nick', {nick: mbNickname, is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+				//console.log('출력확인..', responseJson);
+				setMbNicknameSt(true);
+				ToastMessage('사용가능한 닉네임입니다.');
+			}else if(responseJson.result === 'error'){
+				setMbNicknameSt(false);
+				ToastMessage(responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(resultItem.message);
+			}
+		});
+	}
+
+	function showToast(){
+		setToastText('내 공장1을 먼저 등록해 주세요.')
+		setToastModal(true)
+		setTimeout(()=>{ setToastModal(false) },2000)
+	}
+
+	function submitRegist(){
+		let factory1 = false;
+		let factory2 = false;
+
+		if(!my1){
+			setToastText('내 공장1을 등록해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		if(state){
+			if(mbcompanyNumber == ''){
+				setToastText('사업자 번호를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbcompanyName == ''){
+				setToastText('상호(법인명)를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbName == ''){
+				setToastText('성명을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbCompanyAddr == ''){
+				setToastText('사업장 소재지를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(picture == undefined || picture == ''){
+				setToastText('사업자등록증 사진을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+		}
+
+		Keyboard.dismiss();
+
+		let fac_use = 0;
+		let fac_use2 = 0;
+		if(factActive == "1"){
+			fac_use = 1;
+			fac_use2 = 0;
+		}else{
+			fac_use = 0;
+			fac_use2 = 1;
+		}
+
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('hp', mbHp);
+		formData.append('email', mbEmail);
+		formData.append('nick', mbNickname);
+		formData.append('os', Platform.OS);
+		formData.append('pass', pw);
+		formData.append('fac1_name', factName1);
+		formData.append('fac1_zip', factCode1);
+		formData.append('fac1_addr1', factAddr1);
+		formData.append('fac1_addr2', factAddrDt1);
+		formData.append('fac2_name', factName2);
+		formData.append('fac2_zip', factCode2);
+		formData.append('fac2_addr1', factAddr2);
+		formData.append('fac2_addr2', factAddrDt2);
+		formData.append('bc_no', mbcompanyNumber);
+		formData.append('bc_com_name', mbcompanyName);
+		formData.append('bc_name', mbName);
+		formData.append('bc_local', pw);
+		formData.append('fac1_use', fac_use);
+		formData.append('fac2_use', fac_use2);
+		formData.append('bc_img', picture);
+		formData.append('is_cert', state);
+
+		console.log("::form::",formData);
 	}
 
 	return (
@@ -334,16 +630,26 @@ const Register2 = ({navigation, route}) => {
 								<TextInput
 									value={mbHp}
 									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
-									placeholder={"휴대폰번호를 입력해 주세요."}
+									onChangeText={(v) => {
+										const phone = phoneFormat(v);
+										setMbHp(phone);
+										setCertNumber('');
+										setCertNumberSt(false);
+									}}
+									placeholder={"휴대폰 번호를 입력해 주세요."}
 									style={[styles.input, styles.input2]}
 									placeholderTextColor={"#8791A1"}
-									maxLength={11}
+									maxLength={13}
 								/>
 								<TouchableOpacity 
 									style={styles.certChkBtn}
 									activeOpacity={opacityVal}
-									onPress={() => {_sendSmsButton()}}
+									onPress={() => {
+										//console.log("phoneIntervel : ",phoneIntervel);
+										!phoneIntervel ? ( _sendSmsButton() ) : null
+										!phoneIntervel ? ( setCertNumber('') ) : null
+										!phoneIntervel ? ( setCertNumberSt(false) ) : null
+									}}
 								>
 									<Text style={styles.certChkBtnText}>인증번호</Text>
 								</TouchableOpacity>
@@ -383,7 +689,10 @@ const Register2 = ({navigation, route}) => {
 								<TextInput
 									keyboardType='email-address'
 									value={mbEmail}
-									onChangeText={(v) => {setMbEmail(v)}}
+									onChangeText={(v) => {
+										setMbEmailSt(false);
+										setMbEmail(v);
+									}}
 									placeholder={'이메일을 입력해 주세요.'}
 									placeholderTextColor="#C5C5C6"
 									style={[styles.input, styles.input2]}
@@ -391,7 +700,7 @@ const Register2 = ({navigation, route}) => {
 								<TouchableOpacity 
 									style={styles.certChkBtn}
 									activeOpacity={opacityVal}
-									onPress={() => {}}
+									onPress={() => {emailChk()}}
 								>
 									<Text style={styles.certChkBtnText}>중복확인</Text>
 								</TouchableOpacity>
@@ -405,7 +714,10 @@ const Register2 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TextInput
 									value={mbNickname}									
-									onChangeText={(v) => {setMbNickname(v)}}
+									onChangeText={(v) => {
+										setMbNicknameSt(false);
+										setMbNickname(v);
+									}}
 									placeholder={"닉네임을 입력해 주세요."}
 									style={[styles.input, styles.input2]}
 									placeholderTextColor={"#8791A1"}
@@ -413,7 +725,7 @@ const Register2 = ({navigation, route}) => {
 								<TouchableOpacity 
 									style={styles.certChkBtn}
 									activeOpacity={opacityVal}
-									onPress={() => {}}
+									onPress={() => {nickChk()}}
 								>
 									<Text style={styles.certChkBtnText}>중복확인</Text>
 								</TouchableOpacity>
@@ -566,8 +878,10 @@ const Register2 = ({navigation, route}) => {
 								) : (
 								<TouchableOpacity 
 									style={[styles.typingInputBox, styles.typingFactory]}
-									activeOpacity={opacityVal}
-									onPress={()=>{setModal6(true)}}
+									activeOpacity={opacityVal}									
+									onPress={()=>{
+										my1 ? ( setModal6(true) ) : ( showToast() )										
+									}}
 								>
 									<Text style={styles.myFactoryText}>
 									내 공장2 등록하기
@@ -600,7 +914,7 @@ const Register2 = ({navigation, route}) => {
 									<TouchableOpacity 
 										style={styles.resetBtn}
 										activeOpacity={opacityVal}
-										onPress={() => {setMbCompanyNumber()}}
+										onPress={() => {resetCompany()}}
 									>
 										<AutoHeightImage width={13} source={require("../../assets/img/icon_reset.png")} style={styles.icon_reset} />
 										<Text style={styles.resetBtnText}>초기화</Text>
@@ -705,7 +1019,7 @@ const Register2 = ({navigation, route}) => {
 				<View style={styles.header}>
 					<>
 					<TouchableOpacity
-						style={styles.headerBackBtn}
+						style={styles.headerCloseBtn}
 						activeOpacity={opacityVal}
 						onPress={() => {setModal3(false)}} 						
 					>
@@ -1074,11 +1388,11 @@ const Register2 = ({navigation, route}) => {
 				<View style={styles.toastModal}>
 					<View
 						style={{
-							backgroundColor: '#000000e0',
+							backgroundColor: '#000',
 							borderRadius: 10,
 							paddingVertical: 10,
 							paddingHorizontal: 20,
-							opacity: 0.8,
+							opacity: 0.7,
 						}}
 					>
 						<Text
@@ -1137,6 +1451,7 @@ const styles = StyleSheet.create({
 
 	header: {height:50,backgroundColor:'#fff',position:'relative',display:'flex',justifyContent:'center',paddingLeft:20, paddingRight:20},
 	headerBackBtn: {width:30,height:50,position:'absolute',left:20,top:0,zIndex:10,display:'flex',justifyContent:'center'},
+	headerCloseBtn: {width:34,height:50,position:'absolute',right:10,top:0,zIndex:10,display:'flex',alignItems:'center',justifyContent:'center'},
 	headerTitle: {fontFamily:Font.NotoSansMedium,textAlign:'center',fontSize:17,lineHeight:50,color:'#000'},
 
 	typingFactory: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,
@@ -1153,12 +1468,12 @@ const styles = StyleSheet.create({
 	photoBox: {marginTop:10,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden'},
 	resetBtn: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:75,height:22,backgroundColor:'#31B481',borderRadius:12,},
 	resetBtnText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:22,color:'#fff',marginLeft:5,},
-	timeBox: {position:'absolute',right:20,top:0,},
-	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:56,color:'#000'},
+	timeBox: {position:'absolute',right:20,top:21,},
+	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:19,color:'#000'},
 	findLocal: {marginTop:10,},
 	findLocalBtn: {width:innerWidth,height:58,backgroundColor:'#E9ECF0',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',},
 	findLocalBtnText: {fontFamily:Font.NotoSansMedium,fontSize:14,color:'#8791A1',marginLeft:5},
-	toastModal: {width:widnowWidth,height:(widnowHeight - 50),display:'flex',alignItems:'center',justifyContent:'flex-end'},
+	toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
 
 	modalCont2: {width:innerWidth,borderRadius:10,position:'absolute',left:20,bottom:35},
 	modalCont2Box: {},

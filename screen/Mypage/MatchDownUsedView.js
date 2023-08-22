@@ -250,9 +250,15 @@ const MatchDownUsedView = ({navigation, route}) => {
                   <Text style={styles.memberLocText}>{item.loc}</Text>
                 </View>
               </View>
-              <View style={styles.memberThumb}>
+              <TouchableOpacity 
+                style={styles.memberThumb}
+                activeOpacity={opacityVal}
+                onPress={()=>{
+                  navigation.navigate('Other', {});
+                }}
+              >
                 <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-              </View>
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
           )

@@ -99,9 +99,15 @@ const MatchOrder = ({navigation, route}) => {
                     <Text style={styles.compInfoLocText}>NC가공-밀링-플라스틱-도면무</Text>
                   </View>
                 </View>
-                <View style={styles.compThumb}>
+                <TouchableOpacity 
+                  style={styles.compThumb}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{
+                    navigation.navigate('Other', {});
+                  }}
+                >
                   <AutoHeightImage width={70} source={require("../../assets/img/sample1.jpg")} />
-                </View>
+                </TouchableOpacity>
               </View>
               <View style={styles.matchPrice}>
                 <Text style={styles.matchPriceText}>발주금액</Text>
@@ -244,13 +250,14 @@ const styles = StyleSheet.create({
   compInfoLoc: {display:'flex',flexDirection:'row',alignItems:'center',},
   compInfoLocText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:15,color:'#000',},
   compThumb: {width:70,height:70,borderRadius:50,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'},
+
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
   modalCont2: {top:((widnowHeight/2)-166)},
   avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
 	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
   avatarDesc: {marginTop:20,},
-  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919'},
+  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
 	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
 	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	avatarBtn2: {backgroundColor:'#31B481'},
@@ -265,19 +272,20 @@ const styles = StyleSheet.create({
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
-  modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
-	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
-  modalCont2: {top:((widnowHeight/2)-166)},
-  avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
-	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
-  avatarDesc: {marginTop:20,},
-  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919'},
-	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
-	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
-	avatarBtn2: {backgroundColor:'#31B481'},
-	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
-  starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
-  star: {marginHorizontal:4,},
+
+  // modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
+	// modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
+  // modalCont2: {top:((widnowHeight/2)-166)},
+  // avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
+	// avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
+  // avatarDesc: {marginTop:20,},
+  // avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
+	// avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
+	// avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	// avatarBtn2: {backgroundColor:'#31B481'},
+	// avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
+  // starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
+  // star: {marginHorizontal:4,},
 })
 
 export default MatchOrder

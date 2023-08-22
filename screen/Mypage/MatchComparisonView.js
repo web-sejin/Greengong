@@ -62,9 +62,15 @@ const MatchComparisonView = ({navigation, route}) => {
                 <Text style={styles.compInfoLocText}>{item.loc}</Text>
               </View>
             </View>
-            <View style={styles.compThumb}>
+            <TouchableOpacity 
+              style={styles.compThumb}
+              activeOpacity={opacityVal}
+              onPress={()=>{
+                navigation.navigate('Other', {});
+              }}
+            >
               <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={styles.matchPrice}>
             <Text style={styles.matchPriceText}>가격</Text>

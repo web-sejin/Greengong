@@ -61,8 +61,7 @@ const Login = ({navigation, route}) => {
   const signInWithKakao = async () => {
     try {			
       const token: KakaoOAuthToken = await login();
-      getMyKakaoProfile();
-      
+      getMyKakaoProfile();      
       setKakaoResult(JSON.stringify(token));
     } catch(err) {
       console.log("error : ",err);
@@ -86,23 +85,25 @@ const Login = ({navigation, route}) => {
   const getMyKakaoProfile = async () => {
     try {      
       const profile: KakaoProfile|KakaoProfileNoneAgreement = await getKakaoProfile();
-      console.log(profile);
-      // const kakaoData =JSON.stringify({
-      //     type: "sns_login",
-      //     name: "",
-      //     email: profile.email,
-      //     provider: "kakao",
-      //     photourl: "",
-      //     uid: profile.id,          
-      //     token: appToken,
-      //     nickname: profile.nickname,
-      //     birth: profile.birthday,
-      //     gender:profile.gender
-      // });
-      // console.log(kakaoData);
-    
+      //console.log(profile);
+      const kakaoData =JSON.stringify({
+          type: "sns_login",
+          name: "",
+          email: profile.email,
+          provider: "kakao",
+          photourl: "",
+          uid: profile.id,          
+          //token: appToken,
+      });          
       setKakaoResult(JSON.stringify(kakaoData));
       //unlinkKakao();
+			
+			navigation.navigate('Register', {
+				email:profile.email, 
+				regiType:"sns",
+				provider:"kakao",
+				uid:profile.id
+			})
     } catch(err) {
       console.log(err);
     }

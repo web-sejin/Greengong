@@ -64,9 +64,15 @@ const UsedBuyList = ({navigation, route}) => {
                     <Text style={styles.compInfoLocText}>중3동</Text>
                   </View>
                 </View>
-                <View style={styles.compThumb}>
+                <TouchableOpacity 
+                  style={styles.compThumb}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{
+                    navigation.navigate('Other', {});
+                  }}
+                >
                   <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
-                </View>
+                </TouchableOpacity>
               </View>
               <View style={styles.matchPrice}>
                 <Text style={styles.matchPriceText}>판매가</Text>
@@ -158,7 +164,7 @@ const styles = StyleSheet.create({
   avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
 	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
   avatarDesc: {marginTop:20,},
-  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919'},
+  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
 	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
 	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	avatarBtn2: {backgroundColor:'#31B481'},

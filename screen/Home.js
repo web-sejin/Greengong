@@ -1,9 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../assets/common/Font"
+import Api from '../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -19,6 +20,7 @@ const filterListData = [
 
 const Home = ({navigation, route}) => {
 	const [searchVal, setSearchVal] = useState();
+	const [isLoading, setIsLoading] = useState(true);
 	const [scrollEvent, setScrollEvent] = useState(new Animated.Value(1))	
 	const [scrollEvent2, setScrollEvent2] = useState(new Animated.Value(0))
 	const [scrollEvent3, setScrollEvent3] = useState(new Animated.Value(98))
@@ -30,147 +32,100 @@ const Home = ({navigation, route}) => {
 	const [visible3, setVisible3] = useState(false);
 	const [filterList, setFilterList] = useState(filterListData); //개별선택
 	const [filterList2, setFilterList2] = useState(filterListData); //개별선택
+	const [filterAry, setFilterAry] = useState('');
 	const [filterLen, setFilterLen] = useState(0);
 	const [allFilter, setAllFilter] = useState(false); //모두 선택
+	const [itemList, setItemList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
 
-	const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고자재',
-			naviPage: 'UsedWrite2',
-			stateVal: '나눔',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고기계/장비',
-			naviPage: 'UsedWrite3',
-			stateVal: '입찰',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '폐기물',
-			naviPage: 'UsedWrite4',
-			stateVal: '',
-		},
-		{
-			id: '78694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-		},
-		{
-			id: '88694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-		},
-		{
-			id: '98694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-		},
-	];
+	const getItemList = async () =>{
+		setIsLoading(false);
+
+		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson.data);
+				setItemList(responseJson.data);
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!');
+			}
+		});
+
+		setIsLoading(true);
+	}
+
+	const moreData = async () => {
+		console.log(filterAry);
+		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry, page:nowPage+1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson.data);				
+				const addItem = itemList.concat(responseJson.data);				
+				setItemList(addItem);			
+				setNowPage(nowPage+1);
+			}else{
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
+
+	useEffect(()=>{
+		getItemList();
+	}, [filterList2]);
 	
 	const getList = ({item, index}) => (
-		<TouchableOpacity 
+		<TouchableOpacity
+			key = {item.pd_idx}
 			style={[styles.listLi, index!=0 ? styles.listLiBorder : null ]}
 			activeOpacity={opacityVal}
 			onPress={() => {
-				navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+				navigation.navigate('UsedView', {idx:item.pd_idx})
 			}}
 		>
 			<>
+
+			{item.pd_image ? (
 			<AutoHeightImage width={131} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
-			<View style={styles.listInfoBox}>
+			) : null}
+
+			{/* <AutoHeightImage width={131} source={{uri: item.pd_image}}  style={styles.listImg} />			 */}
+			<View style={[styles.listInfoBox, item.pd_image ? null : styles.listInfoBox2]}>
 				<View style={styles.listInfoTitle}>
-					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-						{item.title}
-					</Text>
+					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.pd_name}</Text>
 				</View>
 				<View style={styles.listInfoDesc}>
-					<Text style={styles.listInfoDescText}>{item.desc}</Text>
+					<Text style={styles.listInfoDescText}>{item.pd_loc} · {item.pd_date}</Text>
 				</View>
 				<View style={styles.listInfoCate}>
-					<Text style={styles.listInfoCateText}>{item.cate}</Text>
+					<Text style={styles.listInfoCateText}>{item.pd_summary}</Text>
 				</View>
 				<View style={styles.listInfoCnt}>
 					<View style={styles.listInfoCntBox}>
 						<AutoHeightImage width={15} source={require("../assets/img/icon_star.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
 					</View>
 					<View style={styles.listInfoCntBox}>
 						<AutoHeightImage width={14} source={require("../assets/img/icon_review.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.pd_chat_cnt}</Text>
 					</View>
 					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
 						<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.pd_scrap_cnt}</Text>
 					</View>
 				</View>
 				<View style={styles.listInfoPriceBox}>
-					{index == 0 ? (
+					{item.is_free != 1 && item.pd_status_org == 1 ? (
 					<View style={[styles.listInfoPriceArea]}>
-						<View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
-							<Text style={styles.listInfoPriceStateText}>예약중</Text>
-						</View>
 						<View style={styles.listInfoPrice}>
-							<Text style={styles.listInfoPriceText}>200,000,000원</Text>
+							<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
 						</View>
 					</View>
 					)
@@ -178,7 +133,7 @@ const Home = ({navigation, route}) => {
 					null
 					}
 
-					{index == 1 ? (
+					{item.is_free == 1 && item.pd_status_org == 1 ? (
 					<View style={[styles.listInfoPriceArea]}>
 						<View style={[styles.listInfoPriceState, styles.listInfoPriceState2]}>
 							<Text style={styles.listInfoPriceStateText}>나눔</Text>
@@ -189,16 +144,37 @@ const Home = ({navigation, route}) => {
 					null
 					}
 
-					{index >= 2 ? (
+					{item.pd_status_org == 2 ? (
 					<View style={[styles.listInfoPriceArea]}>
-						<View style={styles.listInfoPrice}>
-							<Text style={styles.listInfoPriceText}>200,000,000원</Text>
+						<View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
+							<Text style={styles.listInfoPriceStateText}>예약중</Text>
 						</View>
+						{item.is_free != 1 ? (
+						<View style={styles.listInfoPrice}>
+							<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+						</View>
+						) : null }
 					</View>
 					)
 					:
 					null
 					}
+
+					{item.pd_status_org == 3 ? (
+					<View style={[styles.listInfoPriceArea]}>
+						<View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
+							<Text style={styles.listInfoPriceStateText}>판매완료</Text>
+						</View>
+						{item.is_free != 1 ? (
+						<View style={styles.listInfoPrice}>
+							<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+						</View>
+						) : null }
+					</View>
+					)
+					:
+					null
+					}					
 				</View>
 			</View>
 			</>
@@ -296,18 +272,38 @@ const Home = ({navigation, route}) => {
 		selected = filterList.filter((item) => item.isChecked).map(item => item.idx);
 		setFilterLen(selected.length);
 		
+		let commaAry = "";
+		
 		let selectCon = filterList.map((item) => {
 			if(item.isChecked === allFilter){
 				return {...item, isChecked: allFilter};
 			}else{
+				if(commaAry != ''){commaAry+=',';}
+				commaAry+=item.idx;
+				
+				setFilterAry(commaAry);
 				return {...item, isChecked: item.isChecked};
 			}
 		});
+
+		let cnt = 0;
+		filterList.map((item) => {
+			if(item.isChecked === allFilter){
+				
+			}else{
+				cnt = cnt+1;
+			}
+		});
+		if(cnt < 1){
+			setFilterAry('');
+		}
+
+
 		setFilterList2(selectCon);
 
 		//await listCenterInfoReceive(selected);
 		await setVisible3(false);
-	}
+	}	
 	
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -323,118 +319,119 @@ const Home = ({navigation, route}) => {
 				<TouchableOpacity 
 					style={styles.headerBtn2}
 					activeOpacity={opacityVal}
-					onPress={() => {}}
+					onPress={() => {
+						navigation.navigate('AlimList');
+					}}
 				>
 					<AutoHeightImage width={20} source={require("../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
 			</View>
-			<FlatList
-				data={DATA}
-				renderItem={(getList)}
-				keyExtractor={item => item.id}
-				onScroll={onScroll}
-				ListHeaderComponent={
-					<>						
-					<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
-						<View style={styles.schIptBox}>
-							<TouchableOpacity
-							 style={styles.goToSch}
-							 activeOpacity={opacityVal}
-							 onPress={() => {navigation.navigate('Search')}}
-							>
-								<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
-							</TouchableOpacity>
-							{/* <TextInput
-								value={searchVal}
-								onChangeText={(v) => {setSearchVal(v)}}
-								placeholder={"무엇을 찾아드릴까요?"}
-								style={[styles.schInput]}
-								placeholderTextColor="#353636"
-							/>
-							<TouchableOpacity style={styles.schBtn}>
-								<AutoHeightImage width={16} source={require("../assets/img/icon_search.png")} />
-							</TouchableOpacity> */}
-						</View>
-						<View style={styles.schFilterBox}>
-							{filterLen > 0 ? (
-								<View style={styles.filterLabelBox}>
-									{filterList2.map((item, index) => {
-										if(item.isChecked){
-											return(
-											<View key={index} style={styles.filterLabel}>
-												<Text style={styles.filterLabelText}>{item.txt}</Text>
-											</View>
-											)
-										}
-									})}
-								</View>
-							) : (
+
+			{isLoading ? (
+				<FlatList
+					data={itemList}
+					renderItem={(getList)}
+					keyExtractor={(item, index) => index.toString()}
+					onScroll={onScroll}					
+        	onEndReachedThreshold={0.6}
+					onEndReached={moreData}
+					ListHeaderComponent={
+						<>						
+						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
+							<View style={styles.schIptBox}>
+								<TouchableOpacity
+								style={styles.goToSch}
+								activeOpacity={opacityVal}
+								onPress={() => {navigation.navigate('SearchList', {backPage:'Home', tab:1})}}
+								>
+									<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.schFilterBox}>
+								{filterLen > 0 ? (
+									<View style={styles.filterLabelBox}>
+										{filterList2.map((item, index) => {
+											if(item.isChecked){
+												return(
+												<View key={index} style={styles.filterLabel}>
+													<Text style={styles.filterLabelText}>{item.txt}</Text>
+												</View>
+												)
+											}
+										})}
+									</View>
+								) : (
+									<TouchableOpacity 
+										style={styles.schFilterBtn1} 
+										activeOpacity={opacityVal}
+										onPress={()=>{setVisible3(true)}}
+									>
+										<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									</TouchableOpacity>
+								)}
 								<TouchableOpacity 
-									style={styles.schFilterBtn1} 
+									style={styles.schFilterBtn2}
 									activeOpacity={opacityVal}
 									onPress={()=>{setVisible3(true)}}
 								>
-									<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									<Text style={styles.schFilterBtn2Text}>상세필터</Text>
+									<AutoHeightImage width={17} source={require("../assets/img/icon_filter.png")} />
 								</TouchableOpacity>
-							)}
-							<TouchableOpacity 
-								style={styles.schFilterBtn2}
-								activeOpacity={opacityVal}
-								onPress={()=>{setVisible3(true)}}
-							>
-								<Text style={styles.schFilterBtn2Text}>상세필터</Text>
-								<AutoHeightImage width={17} source={require("../assets/img/icon_filter.png")} />
-							</TouchableOpacity>
+							</View>
+						</KeyboardAvoidingView>
+						<View style={styles.borderTop}></View>
+						</>
+					}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>등록된 중고상품이 없습니다.</Text>
 						</View>
-					</KeyboardAvoidingView>
-					<View style={styles.borderTop}></View>
-					</>
-				}
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 매칭이 없습니다.</Text>
-					</View>
-				}
-			/>
+					}
+				/>
+			) : (
+				<View style={[styles.indicator]}>
+          <ActivityIndicator size="large" />
+        </View>
+			)}
 
-			{!visible2 ? (
-			<Animated.View 
-				style={{
-					...styles.writeBtnBase,
-					width:scrollEvent3
-				}}
-			>
-				<TouchableOpacity 
-					activeOpacity={opacityVal}
-					onPress={()=>{setVisible2(true)}}
+			{isLoading ? (
+				!visible2 ? (
+				<Animated.View 
+					style={{
+						...styles.writeBtnBase,
+						width:scrollEvent3
+					}}
 				>
-					<Animated.View
-						style={{
-							...styles.writeBtnBaseAni,
-							opacity:scrollEvent
-						}}
+					<TouchableOpacity 
+						activeOpacity={opacityVal}
+						onPress={()=>{setVisible2(true)}}
 					>
-						<AutoHeightImage 
-							width={13} 
-							source={require("../assets/img/icon_plus2.png")} 
-						/>
-						<Text style={styles.writeBtnBaseText}>글쓰기</Text>
-					</Animated.View>
-					<Animated.View
-						style={{
-							...styles.writeBtnImg,
-							opacity:scrollEvent2
-						}}
-					>
-						<AutoHeightImage width={46} source={require("../assets/img/write_btn.png")} />
-					</Animated.View>
-				</TouchableOpacity>
-			</Animated.View>
+						<Animated.View
+							style={{
+								...styles.writeBtnBaseAni,
+								opacity:scrollEvent
+							}}
+						>
+							<AutoHeightImage 
+								width={13} 
+								source={require("../assets/img/icon_plus2.png")} 
+							/>
+							<Text style={styles.writeBtnBaseText}>글쓰기</Text>
+						</Animated.View>
+						<Animated.View
+							style={{
+								...styles.writeBtnImg,
+								opacity:scrollEvent2
+							}}
+						>
+							<AutoHeightImage width={46} source={require("../assets/img/write_btn.png")} />
+						</Animated.View>
+					</TouchableOpacity>
+				</Animated.View>
+				) : null
 			) : null}
-			{/* <TouchableOpacity style={styles.writeBtn}>				
-				<AutoHeightImage width={52} source={require("../assets/img/write_btn.png")} />
-			</TouchableOpacity> */}
+
 			<View style={styles.gapBox}></View>
 
 			<Modal
@@ -631,6 +628,7 @@ const styles = StyleSheet.create({
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
+	listInfoBox2 : {width:innerWidth,paddingLeft:0,},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
 	listInfoDesc: {marginTop:5},
@@ -646,6 +644,7 @@ const styles = StyleSheet.create({
 	listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,borderRadius:12,marginRight:8,},
 	listInfoPriceState1: {backgroundColor:'#31B481'},
 	listInfoPriceState2: {backgroundColor:'#F58C40'},
+	listInfoPriceState3: {width:64,backgroundColor:'#353636'},
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
@@ -688,6 +687,9 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+
+	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
 })
 
 export default Home

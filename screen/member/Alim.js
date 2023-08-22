@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Animated, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -15,17 +15,12 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Distance = ({navigation, route}) => {
+const Alim = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-  const [dst, setDst] = useState();
-
-  const dstAry = [
-		{ label: '5km', value: '5' },
-		{ label: '8km', value: '8' },
-		{ label: '10km', value: '10' },
-    { label: '15km', value: '15' },
-	]
+  const [state, setState] = useState(true);
+  const [stateEvent, setStateEvent] = useState(new Animated.Value(0));
+  const [stateEvent2, setStateEvent2] = useState(new Animated.Value(0));
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -33,7 +28,7 @@ const Distance = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setDst();
+				//setDst();
 			}
 		}else{
 			//console.log("isFocused");
@@ -49,45 +44,64 @@ const Distance = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
+  useEffect(() => {		
+    let change = 3;
+    let opac = 0;
+    
+    if(state){
+      change = 22;
+      opac = 1;
+    }else{
+      change = 3;
+      opac = 0
+    }
+
+		Animated.timing(
+			stateEvent, {toValue: change, duration: 100, useNativeDriver: false,}
+		).start();
+
+    Animated.timing(
+      stateEvent2, {toValue: opac, duration: 100, useNativeDriver: false,}
+		).start();
+	}, [state]);
+
   function submitRegist(){}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'반경 설정'} />
+			<Header navigation={navigation} headertitle={'알림 설정'} />
 			<ScrollView>
         <View style={styles.registArea}>
           <View style={[styles.registBox, styles.registBox3]}>
 						<View style={styles.alertBox}>
 							<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-							<Text style={styles.alertBoxText}>설정된 반경은 중고상품, 매칭을 보는데 사용합니다.</Text>
+							<Text style={styles.alertBoxText}>이용자는 푸시 알림에 대한 동의를 거부할 권리가 있으며, 미동의시에도 서비스 이용이 가능합니다.</Text>
 						</View>
-            <View style={[styles.typingBox, styles.mgTop30]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>반경</Text>
+            <View style={[styles.alimBox, styles.mgTop30]}>
+							<View style={styles.alimBoxTit}>
+								<Text style={styles.alimBoxTitText}>푸시알림동의</Text>
 							</View>
-							<View style={[styles.typingInputBox]}>
-								<RNPickerSelect
-									onValueChange={(value) => setDst(value)}
-									placeholder={{
-										label: '반경을 선택해 주세요.',
-										inputLabel: '반경을 선택해 주세요.',
-										value: '',
-										color: '#8791A1',
-									}}
-									items={dstAry}
-									fixAndroidTouchableBug={true}
-									useNativeAndroidPickerStyle={false}
-									style={{
-										placeholder: {color: '#8791A1'},
-										inputAndroid: styles.input,
-										inputAndroidContainer: styles.inputContainer,
-										inputIOS: styles.input,
-										inputIOSContainer: styles.inputContainer,
-									}}
-								/>
-								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
-							</View>
-						</View>
+              <View style={styles.alimBtnBox}>
+                <Animated.View 
+                  style={{
+                    ...styles.alimBtnBoxBack,
+                    opacity:stateEvent2
+                  }}
+                ></Animated.View>
+                <TouchableOpacity 
+                  style={[styles.alimBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{setState(!state)}}
+                >
+                  <Animated.View 
+                    style={{
+                      ...styles.alimCircle,
+                      left:stateEvent
+                    }}
+                  ></Animated.View>
+                </TouchableOpacity>
+						  </View>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -120,17 +134,25 @@ const styles = StyleSheet.create({
 	icon_alert: {position:'absolute',left:15,top:15},
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
-	typingBox: {},
-	typingTitle: {},
-	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
-	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
-	typingInputBox: {marginTop:10,position:'relative'},
-	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',},
-	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
-  selectArr: {position:'absolute',top:25.5,right:20,},
+  alimBox: {flexDirection:'row',alignItems:'center',justifyContent:'space-between'},
+  alimBoxTit: {},
+  alimBoxTitText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:19,color:'#000'},
+  alimBtnBox: {width:52,height:32,backgroundColor:'#999',borderRadius:16,overflow:'hidden'},
+  alimBtnBoxBack: {width:52,height:32,backgroundColor:'#31B481',position:'absolute',left:0,top:0,},
+  alimBtn: {width:52,height:32,position:'relative',zIndex:5,},
+  alimCircle: {width:26,height:26,backgroundColor:'#fff',borderRadius:100,position:'absolute',top:3,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 15.0,
+    elevation: 10,
+  },
+
   nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 })
 
-export default Distance
+export default Alim
