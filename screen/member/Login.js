@@ -6,6 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { KakaoOAuthToken, KakaoProfile, getProfile as getKakaoProfile, KakaoProfileNoneAgreement, login, logout, unlink } from '@react-native-seoul/kakao-login';
 
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 
@@ -97,13 +98,28 @@ const Login = ({navigation, route}) => {
       });          
       setKakaoResult(JSON.stringify(kakaoData));
       //unlinkKakao();
-			
-			navigation.navigate('Register', {
-				email:profile.email, 
-				regiType:"sns",
-				provider:"kakao",
-				uid:profile.id
-			})
+
+			//아이디 조회 후 로그인 또는 회원가입
+			Api.send('GET', '	sns_check', {ss_from:'kakao', access_token:'', ss_id:profile.id, is_api:1}, (args)=>{
+				let resultItem = args.resultItem;
+				let arrItems = args.arrItems;
+				let responseJson = args.responseJson;
+				console.log(args);
+				if(resultItem.result === 'Y' && responseJson){
+						console.log('출력확인..', responseJson);	
+				}else if(responseJson.result === 'error'){
+						ToastMessage(responseJson.result_text);
+				}else{
+						console.log('결과 출력 실패!', resultItem);
+						//ToastMessage(resultItem.message);
+				}
+			});
+			// navigation.navigate('SnsRegister', {
+			// 	email:profile.email, 
+			// 	regiType:"sns",
+			// 	provider:"kakao",
+			// 	uid:profile.id
+			// });
     } catch(err) {
       console.log(err);
     }

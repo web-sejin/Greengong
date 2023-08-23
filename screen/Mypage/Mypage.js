@@ -51,6 +51,7 @@ const Mypage = ({navigation, route}) => {
 			>
 				<Text style={{color:'#000',padding:30}}>로그인</Text>
 			</TouchableOpacity>
+
 			<View style={styles.header}>		
 				<Text style={styles.headerTitle}>마이페이지</Text>
 				<TouchableOpacity

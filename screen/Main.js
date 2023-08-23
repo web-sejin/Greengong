@@ -25,13 +25,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AutoHeightImage from "react-native-auto-height-image";
 import Toast from 'react-native-toast-message';
 import SplashScreen from 'react-native-splash-screen';
+import store from '../redux/configureStore';
+import {Provider} from 'react-redux';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import Font from '../assets/common/Font';
+import Intro from './Intro';
 import Home from './Home'; //메인-중고상품 리스트
 import AlimList from './AlimList'; //알림 리스트
 import Login from './member/Login'; //로그인
 import Register from './member/Register'; //약관
 import Register2 from './member/Register2'; //회원가입
+import SnsRegister from './member/SnsRegister'; //약관-SNS
+import SnsRegister2 from './member/SnsRegister2'; //회원가입-SNS
 import Findid from './member/Findid'; //아이디 찾기
 import Findpw from './member/Findpw'; //비밀번호 찾기
 import Match from './Match/Match';
@@ -243,7 +249,7 @@ const TabNavigator = ({ navigation }) => {
 const StackNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="Intro"
       screenOptions={{
         headerShown:false,
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
@@ -251,9 +257,12 @@ const StackNavigator = () => {
     >
       <Stack.Screen name="TabNavigator" component={TabNavigator} />      
       <Stack.Screen name="AlimList" component={AlimList} />
+      <Stack.Screen name="Intro" component={Intro} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="Register2" component={Register2} />
+      <Stack.Screen name="Register2" component={Register2} />      
+      <Stack.Screen name="SnsRegister" component={SnsRegister} />
+      <Stack.Screen name="SnsRegister2" component={SnsRegister2} />
       <Stack.Screen name="Findid" component={Findid} />
       <Stack.Screen name="Findpw" component={Findpw} />
       <Stack.Screen name="SearchList" component={SearchList} />
@@ -351,10 +360,14 @@ const Main = () => {
 
   return (
     <SafeAreaView style={{flex:1}}>
-      <NavigationContainer>
-        <StackNavigator />
-        <Toast config={toastConfig} ref={(ref) => Toast.setRef(ref)} />
-      </NavigationContainer>
+      <Provider store={store}>
+        <PaperProvider>
+          <NavigationContainer>
+            <StackNavigator />
+            <Toast config={toastConfig} ref={(ref) => Toast.setRef(ref)} />
+          </NavigationContainer>
+        </PaperProvider>
+      </Provider>
     </SafeAreaView>
   );
 };
