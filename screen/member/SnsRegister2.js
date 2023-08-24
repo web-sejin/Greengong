@@ -26,11 +26,12 @@ let t1;
 let tcounter;
 let temp;
 
-const SnsRegister2 = ({navigation, route}) => {
+const SnsRegister2 = ({navigation, route}) => {	
   const snsEmail = route.params.email;
   const provider = route.params.provider;
   const regiType = route.params.regiType;
   const uid = route.params.uid;
+	const ssIdx = route.params.ssIdx;
 
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -61,7 +62,7 @@ const SnsRegister2 = ({navigation, route}) => {
 	const [timeStamp, setTimeStamp] = useState('');
 	const [phoneIntervel, setPhoneInterval] = useState(false);
 	const [picture, setPickture] = useState('');	
-	const [state, setState] = useState(false);
+	const [state, setState] = useState(0);
 	const [factName1, setFactName1] = useState('');
 	const [factCode1, setFactCode1] = useState('');
 	const [factAddr1, setFactAddr1] = useState('');
@@ -108,7 +109,7 @@ const SnsRegister2 = ({navigation, route}) => {
 				setMbName('');
 				setMbCompanyAddr('');
 				setPickture();
-				setState(false);
+				setState(0);
 				setTimeStamp('');
 				setPhoneInterval(false);
 				setLocation('');
@@ -299,39 +300,6 @@ const SnsRegister2 = ({navigation, route}) => {
 			return false;
 		}
 
-		setModal1(true);
-	}
-
-	function nextStep2(){
-		if(pw == ""){
-			setToastText('비밀번호를 입력해 주세요.');
-			setToastModal(true);
-			setTimeout(()=>{ setToastModal(false) },2000);
-			return false;
-		}
-
-		const pwChk = pwd_check(pw);
-		if(!pwChk || pw.length < 6){
-			setToastText('비밀번호는 6자 이상 영문,숫자,특수문자를 조합해서 입력해 주세요.');
-			setToastModal(true);
-			setTimeout(()=>{ setToastModal(false) },2000);
-			return false;
-		}
-
-		if(pw2 == ""){
-			setToastText('비밀번호를 한 번 더 입력해 주세요.');
-			setToastModal(true);
-			setTimeout(()=>{ setToastModal(false) },2000);
-			return false;
-		}
-
-		if(pw != pw2){
-			setToastText('비밀번호가 일치하지 않습니다.\n다시 입력해 주세요.');
-			setToastModal(true);
-			setTimeout(()=>{ setToastModal(false) },2000);
-			return false;
-		}
-
 		setModal2(true);
 	}
 
@@ -466,7 +434,7 @@ const SnsRegister2 = ({navigation, route}) => {
 	}
 
 	function resetCompany(){
-		setState(!state);
+		setState(0);
 		setMbCompanyNumber('');
 		setMbCompanyName('');
 		setMbName('');
@@ -539,7 +507,7 @@ const SnsRegister2 = ({navigation, route}) => {
 	function submitRegist(){
 		let factory1 = false;
 		let factory2 = false;
-
+		
 		if(!my1){
 			setToastText('내 공장1을 등록해 주세요.');
 			setToastModal(true);
@@ -602,7 +570,7 @@ const SnsRegister2 = ({navigation, route}) => {
 		formData.append('email', mbEmail);
 		formData.append('nick', mbNickname);
 		formData.append('os', Platform.OS);
-		formData.append('pass', pw);
+		formData.append('is_sso', 1);
 		formData.append('fac1_name', factName1);
 		formData.append('fac1_zip', factCode1);
 		formData.append('fac1_addr1', factAddr1);
@@ -620,7 +588,75 @@ const SnsRegister2 = ({navigation, route}) => {
 		formData.append('bc_img', picture);
 		formData.append('is_cert', state);
 
-		console.log("::form::",formData);
+		//console.log("::form::",formData);
+
+		let formData2 = {
+			is_api:1,				
+			hp:mbHp,
+			email:mbEmail,
+			nick:mbNickname,
+			os:Platform.OS,
+			is_sso:1,
+			ss_idx:ssIdx,
+			fac1_name:factName1, 
+			fac1_zip:factCode1, 
+			fac1_addr1:factAddr1, 
+			fac1_addr2:factAddrDt1, 
+			fac2_name:factName2, 
+			fac2_zip:factCode2, 
+			fac2_addr1:factAddr2, 
+			fac2_addr2:factAddrDt2, 			
+			fac1_use:fac_use, 
+			fac2_use:fac_use2, 
+			is_cert:state,
+		};
+		
+		if(state == 1){
+			formData2 = {
+				is_api:1,				
+				hp:mbHp,
+				email:mbEmail,
+				nick:mbNickname,
+				os:Platform.OS,
+				is_sso:1,
+				ss_idx:ssIdx,
+				fac1_name:factName1, 
+				fac1_zip:factCode1, 
+				fac1_addr1:factAddr1, 
+				fac1_addr2:factAddrDt1, 
+				fac2_name:factName2, 
+				fac2_zip:factCode2, 
+				fac2_addr1:factAddr2, 
+				fac2_addr2:factAddrDt2, 			
+				fac1_use:fac_use, 
+				fac2_use:fac_use2, 
+				is_cert:state,
+				bc_no:mbcompanyNumber, 
+				bc_com_name:mbcompanyName, 
+				bc_name:mbName, 
+				bc_local:mbCompanyAddr, 			
+				bc_img: {
+					'uri': picture,
+					'type': 'image/png',
+					'name': 'bc.png',
+				}
+			};
+		}
+					
+		Api.send('POST', 'member_save', formData2, (args)=>{			
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				navigation.reset({
+					routes: [{ name: 'Intro'}],	
+				});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
 	}
 
 	return (
@@ -757,71 +793,6 @@ const SnsRegister2 = ({navigation, route}) => {
 			</View>
 
 			<Modal
-				visible={modal1}
-				animationType={"slide"}
-				onRequestClose={() => {setModal1(false)}}
-			>
-				<View style={styles.header}>
-					<>
-					<TouchableOpacity 
-						style={styles.headerBackBtn}
-						activeOpacity={opacityVal}
-						onPress={() => (setModal1(false))}
-					>
-						<AutoHeightImage width={9} source={require("../../assets/img/icon_header_back.png")} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle}>비밀번호 설정</Text>
-					</>
-				</View>
-				<KeyboardAwareScrollView>
-					<View style={styles.registArea}>
-						<View style={[styles.registBox, styles.registBox3]}>
-							<View style={styles.alertBox}>
-								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-								<Text style={styles.alertBoxText}>비밀번호는 일반 로그인에 사용됩니다.</Text>
-								<Text style={[styles.alertBoxText, styles.alertBoxText2]}>6자 이상 영문, 숫자, 특수문자만 가능합니다.</Text>
-							</View>
-
-							<View style={[styles.typingBox, styles.mgTop30]}>
-								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>비밀번호</Text>
-								</View>
-								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-									<TextInput
-										secureTextEntry={true}
-										value={pw}
-										onChangeText={(v) => {setPw(v)}}
-										placeholder={'비밀번호 입력(6자 이상 영문, 숫자, 특수문자)'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										secureTextEntry={true}
-										value={pw2}
-										onChangeText={(v) => {setPw2(v)}}
-										placeholder={'비밀번호 재입력'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-							</View>
-						</View>
-					</View>
-				</KeyboardAwareScrollView>
-				<View style={styles.nextFix}>
-					<TouchableOpacity 
-						style={styles.nextBtn}
-						activeOpacity={opacityVal}
-						onPress={() => nextStep2()}
-					>
-						<Text style={styles.nextBtnText}>다음</Text>
-					</TouchableOpacity>
-				</View>
-			</Modal>
-
-			<Modal
 				visible={modal2}
 				animationType={"slide"}
 				onRequestClose={() => {setModal2(false)}}
@@ -907,18 +878,18 @@ const SnsRegister2 = ({navigation, route}) => {
 								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
 								<Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요. 가입 후에도 등록 가능합니다.</Text>
 							</View>
-							{!state ? (
+							{state == 0 ? (
 							<TouchableOpacity
 								style={styles.addBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {setState(true)}}
+								onPress={() => {setState(1)}}
 							>
 								<AutoHeightImage width={13} source={require("../../assets/img/icon_plus.png")} style={styles.icon_add} />
 								<Text style={styles.addBtnText}>등록</Text>
 							</TouchableOpacity>
 							) : null}
 						</View>
-						{state ? (
+						{state == 1 ? (
 						<View style={[styles.registBox, styles.registBox2]}>
 							<View style={[styles.typingBox]}>
 								<View style={[styles.typingTitle, styles.typingTitleFlex]}>
@@ -998,7 +969,7 @@ const SnsRegister2 = ({navigation, route}) => {
 									onPress={() => {setModal4(true);}}
 								>
 									{picture ? (
-										<AutoHeightImage width={102} source={{uri: picture}} />
+										<AutoHeightImage width={102} source={{uri: picture}} style={[styles.photoBox]} />
 									) : (
 										<AutoHeightImage 
 											width={102} 
@@ -1224,7 +1195,7 @@ const SnsRegister2 = ({navigation, route}) => {
 				<View style={styles.header}>
 					<>
 					<TouchableOpacity
-						style={styles.headerBackBtn}
+						style={styles.headerCloseBtn}
 						activeOpacity={opacityVal}
 						onPress={() => (setModal6(false))}						
 					>

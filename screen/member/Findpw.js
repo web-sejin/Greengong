@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Api from '../../Api';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -18,7 +20,7 @@ let t1;
 let tcounter;
 let temp;
 
-const Find_pw = ({navigation, route}) => {
+const Find_pw = ({navigation, route}) => {	
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [mbEmail, setMbEmail] = useState('');
@@ -26,9 +28,14 @@ const Find_pw = ({navigation, route}) => {
 	const [pw, setPw] = useState('');
 	const [pw2, setPw2] = useState('');
 	const [certNumber, setCertNumber] = useState('');
+	const [certNumberSt, setCertNumberSt] = useState(false);
 	const [timeStamp, setTimeStamp] = useState('');
 	const [phoneIntervel, setPhoneInterval] = useState(false);
 	const [visible, setVisible] = useState(false);
+	const [ransoo, setRansoo] = useState('');
+	const [toastModal, setToastModal] = useState(false);
+	const [toastText, setToastText] = useState('');
+	const [mbId, setMbId] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -39,9 +46,16 @@ const Find_pw = ({navigation, route}) => {
 				setMbEmail('')
 				setMbHp('');
 				setCertNumber('');
+				setCertNumberSt(false);
 				setTimeStamp('');
 				setPhoneInterval(false);
-				setVisible(false)
+				setVisible(false);				
+				setRansoo('');
+				clearInterval(t1);
+				setPw('');
+				setPw2('');
+				setToastModal(false);
+				setToastText('');
 			}
 		}else{
 			//console.log("isFocused");
@@ -87,9 +101,9 @@ const Find_pw = ({navigation, route}) => {
 	};
 
 	const _sendSmsButton = () => {
-		// console.log('sms');			
-		if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
+		// console.log('sms');
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
@@ -99,36 +113,74 @@ const Find_pw = ({navigation, route}) => {
 			return false;
 		}
 
-		//setSmsRandNumber(randomNumber(6));
-		setPhoneInterval(true);
+		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: 'join'}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			console.log(resultItem);
+			if(resultItem.result === 'Y' && responseJson){
+					console.log('출력확인..', responseJson);
+					setRansoo(responseJson.ce_num);
+					setPhoneInterval(true);
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
 	}
 
-	const _authComplete = () => {
+	const _authComplete = () => {		
+		//console.log(ransoo);
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
+			return false;
+		}
+
+		if(certNumber == ""){
+			ToastMessage('인증번호를 입력해 주세요.');
+			return false;
+		}
+
 		if(tcounter <= 0){
 			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
 			return false;
 		 }
-		 timer_stop();
-		//  if(smsRandNumber == ransoo){
-		// 	setAuthTitle('인증확인');
-		// 	setPhoneInterval(false);
-		// 	setAuthButtonState(true);//인증버튼 비활성화
-		// 	ToastMessage('본인인증이 완료되었습니다.\n다음단계로 이동하세요.');
-		// 	setNextButtonState(false);
-		// 	return true;
-		//  }else{
-		// 	setAuthTitle('인증완료');
-		// 	setAuthButtonState(false); //인증버튼 비활성화
-		// 	ToastMessage('인증번호가 일치하지 않습니다.');
-		// 	setNextButtonState(true);
-		// 	return false;
-		//  }
+
+		 if(ransoo == certNumber){
+			//ToastMessage('본인인증이 완료되었습니다.');
+			setCertNumberSt(true);
+			timer_stop();
+
+			Api.send('POST', '	find_id', {is_api:1, mb_hp:mbHp}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+	
+				if(responseJson.result === 'success'){
+					//console.log(responseJson);
+					setMbId(responseJson.mb_id);
+					setVisible(true);
+				}else{
+					console.log('결과 출력 실패!', resultItem);
+					ToastMessage(responseJson.result_text);
+				}
+			});
+						
+		 }else{
+			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
+			return false;
+		 }
 	}
 
 	const timer_stop = () => {
 		clearInterval(t1);
 		setTimeStamp('');
 		setPhoneInterval(false);
+		setRansoo('');
+		tcounter = 0;
+		temp = '';
 	};
 
 	useEffect(()=>{
@@ -145,6 +197,12 @@ const Find_pw = ({navigation, route}) => {
 			return false;
 		}
 
+		const emailChk = email_check(mbEmail);
+		if(!emailChk){
+			ToastMessage('이메일을 정확히 입력해 주세요.');
+			return false;
+		}
+
 		if(!mbHp || mbHp == ""){
 			ToastMessage('휴대폰 번호를 입력해 주세요.');
 			return false;
@@ -156,7 +214,51 @@ const Find_pw = ({navigation, route}) => {
 		}
 		
 		_authComplete();
-		setVisible(true);
+	}
+
+	function changePw(){
+		if(pw == ""){
+			setToastText('비밀번호를 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		const pwChk = pwd_check(pw);
+		if(!pwChk || pw.length < 6){
+			setToastText('비밀번호는 6자 이상 영문,숫자,특수문자를 조합해서 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		if(pw2 == ""){
+			setToastText('비밀번호를 한 번 더 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		if(pw != pw2){
+			setToastText('비밀번호가 일치하지 않습니다.\n다시 입력해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
+
+		Api.send('POST', '	find_pass', {is_api:1, mb_id:mbId, mb_pass:pw, mb_pass_re:pw2}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				setToastText('비밀번호가 변경되었습니다.\n로그인 페이지로 돌아갑니다.');
+				setToastModal(true);
+				setTimeout(()=>{ navigation.navigate('Login') },2000);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
 	}
 
 	return (
@@ -197,15 +299,25 @@ const Find_pw = ({navigation, route}) => {
 								<TextInput
 									value={mbHp}
 									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
-									placeholder={"휴대폰번호를 입력해 주세요."}
+									onChangeText={(v) => {
+										const phone = phoneFormat(v);
+										setMbHp(phone);
+										setCertNumber('');
+										setCertNumberSt(false);
+									}}
+									placeholder={"휴대폰 번호를 입력해 주세요."}
 									style={[styles.input, styles.input2]}
 									placeholderTextColor={"#8791A1"}
-									maxLength={11}
+									maxLength={132}
 								/>
 								<TouchableOpacity 
 									style={styles.certChkBtn}
-									onPress={() => {_sendSmsButton()}}
+									onPress={() => {
+										//console.log("phoneIntervel : ",phoneIntervel);
+										!phoneIntervel ? ( _sendSmsButton() ) : null
+										!phoneIntervel ? ( setCertNumber('') ) : null
+										!phoneIntervel ? ( setCertNumberSt(false) ) : null
+									}}
 								>
 									<Text style={styles.certChkBtnText}>인증번호</Text>
 								</TouchableOpacity>
@@ -299,12 +411,41 @@ const Find_pw = ({navigation, route}) => {
 					<TouchableOpacity 
 						style={styles.nextBtn}
 						activeOpacity={opacityVal}
-						onPress={() => {
-							setPageSt(true);
-						}}
+						onPress={() => {changePw()}}
 					>
 						<Text style={styles.nextBtnText}>비밀번호 재설정</Text>
 					</TouchableOpacity>
+				</View>
+			</Modal>
+
+			<Modal
+        visible={toastModal}
+				animationType={"slide"}
+				transparent={true}
+      >
+				<View style={styles.toastModal}>
+					<View
+						style={{
+							backgroundColor: '#000',
+							borderRadius: 10,
+							paddingVertical: 10,
+							paddingHorizontal: 20,
+							opacity: 0.7,
+						}}
+					>
+						<Text
+							style={{
+								textAlign: 'center',
+								color: '#FFFFFF',
+								fontSize: 15,
+								lineHeight: 22,
+								fontFamily: Font.NotoSansRegular,
+								letterSpacing: -0.38,
+							}}
+						>
+							{toastText}
+						</Text>
+					</View>
 				</View>
 			</Modal>
 		</SafeAreaView>
@@ -357,6 +498,8 @@ const styles = StyleSheet.create({
 	modalDescTextBold: {fontFamily:Font.NotoSansBold,color:'#10AA7A',marginRight:4,},
 	grayBox: {width:innerWidth,height:58,backgroundColor:'#F2F2F2',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:35,},
 	grayBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:18,color:'#6C6C6C',marginLeft:4,},
+
+	toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
 })
 
 export default Find_pw

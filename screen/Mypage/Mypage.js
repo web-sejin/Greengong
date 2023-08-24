@@ -43,14 +43,14 @@ const Mypage = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<TouchableOpacity
+			{/* <TouchableOpacity
 				onPress={() => {
 					setPageSt(true);
 					navigation.navigate('Login')
 				}}
 			>
 				<Text style={{color:'#000',padding:30}}>로그인</Text>
-			</TouchableOpacity>
+			</TouchableOpacity> */}
 
 			<View style={styles.header}>		
 				<Text style={styles.headerTitle}>마이페이지</Text>
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
 	mypage1InfoEmail: {},
 	mypage1InfoEmailText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#323232'},
 	mypage1InfoKakaoSt: {width:120,height:24,backgroundColor:'#FFE812',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:10,},
-	mypage1InfoKakaoStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:31,color:'#3C1E1E',marginLeft:7,},
+	mypage1InfoKakaoStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:15,color:'#3C1E1E',marginLeft:7,},
 	mypage1InfoBtn: {width:75,height:26,backgroundColor:'#F2F2F2',borderRadius:13,display:'flex',alignItems:'center',justifyContent:'center'},
 	mypage1InfoBtnText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#737373'},
 	myDealResultBox: {paddingVertical:11,paddingHorizontal:30,backgroundColor:'#F3FAF8',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:20,},

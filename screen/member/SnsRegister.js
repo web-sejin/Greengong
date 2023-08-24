@@ -14,11 +14,12 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const SnsRegister = ({navigation, route}) => {
+const SnsRegister = ({navigation, route}) => {	
   const email = route.params.email;
   const provider = route.params.provider;
   const regiType = route.params.regiType;
   const uid = route.params.uid;
+	const ssIdx = route.params.ss_idx;
 
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -92,7 +93,8 @@ const SnsRegister = ({navigation, route}) => {
       email:email, 
       regiType:regiType,
       provider:provider,
-      uid:uid
+      uid:uid,
+			ssIdx:ssIdx,	
     })
 	}
 

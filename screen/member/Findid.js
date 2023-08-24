@@ -4,10 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -23,9 +24,13 @@ const Find_id = ({navigation, route}) => {
 	const [pageSt, setPageSt] = useState(false);
 	const [mbHp, setMbHp] = useState('');
 	const [certNumber, setCertNumber] = useState('');
+	const [certNumberSt, setCertNumberSt] = useState(false);
 	const [timeStamp, setTimeStamp] = useState('');
 	const [phoneIntervel, setPhoneInterval] = useState(false);
 	const [visible, setVisible] = useState(false);
+	const [ransoo, setRansoo] = useState('');
+	const [resultId, setResultId] = useState('');
+	const [resultDate, setResultDate] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -35,9 +40,14 @@ const Find_id = ({navigation, route}) => {
 			if(!pageSt){
 				setMbHp('');
 				setCertNumber('');
+				setCertNumberSt(false);
 				setTimeStamp('');
 				setPhoneInterval(false);
 				setVisible(false);
+				setRansoo('');
+				clearInterval(t1);
+				setResultId('');
+				setResultDate('');
 			}
 		}else{
 			//console.log("isFocused");
@@ -84,8 +94,8 @@ const Find_id = ({navigation, route}) => {
 
 	const _sendSmsButton = () => {
 		// console.log('sms');
-		if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
@@ -95,36 +105,74 @@ const Find_id = ({navigation, route}) => {
 			return false;
 		}
 
-		//setSmsRandNumber(randomNumber(6));
-		setPhoneInterval(true);
+		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: 'join'}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+					console.log('출력확인..', responseJson);
+					setRansoo(responseJson.ce_num);
+					setPhoneInterval(true);
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
 	}
 
-	const _authComplete = () => {
+	const _authComplete = () => {		
+		//console.log(ransoo);
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
+			return false;
+		}
+
+		if(certNumber == ""){
+			ToastMessage('인증번호를 입력해 주세요.');
+			return false;
+		}
+
 		if(tcounter <= 0){
 			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
 			return false;
 		 }
-		 timer_stop();
-		//  if(smsRandNumber == ransoo){
-		// 	setAuthTitle('인증확인');
-		// 	setPhoneInterval(false);
-		// 	setAuthButtonState(true);//인증버튼 비활성화
-		// 	ToastMessage('본인인증이 완료되었습니다.\n다음단계로 이동하세요.');
-		// 	setNextButtonState(false);
-		// 	return true;
-		//  }else{
-		// 	setAuthTitle('인증완료');
-		// 	setAuthButtonState(false); //인증버튼 비활성화
-		// 	ToastMessage('인증번호가 일치하지 않습니다.');
-		// 	setNextButtonState(true);
-		// 	return false;
-		//  }
+
+		 if(ransoo == certNumber){
+			//ToastMessage('본인인증이 완료되었습니다.');
+			setCertNumberSt(true);
+			timer_stop();
+
+			Api.send('POST', 'find_id', {is_api:1, mb_hp:mbHp}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+	
+				if(responseJson.result === 'success'){
+					//console.log(responseJson);
+					setResultId(responseJson.mb_id);
+					setResultDate(responseJson.mb_regdate);
+					setVisible(true);
+				}else{
+					console.log('결과 출력 실패!', resultItem);
+					ToastMessage(responseJson.result_text);
+				}
+			});
+						
+		 }else{
+			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
+			return false;
+		 }
 	}
 
 	const timer_stop = () => {
 		clearInterval(t1);
 		setTimeStamp('');
 		setPhoneInterval(false);
+		setRansoo('');
+		tcounter = 0;
+		temp = '';
 	};
 
 	useEffect(()=>{
@@ -147,7 +195,6 @@ const Find_id = ({navigation, route}) => {
 		}
 		
 		_authComplete();
-		setVisible(true);
 	}
 
 	return (
@@ -172,15 +219,26 @@ const Find_id = ({navigation, route}) => {
 								<TextInput
 									value={mbHp}
 									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
-									placeholder={"휴대폰번호를 입력해 주세요."}
+									onChangeText={(v) => {
+										const phone = phoneFormat(v);
+										setMbHp(phone);
+										setCertNumber('');
+										setCertNumberSt(false);
+									}}
+									placeholder={"휴대폰 번호를 입력해 주세요."}
 									style={[styles.input, styles.input2]}
 									placeholderTextColor={"#8791A1"}
-									maxLength={11}
+									maxLength={13}
 								/>
 								<TouchableOpacity 
 									style={styles.certChkBtn}
-									onPress={() => {_sendSmsButton()}}
+									activeOpacity={opacityVal}
+									onPress={() => {
+										//console.log("phoneIntervel : ",phoneIntervel);
+										!phoneIntervel ? ( _sendSmsButton() ) : null
+										!phoneIntervel ? ( setCertNumber('') ) : null
+										!phoneIntervel ? ( setCertNumberSt(false) ) : null
+									}}
 								>
 									<Text style={styles.certChkBtnText}>인증번호</Text>
 								</TouchableOpacity>
@@ -208,6 +266,7 @@ const Find_id = ({navigation, route}) => {
 			<View style={styles.nextFix}>
 				<TouchableOpacity 
 					style={styles.nextBtn}
+					activeOpacity={opacityVal}
 					onPress={() => fnSubmit()}
 				>
 					<Text style={styles.nextBtnText}>아이디 찾기</Text>
@@ -237,13 +296,13 @@ const Find_id = ({navigation, route}) => {
 								<Text style={styles.modalDescText}>회원님의 가입된 아이디는</Text>
 							</View>
 							<View style={styles.modalDesc}>
-								<Text style={[styles.modalDescText, styles.modalDescTextBold]}>hong@google.com</Text>
+								<Text style={[styles.modalDescText, styles.modalDescTextBold]}>{resultId}</Text>
 								<Text style={styles.modalDescText}>입니다.</Text>
 							</View>
 						</View>
 						<View style={styles.grayBox}>						
 							<AutoHeightImage width={13} source={require("../../assets/img/icon_alert2.png")} />
-							<Text style={styles.grayBoxText}>가입일자 2023. 06. 10</Text>
+							<Text style={styles.grayBoxText}>가입일자 {resultDate}</Text>
 						</View>
 					</View>
 				</ScrollView>

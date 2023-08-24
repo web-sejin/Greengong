@@ -26,7 +26,7 @@ let t1;
 let tcounter;
 let temp;
 
-const Register2 = ({navigation, route}) => {
+const Register2 = ({navigation, route}) => {	
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 
@@ -56,7 +56,7 @@ const Register2 = ({navigation, route}) => {
 	const [timeStamp, setTimeStamp] = useState('');
 	const [phoneIntervel, setPhoneInterval] = useState(false);
 	const [picture, setPickture] = useState('');	
-	const [state, setState] = useState(false);
+	const [state, setState] = useState(0);
 	const [factName1, setFactName1] = useState('');
 	const [factCode1, setFactCode1] = useState('');
 	const [factAddr1, setFactAddr1] = useState('');
@@ -103,7 +103,7 @@ const Register2 = ({navigation, route}) => {
 				setMbName('');
 				setMbCompanyAddr('');
 				setPickture();
-				setState(false);
+				setState(0);
 				setTimeStamp('');
 				setPhoneInterval(false);
 				setLocation('');
@@ -454,7 +454,7 @@ const Register2 = ({navigation, route}) => {
 	}
 
 	function resetCompany(){
-		setState(!state);
+		setState(0);
 		setMbCompanyNumber('');
 		setMbCompanyName('');
 		setMbName('');
@@ -473,6 +473,7 @@ const Register2 = ({navigation, route}) => {
 			ToastMessage('이메일을 정확히 입력해 주세요.');
 			return false;
 		}		
+		
 
 		Api.send('GET', '	validation_email', {email: mbEmail, is_api: 1}, (args)=>{
 			let resultItem = args.resultItem;
@@ -602,13 +603,78 @@ const Register2 = ({navigation, route}) => {
 		formData.append('bc_no', mbcompanyNumber);
 		formData.append('bc_com_name', mbcompanyName);
 		formData.append('bc_name', mbName);
-		formData.append('bc_local', pw);
+		formData.append('bc_local', mbCompanyAddr);
 		formData.append('fac1_use', fac_use);
 		formData.append('fac2_use', fac_use2);
 		formData.append('bc_img', picture);
 		formData.append('is_cert', state);
+		//console.log("::form::",formData);
 
-		console.log("::form::",formData);
+		let formData2 = {
+			is_api:1,				
+			hp:mbHp,
+			email:mbEmail,
+			nick:mbNickname,
+			os:Platform.OS,
+			pass:pw, 
+			fac1_name:factName1, 
+			fac1_zip:factCode1, 
+			fac1_addr1:factAddr1, 
+			fac1_addr2:factAddrDt1, 
+			fac2_name:factName2, 
+			fac2_zip:factCode2, 
+			fac2_addr1:factAddr2, 
+			fac2_addr2:factAddrDt2, 
+			fac1_use:fac_use, 
+			fac2_use:fac_use2, 
+			is_cert:state
+		};
+		
+		if(state == 1){
+			formData2 = {
+				is_api:1,				
+				hp:mbHp,
+				email:mbEmail,
+				nick:mbNickname,
+				os:Platform.OS,
+				pass:pw,
+				fac1_name:factName1, 
+				fac1_zip:factCode1, 
+				fac1_addr1:factAddr1, 
+				fac1_addr2:factAddrDt1, 
+				fac2_name:factName2, 
+				fac2_zip:factCode2, 
+				fac2_addr1:factAddr2, 
+				fac2_addr2:factAddrDt2, 			
+				fac1_use:fac_use, 
+				fac2_use:fac_use2, 
+				is_cert:state,
+				bc_no:mbcompanyNumber, 
+				bc_com_name:mbcompanyName, 
+				bc_name:mbName, 
+				bc_local:mbCompanyAddr, 			
+				bc_img: {
+					'uri': picture,
+					'type': 'image/png',
+					'name': 'bc.png',
+				}
+			};
+		}
+
+		Api.send('POST', 'member_save', formData2, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				navigation.reset({
+					routes: [{ name: 'Intro'}],	
+				});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
 	}
 
 	return (
@@ -895,18 +961,18 @@ const Register2 = ({navigation, route}) => {
 								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
 								<Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요. 가입 후에도 등록 가능합니다.</Text>
 							</View>
-							{!state ? (
+							{state == 0 ? (
 							<TouchableOpacity
 								style={styles.addBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {setState(true)}}
+								onPress={() => {setState(1)}}
 							>
 								<AutoHeightImage width={13} source={require("../../assets/img/icon_plus.png")} style={styles.icon_add} />
 								<Text style={styles.addBtnText}>등록</Text>
 							</TouchableOpacity>
 							) : null}
 						</View>
-						{state ? (
+						{state == 1 ? (
 						<View style={[styles.registBox, styles.registBox2]}>
 							<View style={[styles.typingBox]}>
 								<View style={[styles.typingTitle, styles.typingTitleFlex]}>
@@ -986,7 +1052,7 @@ const Register2 = ({navigation, route}) => {
 									onPress={() => {setModal4(true);}}
 								>
 									{picture ? (
-										<AutoHeightImage width={102} source={{uri: picture}} />
+										<AutoHeightImage width={102} source={{uri: picture}} style={[styles.photoBox]} />
 									) : (
 										<AutoHeightImage 
 											width={102} 
@@ -1212,7 +1278,7 @@ const Register2 = ({navigation, route}) => {
 				<View style={styles.header}>
 					<>
 					<TouchableOpacity
-						style={styles.headerBackBtn}
+						style={styles.headerCloseBtn}
 						activeOpacity={opacityVal}
 						onPress={() => (setModal6(false))}						
 					>

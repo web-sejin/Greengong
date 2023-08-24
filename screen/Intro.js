@@ -7,6 +7,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../redux/module/action/UserAction';
+import messaging from '@react-native-firebase/messaging';
+import PushNotification from 'react-native-push-notification';
+import PushNotificationIOS from "@react-native-community/push-notification-ios";
 
 import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
@@ -17,17 +20,90 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Intro = ({navigation, route}) => {
-  useEffect(()=>{
-    AsyncStorage.getItem('mb_id').then(async (response) => {
+const Intro = (props) => {
+	const {navigation, member_login, member_info} = props;
+	const [appToken, setAppToken] = useState();
+
+	//토큰값 구하기
+  useEffect(() => {
+    PushNotification.setApplicationIconBadgeNumber(0);
+
+    async function requestUserPermission() {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+            //console.log('Authorization status:', authStatus);
+        if (enabled) {
+            //console.log('Authorization status:', authStatus);
+            await get_token();
+        }
+    }
+
+    //기기토큰 가져오기
+    async function get_token() {
+			await messaging()
+			.getToken()
+			.then(token => {
+				//console.log("appToken", token);
+				if(token) {
+					AsyncStorage.setItem('appToken', token);
+					setAppToken(token);
+					movePageCheck();
+					return true;
+				} else {
+					return false;
+				}
+			});
+    }
+
+    requestUserPermission();
+
+    return messaging().onTokenRefresh(token => {
+      setAppToken(token);
+    });
+  } ,[])
+
+	function movePageCheck(){
+		AsyncStorage.getItem('mb_id').then(async (response) => {
+			console.log("response : ",response);
       if (response === null || response == undefined) {
         setTimeout(() => {
 					navigation.replace('Login');
 				}, 2000);
       }else{
         const payload = {'is_api': 1, 'id': response};
+				const member_info_list = await member_info(payload);
+				console.log("member_info_list : ",member_info_list);
+				if(member_info_list.state){
+					// setTimeout(() => {
+					// 	navigation.replace('TabNavigator', {
+					// 		screen: 'Home',
+					// 		params: {
+					// 			msg : member_info_list.result,
+					// 		}
+					// 	});
+					// }, 2000);
+				}else{
+					// setTimeout(() => {
+					// 	navigation.replace('Login');
+					// }, 2000);
+				}
       }
-    })
+    });
+	}
+
+  useEffect(()=>{
+    // AsyncStorage.getItem('mb_id').then(async (response) => {
+    //   if (response === null || response == undefined) {
+    //     setTimeout(() => {
+		// 			navigation.replace('Login', {appToken:appToken});
+		// 		}, 2000);
+    //   }else{
+    //     const payload = {'is_api': 1, 'id': response};
+    //   }
+    // })
   }, []);
 
 	return (

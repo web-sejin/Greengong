@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "52626973778",
+    "project_id": "greengong-f2718",
+    "storage_bucket": "greengong-f2718.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52626973778:android:2bb5bf3d69fcf86779eb8b",
+        "android_client_info": {
+          "package_name": "com.greengong"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "52626973778-qkss6ad78gpuucqa1cj4s15kd8r5rg7v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.greengong",
+            "certificate_hash": "c20b6accaad1b0ca023e3524ec81c8120c31ba40"
+          }
+        },
+        {
+          "client_id": "52626973778-imbisc7qvf6t2m720lmkeolcc6h3tl8p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKIiQMp5TBbZ6o7vNPxAwrEJRtVMVIGs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "52626973778-imbisc7qvf6t2m720lmkeolcc6h3tl8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

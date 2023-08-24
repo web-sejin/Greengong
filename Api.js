@@ -22,12 +22,25 @@ class Api {
 		};
 	}
 
+	//formdata 로 변경
+	makeFormData(method = '', datas = {}) {
+		let formdata = new FormData();
+		// formdata.append('method', method);
+		// formdata.append('secretKey', '40ed77f38d24ac80b36764f4a423f314');
+		for (let [key, value] of Object.entries(datas)) {
+			formdata.append(key, value);
+		}
+		// console.log('type : ' + typeof (formdata));
+		this.state.option.body = formdata;
+	}
+
   send(protocol, method, datas, callback) {
 		// this.state.isLoading = true;
-		if(protocol === 'POST'){
+		if(protocol === 'POST'){			
 			this.makeFormData(method, datas);
 
-			console.log('api body : ', this.state.option.headers);
+			//console.log("send_method : ",method);
+			//console.log('api body : ', this.state.option.headers);
 			return Axios.post(this.state.url + this.state.path + method, this.state.option.body, {headers: this.state.option.headers})
 			/*return Axios.post(this.state.url + this.state.path + method, this.state.option.body, {
 				headers: {'content-type': 'multipart/form-data'}

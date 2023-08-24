@@ -1,26 +1,40 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, Platform} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { KakaoOAuthToken, KakaoProfile, getProfile as getKakaoProfile, KakaoProfileNoneAgreement, login, logout, unlink } from '@react-native-seoul/kakao-login';
+import {connect} from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Login = ({navigation, route}) => {
+const Login = (props) => {
+	const {navigation, member_login, member_info} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [email ,setEmail] = useState();
 	const [pw ,setPw] = useState();
 	const [pageSt, setPageSt] = useState(false);
 	const [kakaoResult, setKakaoResult] = useState('');
+	const [appToken, setAppToken] = useState();
+	const [indi, setIndi] = useState(false);
+
+	useEffect(() => {
+		AsyncStorage.getItem('appToken').then(async (response) => {
+			if (response) {
+				setAppToken(response);
+			}
+		})
+	}, []);	
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -32,13 +46,7 @@ const Login = ({navigation, route}) => {
 				setPw('');
 				setRouteLoad(false);
 			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
+		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -46,7 +54,7 @@ const Login = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-	const _sendSmsButton = () => {		
+	const _sendLogin = async () => {		
 		if(!email || email == ""){
 			ToastMessage('이메일을 입력해 주세요.');
 			return false;
@@ -56,17 +64,87 @@ const Login = ({navigation, route}) => {
 			ToastMessage('비밀번호를 입력해 주세요.');
 			return false;
 		}
+
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('mb_id', email);
+		formData.append('pass', pw);
+		formData.append('mb_os', Platform.OS);
+		formData.append('mb_regnum', appToken);
+		formData.append('method', 'member_login');
+		
+		setIndi(true);
+		const login = await member_login(formData);
+		console.log('login : ', login);
+
+		if(login.state){
+			const payload = {'is_api': 1, 'id': login.result.mb_id}			
+			const member_info_list = await member_info(payload);
+			console.log("member_info_list : ",member_info_list);
+			if(member_info_list.state){
+				setTimeout(() => {
+					navigation.replace('TabNavigator', {
+						screen: 'Home',
+						params: {
+							msg: member_info_list.result,
+						}
+					});
+				}, 1000);
+			}
+		}else{
+			ToastMessage(login.msg);
+			setIndi(false);
+			return false;
+		}
+	}
+
+	const _snsLogin = async (ss_idx) => {
+		console.log("ss_idx : ",ss_idx);
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('ss_idx', ss_idx);
+		formData.append('method', 'member_login');
+		formData.append('mb_os', Platform.OS);
+		formData.append('mb_regnum', appToken);
+		formData.append('method', 'member_login');
+		
+		const login = await member_login(formData);
+		console.log('sns_login : ', login);
+
+		if(login.state){
+			const payload = {'is_api': 1, 'id': login.result.mb_id}			
+			const member_info_list = await member_info(payload);
+			if(member_info_list.state){
+				setTimeout(() => {
+					setIndi(false);
+					navigation.replace('TabNavigator', {
+						screen: 'Home',
+						params: {
+							msg: member_info_list.result,
+						}
+					});
+				}, 1000);
+			}else{
+				setIndi(false);
+				ToastMessage(login.msg);
+			}
+		}else{			
+			setIndi(false);
+			ToastMessage(login.msg);
+			return false;
+		}
 	}
 
 	/* 카카오 시작 */
   const signInWithKakao = async () => {
+		//setIndi(true);
     try {			
       const token: KakaoOAuthToken = await login();
       getMyKakaoProfile();      
       setKakaoResult(JSON.stringify(token));
     } catch(err) {
       console.log("error : ",err);
-      
+      //setIndi(false);
     }
   };
   
@@ -83,7 +161,8 @@ const Login = ({navigation, route}) => {
     }
   };
   
-  const getMyKakaoProfile = async () => {
+  const getMyKakaoProfile = async () => {	
+		setIndi(true);	
     try {      
       const profile: KakaoProfile|KakaoProfileNoneAgreement = await getKakaoProfile();
       //console.log(profile);
@@ -99,27 +178,32 @@ const Login = ({navigation, route}) => {
       setKakaoResult(JSON.stringify(kakaoData));
       //unlinkKakao();
 
-			//아이디 조회 후 로그인 또는 회원가입
-			Api.send('GET', '	sns_check', {ss_from:'kakao', access_token:'', ss_id:profile.id, is_api:1}, (args)=>{
+			console.log(appToken);
+			console.log(profile.id);
+
+			Api.send('POST', 'sns_check', {is_api:1, ss_from:'kakao', access_token:appToken, ss_id:profile.id}, (args)=>{
 				let resultItem = args.resultItem;
-				let arrItems = args.arrItems;
 				let responseJson = args.responseJson;
-				console.log(args);
-				if(resultItem.result === 'Y' && responseJson){
-						console.log('출력확인..', responseJson);	
-				}else if(responseJson.result === 'error'){
-						ToastMessage(responseJson.result_text);
+	
+				if(responseJson.result === 'success'){
+					console.log("sns responseJson : ", responseJson);
+					if(responseJson.screen == 'register'){
+						navigation.navigate('SnsRegister', {
+							email:profile.email, 
+							regiType:"sns",
+							provider:"kakao",
+							uid:profile.id,
+							ss_idx:responseJson.ss_idx,
+						});
+					}else{
+						_snsLogin(responseJson.ss_idx);
+					}					
 				}else{
-						console.log('결과 출력 실패!', resultItem);
-						//ToastMessage(resultItem.message);
+					console.log('결과 출력 실패!', resultItem);
+					ToastMessage(responseJson.result_text);
 				}
 			});
-			// navigation.navigate('SnsRegister', {
-			// 	email:profile.email, 
-			// 	regiType:"sns",
-			// 	provider:"kakao",
-			// 	uid:profile.id
-			// });
+			
     } catch(err) {
       console.log(err);
     }
@@ -177,7 +261,7 @@ const Login = ({navigation, route}) => {
 						<TouchableOpacity 
 							style={styles.loginBtn}
 							activeOpacity={opacityVal}
-							onPress={() => {_sendSmsButton()}}
+							onPress={() => {_sendLogin()}}
 						>
 							<Text style={styles.loginBtnText}>로그인</Text>
 						</TouchableOpacity>
@@ -198,7 +282,7 @@ const Login = ({navigation, route}) => {
 							activeOpacity={opacityVal}
 							onPress={() => {
 								setPageSt(true);
-								navigation.navigate('Register')
+								navigation.navigate('Register', {appToken: appToken});
 							}}
 						>
 							<Text style={styles.loginFindBtnText}>회원가입</Text>
@@ -208,7 +292,7 @@ const Login = ({navigation, route}) => {
 							activeOpacity={opacityVal}
 							onPress={() => {
 								setPageSt(true);
-								navigation.navigate('Findid')
+								navigation.navigate('Findid', {appToken: appToken})
 							}}
 						>
 							<Text style={styles.loginFindBtnText}>아이디 찾기</Text>
@@ -220,7 +304,7 @@ const Login = ({navigation, route}) => {
 							activeOpacity={opacityVal}
 							onPress={() => {
 								setPageSt(true);
-								navigation.navigate('Findpw')
+								navigation.navigate('Findpw', {appToken: appToken})
 							}}
 						>
 							<Text style={styles.loginFindBtnText}>비밀번호 찾기</Text>
@@ -228,6 +312,11 @@ const Login = ({navigation, route}) => {
 					</View>
 				</View>
 			</KeyboardAwareScrollView>
+			{indi ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -256,7 +345,17 @@ const styles = StyleSheet.create({
 	loginFindBtnText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:40,color:'#000'},
 	btnBar: {width:1,height:11,backgroundColor:'#D8DBE1',position:'absolute',top:10},
 	btnBar1: {left:0,},
-	btnBar2: {right:0}
+	btnBar2: {right:0},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-export default Login
+//export default Login
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(Login);

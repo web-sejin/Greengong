@@ -2,7 +2,6 @@ import React from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import UserApi from '../api/UserApi';
 export const MEBMER_LOGIN = 'user/MEBMER_LOGIN';
-export const MEMBER_COMMENT = 'user/MEMBER_COMMENT';
 export const MEMBER_INFO = 'user/MEMBER_INFO';
 export const MEMBER_OTHER_INFO = 'user/MEMBER_OTHER_INFO';
 export const MEMBER_JOIN = 'user/MEMBER_JOIN';
@@ -18,49 +17,22 @@ export const actionCreators = {
   member_login: (user) => async (dispatch) => {
     try {
       const response = await UserApi.member_login(user);
-      // console.log('member_login ::: ', response);
+      //console.log('member_login ::: ', response);
 
-      if (response.result) {
+      if (response.result === 'success') {
+        //console.log('success : ',response);
         await dispatch({
           type: MEBMER_LOGIN,
-          payload: response.data,
+          payload: response,
         });
 
-        //console.log(response.data.id);
-        //console.log('저장', response.data.auto_logins);
-
-        const saves = await response.data.auto_logins;
-
-        AsyncStorage.setItem('flex_id', response.data.email);
-
-
-        console.log('1231231231',saves);
-
-        if(saves=='true'){
-            console.log('저장');
-            AsyncStorage.setItem('save_id', response.data.email);
-        }else{
-            console.log('노 저장');
-        }
-
-        // if(response.data.auto_logins){
-
-        //     await console.log('저장완료...', response.data.auto_logins);
-        //     // await AsyncStorage.setItem('save_id', 
-        //     //   JSON.stringify({
-        //     //     'id': response.data.email,
-        //     //     'appToken': response.data.appToken
-        //     //   })
-        //     // );
-        // }else if(!response.data.auto_logins){
-        //     await console.log('세션저장 노..', response.data.auto_logins);
-        // }
+        //console.log('payload : ', response);
+        AsyncStorage.setItem('mb_id', response.mb_id);
        
         return {
           state: true,
-          result : response.data,
-          msg : response.msg
-          //pwds : response.data.mb_password
+          result : response,
+          msg : response.result_text
         };
       } else {
         
@@ -68,60 +40,34 @@ export const actionCreators = {
           type: MEBMER_LOGIN,
           payload: null,
         });
-        return { state: false, msg: response.msg, ids: '' };
+        //return { state: false, msg: response.msg, ids: '' };
+        return { state: false, msg: response.result_text, result_code: response.result_code, ids: '' };
       }
     } catch (error) {
+      console.log(error);
       return { state: false, msg: '', ids: '' };
 
     }
   },
-  member_comment: (user) => async (dispatch) => {
-    try {
-      const response = await UserApi.member_comment(user);
-      // console.log('member_login ::: ', response);
 
-      if (response.result) {
-        await dispatch({
-          type: MEMBER_COMMENT,
-          payload: response.data,
-        });
-
-        
-       // AsyncStorage.setItem('flex_id', response.data.id);
-       
-       return { state: true, msg: response.msg };
-       
-       /*
-        return {
-          state: true,
-          id: response.data.mb_id,
-          //pwds : response.data.mb_password
-        };*/
-      } else {
-        
-        await dispatch({
-          type: MEMBER_COMMENT,
-          payload: null,
-        });
-        return { state: false, msg: response.msg, ids: '' };
-      }
-    } catch (error) {
-      return { state: false, msg: '', id: '' };
-
-    }
-  },
   //회원 정보확인
   member_info: (user) => async (dispatch) => {
-    try {
+    try {      
       const response = await UserApi.member_info(user);
-//       console.log('member_info ::: ', response);
+      //console.log('member_info ::: ', response);
 
       if (response.result) {
         await dispatch({
           type: MEBMER_LOGIN,
-          payload: response.data,
+          payload: response,
         });
-        return { state: true, result: response.data, msg:response.msg };
+        return {
+					'state': true,
+					'mb_idx': response.mb_idx,
+					'nick': response.mb_nick,
+					'result': response.result,
+					'result_text': response.result_text
+				};
       } else {
         await dispatch({
           type: MEBMER_LOGIN,

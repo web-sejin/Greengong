@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://cnj0005.cafe24.com'; //본 아이피
+export const BASE_URL = 'https://cnj0005.cafe24.com/'; //본 아이피

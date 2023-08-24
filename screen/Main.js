@@ -222,26 +222,10 @@ const TabNavigator = ({ navigation }) => {
       screenOptions={{headerShown: false}}
       tabBar={ (props) => <TabBarMenu {...props} /> }
     >
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{}}
-      />
-      <Tab.Screen
-        name="Match"
-        component={Match}
-        options={{}}
-      />
-      <Tab.Screen
-        name="Chat"
-        component={Chat}
-        options={{}}
-      />
-      <Tab.Screen
-        name="Mypage"
-        component={Mypage}
-        options={{}}
-      />
+      <Tab.Screen name="Home" component={Home} options={{}} />
+      <Tab.Screen name="Match" component={Match} options={{}} />
+      <Tab.Screen name="Chat" component={Chat} options={{}} />
+      <Tab.Screen name="Mypage" component={Mypage} options={{}} />
     </Tab.Navigator>
   );
 };

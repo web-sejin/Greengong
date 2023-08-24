@@ -2,6 +2,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
+import AsyncStorage from '@react-native-community/async-storage';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -20,7 +21,7 @@ const Register = ({navigation, route}) => {
 	const [all, setAll] = useState(false);
 	const [chk1, setChk1] = useState(false);
 	const [chk2, setChk2] = useState(false);
-	const [chk3, setChk3] = useState(false);
+	const [chk3, setChk3] = useState(false);	
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
