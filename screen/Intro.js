@@ -50,7 +50,7 @@ const Intro = (props) => {
 				if(token) {
 					AsyncStorage.setItem('appToken', token);
 					setAppToken(token);
-					movePageCheck();
+					movePageCheck(token);
 					return true;
 				} else {
 					return false;
@@ -65,30 +65,30 @@ const Intro = (props) => {
     });
   } ,[])
 
-	function movePageCheck(){
+	function movePageCheck(token){
 		AsyncStorage.getItem('mb_id').then(async (response) => {
-			console.log("response : ",response);
+			//console.log("response : ",response);
       if (response === null || response == undefined) {
         setTimeout(() => {
 					navigation.replace('Login');
 				}, 2000);
       }else{
-        const payload = {'is_api': 1, 'id': response};
+        const payload = {'is_api':1, 'id':response, 'mb_regnum':token};
 				const member_info_list = await member_info(payload);
-				console.log("member_info_list : ",member_info_list);
+				//console.log("payload : ",payload);
 				if(member_info_list.state){
-					// setTimeout(() => {
-					// 	navigation.replace('TabNavigator', {
-					// 		screen: 'Home',
-					// 		params: {
-					// 			msg : member_info_list.result,
-					// 		}
-					// 	});
-					// }, 2000);
+					setTimeout(() => {
+						navigation.replace('TabNavigator', {
+							screen: 'Home',
+							params: {
+								msg : member_info_list.result,
+							}
+						});
+					}, 2000);
 				}else{
-					// setTimeout(() => {
-					// 	navigation.replace('Login');
-					// }, 2000);
+					setTimeout(() => {
+						navigation.replace('Login');
+					}, 2000);
 				}
       }
     });

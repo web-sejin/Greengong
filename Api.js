@@ -52,7 +52,7 @@ class Api {
 					let resultCode = responseJson.result_code;
 					let arrItems = responseJson.data;
 					// console.log('message : ' + resultItem);
-					console.log('responseJson : ', responseJson);
+					//console.log('responseJson : ', responseJson);
 					let returnJson = {
 						resultItem: {result: resultItem === 'error' ? 'N' : 'Y', message: message},
 						arrItems: arrItems,

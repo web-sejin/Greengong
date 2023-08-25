@@ -29,13 +29,13 @@ export default {
   member_logout: async (data) => {
     const url = `${BASE_URL}app/`;
     //method : member_logout
-    return await $http.multipart(url, data);
+    return await $http.post(url + 'logout', data);
   },
   //탈퇴하기
   member_out: async (data) => {
     const url = `${BASE_URL}app/`;
     //method : member_out
-    return await $http.multipart(url, data);
+    return await $http.multipart(url + 'out_member', data);
   },
 
 };

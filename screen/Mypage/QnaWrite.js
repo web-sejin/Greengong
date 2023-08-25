@@ -8,15 +8,18 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const QnaWrite = ({navigation, route}) => {
+const QnaWrite = (props) => {
+	const {navigation, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);  
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
 
@@ -28,6 +31,7 @@ const QnaWrite = ({navigation, route}) => {
 			if(!pageSt){
 				setSubject('');
         setContent('');
+				setIsLoading(false);
 			}
 		}else{
 			//console.log("isFocused");
@@ -54,11 +58,34 @@ const QnaWrite = ({navigation, route}) => {
       ToastMessage('내용을 입력해 주세요.');
       return false;
     }
+		
+		setIsLoading(true);
+
+		let formData = {
+			is_api:1,				
+			bd_title:subject,
+			bd_contents:content
+		};
+
+		Api.send('POST', 'save_1to1', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				navigation.navigate('QnaList');
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'1:1문의'} />
+			
 			<KeyboardAwareScrollView>
         <View style={styles.registArea}>
 					<View style={[styles.registBox]}>
@@ -98,7 +125,8 @@ const QnaWrite = ({navigation, route}) => {
                 style={styles.btn}
                 activeOpacity={opacityVal}
                 onPress={()=>{
-                  navigation.navigate('QnaList');
+                  //navigation.navigate('QnaList');
+									navigation.goBack();
                 }}
               >
                 <Text style={styles.btnText}>리스트</Text>
@@ -116,6 +144,11 @@ const QnaWrite = ({navigation, route}) => {
           </View>
         </View>
       </KeyboardAwareScrollView>
+			{isLoading ? (
+				<View style={[styles.indicator]}>
+					<ActivityIndicator size="large" />
+				</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -124,8 +157,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
   mgTop30: {marginTop:30},
 	mgTop35: {marginTop:35},
   registArea: {},

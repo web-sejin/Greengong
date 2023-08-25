@@ -109,6 +109,8 @@ const TabBarMenu = (props) => {
   const {state, navigation, optionsNum} = props;
   const screenName = state.routes[state.index].name;  
 
+  //console.log("screenName : ",screenName);
+
   return (
     <View style={styles.TabBarMainContainer}>
       <TouchableOpacity 

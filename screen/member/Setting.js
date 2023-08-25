@@ -9,12 +9,17 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Setting = ({navigation, route}) => {
+const Setting = (props) => {
+  const {navigation, userInfo, member_logout, member_out, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -42,6 +47,38 @@ const Setting = ({navigation, route}) => {
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  //로그아웃
+	const memberLogout = async () => {
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('mb_idx', userInfo?.mb_idx);
+		const logout =  await member_logout(formData);
+		console.log("logout : ",logout);
+
+		// ToastMessage('로그아웃처리 되었습니다.');
+		// navigation.reset({
+		// 	routes: [{ name: 'Login'}],
+		// });
+	}
+
+	//회원탈퇴
+	const memberLeaveHandler = async () => {
+		const formData = new FormData();
+		formData.append('id', userInfo?.mb_id);
+		formData.append('is_api', '1');
+		formData.append('mb_idx', userInfo?.mb_idx);
+		formData.append('method', 'out_member');
+		//console.log('formData', formData);
+		const leaved =  await member_out(formData);
+		console.log("leaved : ",leaved)
+		
+		// ToastMessage('탈퇴처리 되었습니다.');
+		// navigation.reset({
+		// 	routes: [{ name: 'Intro'}],
+		// });
+
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -114,7 +151,7 @@ const Setting = ({navigation, route}) => {
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.avatarBtn, styles.avatarBtn2]}
-                onPress={() => {}}
+                onPress={() => {memberLogout()}}
               >
                 <Text style={styles.avatarBtnText}>확인</Text>
               </TouchableOpacity>
@@ -148,7 +185,7 @@ const Setting = ({navigation, route}) => {
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.avatarBtn, styles.avatarBtn2]}
-                onPress={() => {}}
+                onPress={() => {memberLeaveHandler()}}
               >
                 <Text style={styles.avatarBtnText}>확인</Text>
               </TouchableOpacity>
@@ -206,4 +243,13 @@ const styles = StyleSheet.create({
   indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10,backgroundColor:'rgba(0,0,0,0.5)'},
 })
 
-export default Setting
+//export default Setting
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(Setting);

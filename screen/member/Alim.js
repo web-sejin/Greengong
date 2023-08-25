@@ -10,17 +10,23 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Alim = ({navigation, route}) => {
+const Alim = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-  const [state, setState] = useState(true);
+  const [state, setState] = useState();
   const [stateEvent, setStateEvent] = useState(new Animated.Value(0));
   const [stateEvent2, setStateEvent2] = useState(new Animated.Value(0));
+  const [isLoading, setIsLoading] = useState(false); 
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -28,15 +34,10 @@ const Alim = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				//setDst();
+				setIsLoading(false);
 			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
+		}else{            
+      chkAlim();
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -65,7 +66,55 @@ const Alim = ({navigation, route}) => {
 		).start();
 	}, [state]);
 
-  function submitRegist(){}
+  const chkAlim = async () => {
+    await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+        if(responseJson.mb_push == 1){
+          setState(true);
+        }else{
+          setState(false);
+        }
+			}else{
+				console.log(responseJson.result_text);
+			}
+		});    
+  }
+
+  const submitRegist = async () => {
+    setIsLoading(true);
+
+    let pushState;
+    if(state){
+      pushState = 1;
+    }else{
+      pushState = 0;
+    }
+
+    let formData = {
+			is_api:1,				
+			mb_push:pushState,
+		};
+
+		Api.send('POST', 'push_onoff', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setIsLoading(false);
+        ToastMessage('푸시알림이 '+responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -114,6 +163,12 @@ const Alim = ({navigation, route}) => {
           <Text style={styles.nextBtnText}>수정</Text>
         </TouchableOpacity>
       </View>
+
+      {isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -122,8 +177,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 	mgTop30: {marginTop:30},
 	mgTop35: {marginTop:35},
   registArea: {},
@@ -155,4 +209,13 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 })
 
-export default Alim
+//export default Alim
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(Alim);

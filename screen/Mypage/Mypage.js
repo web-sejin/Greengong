@@ -3,20 +3,25 @@ import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Moda
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-community/async-storage';
 import Font from "../../assets/common/Font"
 import ToastMessage from "../../components/ToastMessage"
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Mypage = ({navigation, route}) => {
+const Mypage = (props) => {
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
+	const [memberData, setMemberData] = useState([]); //회원 정보		
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -40,6 +45,45 @@ const Mypage = ({navigation, route}) => {
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	//회원정보 조회
+	const member_info_handle = async () => {
+		const payload = {'is_api': 1, 'id': userInfo?.mb_id}
+		const member_info_list = await member_info(payload);
+		//console.log('member_info_list >>', member_info_list);
+	};
+
+	//로그아웃
+	const memberLogout = async () => {
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('mb_idx', userInfo?.mb_idx);
+		const logout =  await member_logout(formData);
+		console.log("logout : ",logout);
+
+		ToastMessage('로그아웃처리 되었습니다.');
+		navigation.reset({
+			routes: [{ name: 'Login'}],
+		});
+	}
+
+	//회원탈퇴
+	const memberLeaveHandler = async () => {
+		const formData = new FormData();
+		formData.append('id', userInfo?.mb_id);
+		formData.append('is_api', '1');
+		formData.append('mb_idx', userInfo?.mb_idx);
+		formData.append('method', 'out_member');
+		//console.log('formData', formData);
+		const leaved =  await member_out(formData);
+		console.log("leaved : ",leaved)
+		
+		ToastMessage('탈퇴처리 되었습니다.');
+		navigation.reset({
+			routes: [{ name: 'Intro'}],
+		});
+
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -78,12 +122,14 @@ const Mypage = ({navigation, route}) => {
 								</View>
 								<View style={styles.mypage1Info}>
 									<View style={styles.mypage1InfoEmail}>
-										<Text style={styles.mypage1InfoEmailText}>hong@gmail.com</Text>
+										<Text style={styles.mypage1InfoEmailText}>{userInfo?.mb_id}</Text>
 									</View>
+									{userInfo?.mb_is_sso == 1 ? (
 									<View style={styles.mypage1InfoKakaoSt}>
 										<AutoHeightImage width={13} source={require("../../assets/img/kakao_login2.png")} />
 										<Text style={styles.mypage1InfoKakaoStText}>카카오 로그인</Text>
 									</View>
+									) : null}
 								</View>
 							</View>
 							<TouchableOpacity 
@@ -98,7 +144,7 @@ const Mypage = ({navigation, route}) => {
 						</View>
 						<View style={styles.myDealResultBox}>
 							<Text style={styles.myDealResultBoxText}>거래평가점수</Text>
-							<Text style={styles.myDealResultBoxText2}>4점</Text>
+							<Text style={styles.myDealResultBoxText2}>{userInfo?.mb_score}점</Text>
 						</View>
 					</View>
 
@@ -337,7 +383,7 @@ const Mypage = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {}}
+              onPress={() => {memberLogout()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -371,7 +417,7 @@ const Mypage = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {}}
+              onPress={() => {memberLeaveHandler()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -442,4 +488,15 @@ const styles = StyleSheet.create({
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
 })
 
-export default Mypage
+//export default Mypage
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(Mypage);

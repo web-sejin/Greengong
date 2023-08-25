@@ -8,6 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -17,49 +18,9 @@ const opacityVal = 0.8;
 const NoticeList = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-
-  const DATA = [
-		{
-			id: '1',
-      title: '시스템 점검 안내',
-			date: '2023.02.02',
-		},
-		{
-			id: '2',
-      title: '시스템 점검 안내2',
-			date: '2023.02.02',
-		},
-		{
-			id: '3',
-      title: '시스템 점검 안내2',
-			date: '2023.02.02',
-		},
-	];
-
-  const dataLen = DATA.length;
-
-  const getList = ({item, index}) => (    
-    <TouchableOpacity
-      style={styles.noticeBtn}
-      activeOpacity={opacityVal}
-      onPress={()=>{
-        navigation.navigate('NoticeView', {idx:item.id})
-      }}
-    >
-      <View style={[styles.noticeWrap]}>
-        <View style={styles.noticeListCont}>
-          <View style={styles.noticeTit}>
-            <Text style={styles.noticeTitSort}>[공지]</Text>
-            <Text style={styles.noticeTitText}>시스템 점검 안내</Text>
-          </View>
-          <View style={styles.noticeDate}>
-            <Text style={styles.noticeDateText}>2023.02.02</Text>
-          </View>
-        </View>
-        <AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} />
-      </View>
-    </TouchableOpacity>
-	);
+	const [isLoading, setIsLoading] = useState(true);  
+	const [itemList, setItemList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -67,15 +28,9 @@ const NoticeList = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+				//setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -83,13 +38,82 @@ const NoticeList = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
+	const getItemList = async () =>{
+		setIsLoading(false);
+
+		await Api.send('GET', 'list_notice', {is_api: 1, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson.data);
+				setItemList(responseJson.data);
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!');
+			}
+		});
+
+		setIsLoading(true);
+	}
+
+	useState(()=>{
+		getItemList();
+	},[]);
+
+  const getList = ({item, index}) => (    
+    <TouchableOpacity
+      style={styles.noticeBtn}
+      activeOpacity={opacityVal}
+      onPress={()=>{
+        navigation.navigate('NoticeView', {bd_idx:item.bd_idx})
+      }}
+    >
+      <View style={[styles.noticeWrap]}>
+        <View style={styles.noticeListCont}>
+          <View style={styles.noticeTit}>
+            {/* <Text style={styles.noticeTitSort}>[공지]</Text> */}
+            <Text style={styles.noticeTitText}>{item.bd_title}</Text>
+          </View>
+          <View style={styles.noticeDate}>
+            <Text style={styles.noticeDateText}>{item.date}</Text>
+          </View>
+        </View>
+        <AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} />
+      </View>
+    </TouchableOpacity>
+	);
+
+	const moreData = async () => {
+		console.log('moreData');
+		await Api.send('GET', 'list_notice', {'is_api': 1, page:nowPage+1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson.data);
+				const addItem = itemList.concat(responseJson.data);
+				setItemList(addItem);			
+				setNowPage(nowPage+1);
+			}else{
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'공지사항'} />
+			{isLoading ? (
 			<FlatList
-				data={DATA}
+				data={itemList}
 				renderItem={(getList)}
-				keyExtractor={item => item.id}		
+				keyExtractor={(item, index) => index.toString()}	
+				onEndReachedThreshold={0.6}
+				onEndReached={moreData}
 				ListEmptyComponent={
 					<View style={styles.notData}>
 						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
@@ -97,6 +121,11 @@ const NoticeList = ({navigation, route}) => {
 					</View>
 				}
       />
+			) : (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			)}
 		</SafeAreaView>
 	)
 }
@@ -114,7 +143,7 @@ const styles = StyleSheet.create({
   noticeListCont: {width:(innerWidth-17),},
   noticeTit: {display:'flex',flexDirection:'row',alignItems:'center'},
   noticeTitSort: {width:45,fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:22,color:'#000'},
-  noticeTitText: {width:(innerWidth-62),fontFamily:Font.NotoSansMedium,fontSize:16,lineHeight:22,color:'#000'},
+  noticeTitText: {/*width:(innerWidth-62),*/fontFamily:Font.NotoSansMedium,fontSize:16,lineHeight:22,color:'#000'},
   noticeDate: {marginTop:12,},
   noticeDateText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#9C9C9C'},
 })

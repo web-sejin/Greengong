@@ -1,11 +1,11 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RNPickerSelect from 'react-native-picker-select';
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -40,23 +40,23 @@ const Write1 = ({navigation, route}) => {
 		{'idx': 6, 'txt': '상담필요', 'isChecked': false},
 	];
 	
-	const sortAry = [
-		{ label: '고철', value: '1' },
-		{ label: '스테인레스 강', value: '2' },
-		{ label: '특수강', value: '3' },
-	]
+	// const sortAry = [
+	// 	{ label: '고철', value: '1' },
+	// 	{ label: '스테인레스 강', value: '2' },
+	// 	{ label: '특수강', value: '3' },
+	// ]
 	
-	const ingreAry = [
-		{ label: '생철', value: '1' },
-		{ label: '중량', value: '2' },
-		{ label: '경량', value: '3' },
-	]
+	// const ingreAry = [
+	// 	{ label: '생철', value: '1' },
+	// 	{ label: '중량', value: '2' },
+	// 	{ label: '경량', value: '3' },
+	// ]
 
-	const shapeAry = [
-		{ label: '레이저', value: '1' },
-		{ label: '뻔지', value: '2' },
-		{ label: '금형', value: '3' },
-	]
+	// const shapeAry = [
+	// 	{ label: '레이저', value: '1' },
+	// 	{ label: '뻔지', value: '2' },
+	// 	{ label: '금형', value: '3' },
+	// ]
 
 	const dealMethod2Ary = [
 		{ label: '집게차 요청', value: '1' },
@@ -91,6 +91,11 @@ const Write1 = ({navigation, route}) => {
 	const [priceOpt, setPriceOpt] = useState(''); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [sortAry, setSortAry] = useState([]); //분류 리스트
+	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
+	const [shapeAry, setShapeAry] = useState([]); //형태 리스트
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -113,20 +118,61 @@ const Write1 = ({navigation, route}) => {
 				setPriceOpt('');
 				setPayMethod('');
 				setContent('');
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			select1();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	const select1 = async () => {
+		await Api.send('GET', 'product_cate2', {is_api:1, cate1:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setSortAry(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+	}
+
+	const select2 = async (v) => {
+		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setIngreAry(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+	}
+
+	const select3 = async (v) => {
+		await Api.send('GET', 'product_cate4', {is_api:1, cate3:v}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setShapeAry(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+	}
 
 	function getFileCount(selectCon){
 		let cnt = 0;
@@ -249,7 +295,10 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setSort(value)}
+									onValueChange={(value) => {
+										setSort(value);
+										select1(value);
+									}}
 									placeholder={{
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
@@ -277,7 +326,10 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setIngred(value)}
+									onValueChange={(value) => {
+										setIngred(value)
+										select2(value);
+									}}
 									placeholder={{
 										label: '성분을 선택해 주세요.',
 										inputLabel: '성분을 선택해 주세요.',
@@ -305,7 +357,10 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setShape(value)}
+									onValueChange={(value) => {
+										setShape(value)
+										select3(value);
+									}}
 									placeholder={{
 										label: '형태를 선택해 주세요.',
 										inputLabel: '형태를 선택해 주세요.',
@@ -573,6 +628,12 @@ const Write1 = ({navigation, route}) => {
 					/>
 				</View>
       </Modal>
+
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -624,6 +685,7 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default Write1

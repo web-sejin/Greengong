@@ -9,6 +9,11 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -18,28 +23,45 @@ let t1;
 let tcounter;
 let temp;
 
-const MyInfo = ({navigation, route}) => {
+const MyInfo = (props) => {
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [mbHp, setMbHp] = useState('');
 	const [certNumber, setCertNumber] = useState('');
+	const [certNumberSt, setCertNumberSt] = useState(false);
 	const [mbEmail, setMbEmail] = useState('');
+	const [mbEmailSt, setMbEmailSt] = useState(false);
 	const [mbNickname, setMbNickname] = useState('');
+	const [mbNicknameSt, setMbNicknameSt] = useState(false);
   const [timeStamp, setTimeStamp] = useState('');
   const [phoneIntervel, setPhoneInterval] = useState(false);
+	const [ransoo, setRansoo] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
 
+		if(userInfo){
+			console.log(userInfo);
+			setMbHp(userInfo.mb_hp);
+			setMbEmail(userInfo.mb_email);
+			setMbNickname(userInfo.mb_nick);
+		}
+
 		if(!isFocused){
 			if(!pageSt){
 				setMbHp('');
 				setCertNumber('');
+				setCertNumberSt(false);
 				setMbEmail('');
+				setMbEmailSt(false);
 				setMbNickname('');
+				setMbNicknameSt(false);
         setTimeStamp('');
         setPhoneInterval(false);
+				setRansoo('');
+				clearInterval(t1);
 			}
 		}else{
 			//console.log("isFocused");
@@ -86,8 +108,8 @@ const MyInfo = ({navigation, route}) => {
 
 	const _sendSmsButton = () => {
 		// console.log('sms');
-		if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
@@ -97,18 +119,33 @@ const MyInfo = ({navigation, route}) => {
 			return false;
 		}
 
-		//setSmsRandNumber(randomNumber(6));
-		setPhoneInterval(true);
+		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: 'join'}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+					console.log('출력확인..', responseJson);
+					setRansoo(responseJson.ce_num);
+					setPhoneInterval(true);
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
 	}
 
-	const _authComplete = () => {
-    if(mbHp == "" || mbHp.length!=11){
-			ToastMessage('휴대폰번호를 정확히 입력해 주세요.');
+	const _authComplete = () => {		
+		//console.log(ransoo);
+		if(mbHp == "" || mbHp.length!=13){
+			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
-    if(certNumber == "" || certNumber.length!=6){
-			ToastMessage('인증번호를 정확히 입력해 주세요.');
+		if(certNumber == ""){
+			ToastMessage('인증번호를 입력해 주세요.');
 			return false;
 		}
 
@@ -116,27 +153,40 @@ const MyInfo = ({navigation, route}) => {
 			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
 			return false;
 		 }
-		 timer_stop();
-		//  if(smsRandNumber == ransoo){
-		// 	setAuthTitle('인증확인');
-		// 	setPhoneInterval(false);
-		// 	setAuthButtonState(true);//인증버튼 비활성화
-		// 	ToastMessage('본인인증이 완료되었습니다.\n다음단계로 이동하세요.');
-		// 	setNextButtonState(false);
-		// 	return true;
-		//  }else{
-		// 	setAuthTitle('인증완료');
-		// 	setAuthButtonState(false); //인증버튼 비활성화
-		// 	ToastMessage('인증번호가 일치하지 않습니다.');
-		// 	setNextButtonState(true);
-		// 	return false;
-		//  }
+
+		 if(ransoo == certNumber){
+			//ToastMessage('본인인증이 완료되었습니다.');
+			setCertNumberSt(true);
+			timer_stop();
+
+			Api.send('POST', 'find_id', {is_api:1, mb_hp:mbHp}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+	
+				if(responseJson.result === 'success'){
+					//console.log(responseJson);
+					setResultId(responseJson.mb_id);
+					setResultDate(responseJson.mb_regdate);
+					setVisible(true);
+				}else{
+					console.log('결과 출력 실패!', resultItem);
+					ToastMessage(responseJson.result_text);
+				}
+			});
+						
+		 }else{
+			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
+			return false;
+		 }
 	}
 
 	const timer_stop = () => {
 		clearInterval(t1);
 		setTimeStamp('');
 		setPhoneInterval(false);
+		setRansoo('');
+		tcounter = 0;
+		temp = '';
 	};
 
 	useEffect(()=>{
@@ -147,8 +197,101 @@ const MyInfo = ({navigation, route}) => {
 		}
 	},[phoneIntervel]);
 
-  function _submit(){
+	function emailChk(){
+		if(mbEmail == ""){
+			ToastMessage('이메일을 입력해 주세요.');
+			return false;
+		}
 
+		const emailChk = email_check(mbEmail);
+		if(!emailChk){
+			ToastMessage('이메일을 정확히 입력해 주세요.');
+			return false;
+		}		
+		
+
+		Api.send('GET', '	validation_email', {email: mbEmail, is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+				//console.log('출력확인..', responseJson);
+				setMbEmailSt(true);
+				ToastMessage('사용가능한 이메일입니다.');
+			}else if(responseJson.result === 'error'){
+				setMbEmailSt(false);
+				ToastMessage(responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(resultItem.message);
+			}
+		});
+	}
+
+	function nickChk(){
+		if(mbNickname == ""){
+			ToastMessage('닉네임을 입력해 주세요.');
+			return false;
+		}
+
+		Api.send('GET', '	validation_nick', {nick: mbNickname, is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+				//console.log('출력확인..', responseJson);
+				setMbNicknameSt(true);
+				ToastMessage('사용가능한 닉네임입니다.');
+			}else if(responseJson.result === 'error'){
+				setMbNicknameSt(false);
+				ToastMessage(responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(resultItem.message);
+			}
+		});
+	}
+
+  function _submit(){
+		if(!mbHp || mbHp == ""){
+			ToastMessage('휴대폰 번호를 입력해 주세요.');
+			return false;
+		}
+
+		// if(!certNumberSt){
+		// 	ToastMessage('인증번호 확인을 완료해 주세요.');
+		// 	return false;
+		// }
+
+		if(mbEmail == ""){
+			ToastMessage('이메일을 입력해 주세요.');
+			return false;
+		}
+
+		const emailChk = email_check(mbEmail);
+		if(!emailChk){
+			ToastMessage('이메일을 정확히 입력해 주세요.');
+			return false;
+		}
+
+		// if(!mbEmailSt){
+		// 	ToastMessage('이메일 중복확인을 완료해 주세요.');
+		// 	return false;
+		// }
+
+		if(mbNickname == ""){
+			ToastMessage('닉네임을 입력해 주세요.');
+			return false;
+		}
+
+		// if(!mbNicknameSt){
+		// 	ToastMessage('닉네임 중복확인을 완료해 주세요.');
+		// 	return false;
+		// }
+		
+		_authComplete();
   }
 
 	return (
@@ -170,11 +313,16 @@ const MyInfo = ({navigation, route}) => {
 								<TextInput
 									value={mbHp}
 									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
+									onChangeText={(v) => {
+										const phone = phoneFormat(v);
+										setMbHp(phone);
+										setCertNumber('');
+										setCertNumberSt(false);
+									}}
 									placeholder={"휴대폰번호를 입력해 주세요."}
 									style={[styles.input, styles.input2]}
 									placeholderTextColor={"#8791A1"}
-									maxLength={11}
+									maxLength={13}
 								/>
 								<TouchableOpacity 
 									style={styles.certChkBtn}
@@ -192,7 +340,6 @@ const MyInfo = ({navigation, route}) => {
 									placeholder={"인증번호 입력"}
 									style={[styles.input]}
 									placeholderTextColor={"#8791A1"}
-									maxLength={11}
 								/>
 								<View style={styles.timeBox}>
 									<Text style={styles.timeBoxText}>
@@ -227,7 +374,7 @@ const MyInfo = ({navigation, route}) => {
 								<TouchableOpacity 
 									style={styles.certChkBtn}
 									activeOpacity={opacityVal}
-									onPress={() => {}}
+									onPress={() => {emailChk()}}
 								>
 									<Text style={styles.certChkBtnText}>중복확인</Text>
 								</TouchableOpacity>
@@ -249,7 +396,7 @@ const MyInfo = ({navigation, route}) => {
 								<TouchableOpacity 
 									style={styles.certChkBtn}
 									activeOpacity={opacityVal}
-									onPress={() => {}}
+									onPress={() => {nickChk()}}
 								>
 									<Text style={styles.certChkBtnText}>중복확인</Text>
 								</TouchableOpacity>
@@ -307,6 +454,16 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+	timeBox: {position:'absolute',right:20,top:0,},
+	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:56,color:'#000'},
 })
 
-export default MyInfo
+//export default MyInfo
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(MyInfo);

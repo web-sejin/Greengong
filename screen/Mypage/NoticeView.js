@@ -8,6 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -15,8 +16,11 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const NoticeView = ({navigation, route}) => {
+  const idx = route.params.bd_idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); 
+  const [itemInfo, setItemInfo] = useState({});
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -24,7 +28,7 @@ const NoticeView = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+        setIsLoading(false);
 			}
 		}else{
 			//console.log("isFocused");
@@ -40,34 +44,60 @@ const NoticeView = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  const sampleText = '시스템 점검 안내입니다.\n\n내용글입니다.';
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'view_notice', {is_api: 1, bd_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setItemInfo(responseJson);
+        setIsLoading(true);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		});
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'공지사항'} />
+      {isLoading ? (
 			<ScrollView>
         <View style={styles.boView}>
           <View style={styles.boViewTit}>
-            <Text style={styles.boViewTitText}>시스템 점검 안내</Text>
+            <Text style={styles.boViewTitText}>{itemInfo.bd_title}</Text>
           </View>
           <View style={styles.boViewDesc}>
-            <Text style={styles.boViewDescText}>2023.04.25</Text>
-            <Text style={styles.boViewDescText}>조회수 : 20</Text>
+            <Text style={styles.boViewDescText}>{itemInfo.date}</Text>
+            <Text style={styles.boViewDescText}>조회수 : {itemInfo.bd_view_cnt}</Text>
           </View>
           <View style={styles.boViewCont}>
-            <Text style={styles.boViewContText}>{sampleText}</Text>
+            <Text style={styles.boViewContText}>{itemInfo.bd_contents}</Text>
           </View>
           <TouchableOpacity 
             style={styles.boBackBtn}
             activeOpacity={opacityVal}
             onPress={()=>{
-              navigation.navigate('NoticeList');
+              //navigation.navigate('NoticeList');
+              navigation.goBack();
             }}
           >
             <Text style={styles.boBackBtnText}>목록으로</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      ) : (
+      <View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+      )}
 		</SafeAreaView>
 	)
 }

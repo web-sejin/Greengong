@@ -80,7 +80,7 @@ const Login = (props) => {
 		if(login.state){
 			const payload = {'is_api': 1, 'id': login.result.mb_id}			
 			const member_info_list = await member_info(payload);
-			console.log("member_info_list : ",member_info_list);
+			//console.log("member_info_list : ",member_info_list);
 			if(member_info_list.state){
 				setTimeout(() => {
 					navigation.replace('TabNavigator', {
@@ -99,7 +99,6 @@ const Login = (props) => {
 	}
 
 	const _snsLogin = async (ss_idx) => {
-		console.log("ss_idx : ",ss_idx);
 		const formData = new FormData();
 		formData.append('is_api', 1);
 		formData.append('ss_idx', ss_idx);
@@ -178,15 +177,12 @@ const Login = (props) => {
       setKakaoResult(JSON.stringify(kakaoData));
       //unlinkKakao();
 
-			console.log(appToken);
-			console.log(profile.id);
-
 			Api.send('POST', 'sns_check', {is_api:1, ss_from:'kakao', access_token:appToken, ss_id:profile.id}, (args)=>{
 				let resultItem = args.resultItem;
 				let responseJson = args.responseJson;
 	
 				if(responseJson.result === 'success'){
-					console.log("sns responseJson : ", responseJson);
+					//console.log("sns responseJson : ", responseJson);
 					if(responseJson.screen == 'register'){
 						navigation.navigate('SnsRegister', {
 							email:profile.email, 

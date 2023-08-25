@@ -8,6 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -15,18 +16,38 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const QnaView = ({navigation, route}) => {
-  const contState = route.params.state;
+  const idx = route.params.bd_idx;
 
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); 
+  const [itemInfo, setItemInfo] = useState({});
 
 	const isFocused = useIsFocused();
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'view_1to1', {is_api: 1, bd_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setItemInfo(responseJson);
+        setIsLoading(true);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		});
+  }
+
 	useEffect(() => {
 		let isSubscribed = true;
 
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+				setIsLoading(false);
 			}
 		}else{
 			//console.log("isFocused");
@@ -35,6 +56,7 @@ const QnaView = ({navigation, route}) => {
 			}else{
 				//console.log("route off!!");
 			}
+      getData();
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -47,56 +69,65 @@ const QnaView = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'1:1문의'} />
+      {isLoading ? (
 			<ScrollView>
         <View style={styles.boView}>
           <View style={styles.boViewTit}>
-            {contState == 1 ? (
+            {itemInfo.is_answer != 1 ? (
 						<Text style={styles.noticeState1}>[답변대기]</Text>
 						) : null}
 
-						{contState == 2 ? (
+						{itemInfo.is_answer == 1 ? (
 						<Text style={styles.noticeState2}>[답변완료]</Text>
 						) : null}
-            <Text style={styles.boViewTitText}>문의합니다.</Text>
+            <Text style={styles.boViewTitText}>{itemInfo.bd_title}</Text>
           </View>
           <View style={styles.boViewDesc}>
-            <Text style={styles.boViewDescText}>2023.04.25</Text>
+            <Text style={styles.boViewDescText}>{itemInfo.date}</Text>
           </View>
           <View style={styles.boViewCont}>
-            <Text style={styles.boViewContText}>{sampleText}</Text>
+            <Text style={styles.boViewContText}>{itemInfo.bd_contents}</Text>
           </View>
 
-          {contState == 2 ? (
+          {itemInfo.is_answer == 1 ? (
 						<View style={[styles.boViewCont, styles.boViewCont2]}>
               <View style={styles.boViewCont2Box}>
                 <Text style={styles.boViewCont2BoxText}>[관리자 답변]</Text>
-                <Text style={styles.boViewCont2BoxText2}>2023.04.25</Text>
+                <Text style={styles.boViewCont2BoxText2}>{itemInfo.answer_date}</Text>
               </View>
-              <Text style={styles.boViewContText}>답변 드립니다.</Text>
+              <Text style={styles.boViewContText}>{itemInfo.bd_answer}</Text>
             </View>
 					) : null}
 
+          {itemInfo.is_answer != 1 ? (
           <TouchableOpacity 
             style={styles.boBackBtn}
             activeOpacity={opacityVal}
             onPress={()=>{
-              navigation.navigate('QnaModify');
+              navigation.navigate('QnaModify', {bd_idx:idx});
             }}
           >
             <Text style={styles.boBackBtnText}>수정하기</Text>
           </TouchableOpacity>
-          
+          ) : null}
+
           <TouchableOpacity 
             style={[styles.boBackBtn, styles.boBackBtn2]}
             activeOpacity={opacityVal}
             onPress={()=>{
-              navigation.navigate('QnaList');
+              //navigation.navigate('QnaList');
+              navigation.goBack();
             }}
           >
             <Text style={[styles.boBackBtnText, styles.boBackBtn2Text]}>목록으로</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      ) : (
+      <View style={[styles.indicator]}>
+        <ActivityIndicator size="large" />
+      </View>
+			)}
 		</SafeAreaView>
 	)
 }

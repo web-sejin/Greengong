@@ -128,48 +128,6 @@ export const actionCreators = {
     }
   },
 
-  //관심 목록 리스트
-  wish_set: (data, count) => async (dispatch) => {
-    try {
-      const response = await UserApi.market_list(data);
-      if (response.result) {
-        await dispatch({
-          type: MARKET_UESR_LIST,
-          payload: response.data,
-          count: count,
-        });
-
-        return { state: true };
-      } else {
-        return { state: false, msg: response.msg };
-      }
-    } catch (error) {
-      // console.log('market_list Error : ', error);
-      return { state: false, msg: '' };
-    }
-  },
-
-
-  //관심목록 리스트
-  wish_list: (data, count, type) => async (dispatch) => {
-    try {
-      const response = await UserApi.wish_list(data);
-      console.log('wish_list :::: ', data);
-      if (response.result) {
-        await dispatch({
-          type: type === 1 ? WISH_LIST : WISH_LIST_FLEX,
-          payload: response.data,
-          count: count,
-        });
-        return { state: true };
-      } else {
-        return { state: false, msg: response.msg };
-      }
-    } catch (error) {
-      // console.log('wish_list Error : ', error);
-      return { state: false, msg: '' };
-    }
-  },
   //회원 정보 변경
   member_update: (user) => async (dispatch) => {
     try {
@@ -245,16 +203,15 @@ export const actionCreators = {
   member_logout: (data) => async (dispatch) => {
     try {
       const response = await UserApi.member_logout(data);
-      // console.log('member_logout :::', response);
-      AsyncStorage.removeItem('flex_id');
-      AsyncStorage.removeItem('save_id');
+      console.log('member_logout :::', response);
+      AsyncStorage.removeItem('mb_id');
 
       await dispatch({
         type: MEMBER_LOGOUT,
       });
       return response;
     } catch (error) {
-      // console.log('member_logout Error : ', error);
+      //console.log('member_logout Error : ', error);
       return { state: false, msg: '' };
     }
   },
@@ -263,8 +220,7 @@ export const actionCreators = {
     try {
       const response = await UserApi.member_out(data);
       // console.log('member_out :::', response);
-      AsyncStorage.removeItem('flex_id');
-      AsyncStorage.removeItem('save_id');
+      AsyncStorage.removeItem('mb_id');
 
       await dispatch({
         type: MEMBER_LOGOUT,
@@ -272,18 +228,6 @@ export const actionCreators = {
       return response;
     } catch (error) {
       // console.log('member_out Error : ', error);
-      return { state: false, msg: '' };
-    }
-  },
-  //판매신청
-  member_sellerReg: (data) => async (dispatch) => {
-    try {
-      const response = await UserApi.member_sellerReg(data);
-      // console.log('member_sellerReg :::', response);
-
-      return response;
-    } catch (error) {
-      // console.log('member_sellerReg Error : ', error);
       return { state: false, msg: '' };
     }
   },
