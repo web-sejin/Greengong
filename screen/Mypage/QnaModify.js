@@ -98,7 +98,8 @@ const QnaModify = (props) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);				
-				navigation.navigate('QnaView', {bd_idx:idx});
+				//navigation.navigate('QnaView', {bd_idx:idx});
+				navigation.navigate('QnaList', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				setIsLoading(false);
@@ -120,7 +121,7 @@ const QnaModify = (props) => {
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);
 				setVisible(false);
-				navigation.navigate('QnaList');
+				navigation.navigate('QnaList', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				setIsLoading(false);

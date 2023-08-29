@@ -17,11 +17,13 @@ const opacityVal = 0.8;
 
 const QnaList = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
+	const {params} = route;
 	const [pageSt, setPageSt] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);  
 	const [itemList, setItemList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);  
 	const isFocused = useIsFocused();	
+	const [initLoading, setInitLoading] = useState(false)
 
 	const getItemList = async () =>{
 		setIsLoading(false);
@@ -81,13 +83,15 @@ const QnaList = ({navigation, route}) => {
 				//setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
+			if(!initLoading){
+				getItemList();
+				setInitLoading(true);
+			}else if(params?.isSubmit){
+				setNowPage(1);
+				getItemList();
+				delete params?.isSubmit
 			}
-			getItemList();
+
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}

@@ -45,9 +45,13 @@ import Chat from './Chat/Chat';
 import Mypage from './Mypage/Mypage';
 import SearchList from './Search'; //검색 리스트
 import UsedWrite1 from './usedArticle/Write1'; //스크랩 글쓰기
+import UsedModify1 from './usedArticle/Modify1'; //스크랩 글수정
 import UsedWrite2 from './usedArticle/Write2'; //중고자재 글쓰기
+import UsedModify2 from './usedArticle/Modify2'; //중고자재 글수정
 import UsedWrite3 from './usedArticle/Write3'; //중고기계/장비 글쓰기
+import UsedModify3 from './usedArticle/Modify3'; //중고자재 글수정
 import UsedWrite4 from './usedArticle/Write4'; //폐기물 글쓰기
+import UsedModify4 from './usedArticle/Modify4'; //폐기물 글수정
 import UsedView from './usedArticle/View'; //상세페이지
 import Bid from './usedArticle/Bid'; //입찰하기
 import SalesComplete from './usedArticle/SalesComplete'; //판매완료업체선정
@@ -253,9 +257,13 @@ const StackNavigator = () => {
       <Stack.Screen name="Findpw" component={Findpw} />
       <Stack.Screen name="SearchList" component={SearchList} />
       <Stack.Screen name="UsedWrite1" component={UsedWrite1} />
+      <Stack.Screen name="UsedModify1" component={UsedModify1} />      
       <Stack.Screen name="UsedWrite2" component={UsedWrite2} />
+      <Stack.Screen name="UsedModify2" component={UsedModify2} />      
       <Stack.Screen name="UsedWrite3" component={UsedWrite3} />
+      <Stack.Screen name="UsedModify3" component={UsedModify3} />
       <Stack.Screen name="UsedWrite4" component={UsedWrite4} />
+      <Stack.Screen name="UsedModify4" component={UsedModify4} />
       <Stack.Screen name="UsedView" component={UsedView} />
       <Stack.Screen name="Bid" component={Bid} />
       <Stack.Screen name="SalesComplete" component={SalesComplete} />      

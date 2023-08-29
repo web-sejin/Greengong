@@ -19,7 +19,7 @@ const QnaWrite = (props) => {
 	const {navigation, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);  
+	const [isLoading, setIsLoading] = useState(false);  
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
 
@@ -73,7 +73,7 @@ const QnaWrite = (props) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);
-				navigation.navigate('QnaList');
+				navigation.navigate('QnaList', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				setIsLoading(false);

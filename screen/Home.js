@@ -20,6 +20,7 @@ const filterListData = [
 
 const Home = (props) => {
 	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const {params} = route	
 	const [searchVal, setSearchVal] = useState();
 	const [isLoading, setIsLoading] = useState(false);
 	const [scrollEvent, setScrollEvent] = useState(new Animated.Value(1))	
@@ -41,6 +42,8 @@ const Home = (props) => {
 	const [myInfo, setMyInfo] = useState({});
 	const [myFac, setMyFac] = useState({});
 	const [myFacOn, setMyFacOn] = useState('');
+
+	const [initLoading, setInitLoading] = useState(false);
 	
 	const isFocused = useIsFocused();
 
@@ -68,7 +71,7 @@ const Home = (props) => {
 	//중고 리스트
 	const getItemList = async () =>{
 		setIsLoading(true);
-		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry}, (args)=>{
+		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -88,7 +91,8 @@ const Home = (props) => {
 
 	//중고 리스트 무한 스크롤
 	const moreData = async () => {
-		await Api.send('GET', 'list_product', {is_api: 1, page:nowPage+1}, (args)=>{
+		console.log("nowPage : ",nowPage);
+		await Api.send('GET', 'list_product', {is_api: 1, c1_idx:filterAry, page:nowPage+1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -99,18 +103,32 @@ const Home = (props) => {
 				setItemList(addItem);			
 				setNowPage(nowPage+1);
 			}else{
+				console.log(responseJson);
 				console.log('결과 출력 실패!');
 			}
 		});
 	}
 
 	useEffect(()=>{
-		getMyInfo();
+			getMyInfo();
+			//console.log("initLoading : ",initLoading);
+			//console.log("isSubmit : ",params?.isSubmit);
+			if(!initLoading){
+				getItemList();
+				setInitLoading(true);
+			}else if(params?.isSubmit){
+				setNowPage(1);
+				getItemList();
+				delete params?.isSubmit
+			}
 	},[isFocused]);
 
 	useEffect(()=>{
-		getItemList();
-	}, [isFocused, filterList2]);
+		if(initLoading){
+			setNowPage(1);
+			getItemList();			
+		}
+	}, [filterList2]);
 	
 	const getList = ({item, index}) => (
 		<TouchableOpacity
@@ -124,7 +142,9 @@ const Home = (props) => {
 			<>
 
 			{item.pd_image ? (
-			<AutoHeightImage width={131} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
+			<View style={styles.pdImage}>
+				<AutoHeightImage width={131} source={{uri: item.pd_image}}  style={styles.listImg} />
+			</View>
 			) : null}
 
 			{/* <AutoHeightImage width={131} source={{uri: item.pd_image}}  style={styles.listImg} />			 */}
@@ -328,8 +348,6 @@ const Home = (props) => {
 		if(cnt < 1){
 			setFilterAry('');
 		}
-
-
 		setFilterList2(selectCon);
 
 		//await listCenterInfoReceive(selected);
@@ -349,6 +367,8 @@ const Home = (props) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);
+				setItemList([]);
+				setNowPage(1);
 				setVisible(false);
 				setMyFac(responseJson.data);
 
@@ -384,68 +404,74 @@ const Home = (props) => {
 					<AutoHeightImage width={20} source={require("../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
 			</View>
-
-			<FlatList
-				data={itemList}
-				renderItem={(getList)}
-				keyExtractor={(item, index) => index.toString()}
-				onScroll={onScroll}					
-				onEndReachedThreshold={0.6}
-				onEndReached={moreData}
-				ListHeaderComponent={
-					<>						
-					<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
-						<View style={styles.schIptBox}>
-							<TouchableOpacity
-							style={styles.goToSch}
-							activeOpacity={opacityVal}
-							onPress={() => {navigation.navigate('SearchList', {backPage:'Home', tab:1})}}
-							>
-								<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
-							</TouchableOpacity>
-						</View>
-						<View style={styles.schFilterBox}>
-							{filterLen > 0 ? (
-								<View style={styles.filterLabelBox}>
-									{filterList2.map((item, index) => {
-										if(item.isChecked){
-											return(
-											<View key={index} style={styles.filterLabel}>
-												<Text style={styles.filterLabelText}>{item.txt}</Text>
-											</View>
-											)
-										}
-									})}
-								</View>
-							) : (
+			
+			{!isLoading ? (
+				<FlatList
+					data={itemList}
+					renderItem={(getList)}
+					keyExtractor={(item, index) => index.toString()}
+					onScroll={onScroll}					
+					onEndReachedThreshold={0.6}
+					onEndReached={moreData}
+					ListHeaderComponent={
+						<>						
+						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
+							<View style={styles.schIptBox}>
+								<TouchableOpacity
+								style={styles.goToSch}
+								activeOpacity={opacityVal}
+								onPress={() => {navigation.navigate('SearchList', {backPage:'Home', tab:1})}}
+								>
+									<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.schFilterBox}>
+								{filterLen > 0 ? (
+									<View style={styles.filterLabelBox}>
+										{filterList2.map((item, index) => {
+											if(item.isChecked){
+												return(
+												<View key={index} style={styles.filterLabel}>
+													<Text style={styles.filterLabelText}>{item.txt}</Text>
+												</View>
+												)
+											}
+										})}
+									</View>
+								) : (
+									<TouchableOpacity 
+										style={styles.schFilterBtn1} 
+										activeOpacity={opacityVal}
+										onPress={()=>{setVisible3(true)}}
+									>
+										<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									</TouchableOpacity>
+								)}
 								<TouchableOpacity 
-									style={styles.schFilterBtn1} 
+									style={styles.schFilterBtn2}
 									activeOpacity={opacityVal}
 									onPress={()=>{setVisible3(true)}}
 								>
-									<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									<Text style={styles.schFilterBtn2Text}>상세필터</Text>
+									<AutoHeightImage width={17} source={require("../assets/img/icon_filter.png")} />
 								</TouchableOpacity>
-							)}
-							<TouchableOpacity 
-								style={styles.schFilterBtn2}
-								activeOpacity={opacityVal}
-								onPress={()=>{setVisible3(true)}}
-							>
-								<Text style={styles.schFilterBtn2Text}>상세필터</Text>
-								<AutoHeightImage width={17} source={require("../assets/img/icon_filter.png")} />
-							</TouchableOpacity>
+							</View>
+						</KeyboardAvoidingView>
+						<View style={styles.borderTop}></View>
+						</>
+					}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>등록된 중고상품이 없습니다.</Text>
 						</View>
-					</KeyboardAvoidingView>
-					<View style={styles.borderTop}></View>
-					</>
-				}
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 중고상품이 없습니다.</Text>
-					</View>
-				}
-			/>
+					}
+				/>
+			) : (
+				<View style={[styles.indicator]}>
+					<ActivityIndicator size="large" />
+				</View>
+			)}
 
 			{!visible2 ? (
 			<Animated.View 
@@ -662,12 +688,6 @@ const Home = (props) => {
 					</View>
 				</View>
 			</Modal>
-
-			{isLoading ? (
-			<View style={[styles.indicator]}>
-				<ActivityIndicator size="large" />
-			</View>
-			) : null}
 		</SafeAreaView>
 	)
 }
@@ -695,7 +715,8 @@ const styles = StyleSheet.create({
 	filterLabelText: {fontSize:13,lineHeight:17,color:'#fff'},
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	listImg: {borderRadius:12},
+	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden'},
+	listImg: {borderRadius:12,},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoBox2 : {width:innerWidth,paddingLeft:0,},
 	listInfoTitle: {},

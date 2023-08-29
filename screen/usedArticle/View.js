@@ -9,6 +9,9 @@ import Swiper from 'react-native-swiper'
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
+
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
@@ -16,22 +19,25 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const UsedView = ({navigation, route}) => {
-  const scrollRef = useRef();
-
+const UsedView = (props) => {
+  const scrollRef = useRef();  
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
   const idx = route.params.idx;
-
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [zzim, setZzim] = useState(0);
   const [like, setLike] = useState(0);
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
+  const [visible3, setVisible3] = useState(false);
+  const [toastModal, setToastModal] = useState(false);
+  const [toastText, setToastText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [itemInfo, setItemInfo] = useState({});
   const [swp, setSwp] = useState({});
   const [latest, setLatest] = useState({});
   const [naviPage, setNaviPage] = useState('');
+  const [myInfo, setMyInfo] = useState({});
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -41,19 +47,11 @@ const UsedView = ({navigation, route}) => {
 			if(!pageSt){
 				setVisible(false);
         setVisible2(false);
-        //setIsLoading(false);
-        //setItemInfo({});
-        //setSwp({});
-        //setLatest({});
-        //setNaviPage('');
+        setVisible3(false);
+        setToastModal(false);
+        setToastText('');
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -66,35 +64,37 @@ const UsedView = ({navigation, route}) => {
   }
 
   const ModalOn = () => {
-    setVisible(true);
+    if(myInfo.mb_idx == itemInfo.pd_mb_idx){
+      setVisible(true);
+    }else{
+      setVisible3(true);
+    }
   }
 
   const getData = async () => {
     setIsLoading(false);
-    await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx}, (args)=>{
+    await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx, page_name:'view'}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(responseJson);
+				//console.log("view_product : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.pf_data);
         setLatest(responseJson.mb_latest);
         setZzim(responseJson.is_scrap);
 
         if(responseJson.c1_idx == 1){
-          setNaviPage('UsedWrite1');
+          setNaviPage('UsedModify1');
         }else if(responseJson.c1_idx == 2){
-          setNaviPage('UsedWrite2');
+          setNaviPage('UsedModify2');
         }else if(responseJson.c1_idx == 3){
-          setNaviPage('UsedWrite3');
+          setNaviPage('UsedModify3');
         }else if(responseJson.c1_idx == 4){
-          setNaviPage('UsedWrite4');
+          setNaviPage('UsedModify4');
         }
-        setTimeout(function(){
-          setIsLoading(true);
-        },300);
+        setIsLoading(true);
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
@@ -102,16 +102,73 @@ const UsedView = ({navigation, route}) => {
 		});
   }
 
+  const getMyDate = async () => {
+    await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_member_info : ",responseJson);
+        setMyInfo(responseJson);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		});  
+  }
+
   useEffect(() => {
     getData();
+    getMyDate();
   }, []);
+
+  //판매 상태 변경
+  const chgState = async (v) => {
+    /*
+    v=1 : 판매중
+    v=2 : 예약중
+    */
+    if(itemInfo.pd_status_org == v){
+      if(v == '1'){
+        setToastText('이미 판매중 상태인 상품입니다.');        
+      }else if(v == '2'){
+        setToastText('이미 예약중 상태인 상품입니다.');
+      }
+
+      setToastModal(true);
+      setTimeout(()=>{ setToastModal(false) },2000);
+      return false;
+    }
+  }
+
+  //삭제
+  function deleteItem(idx){
+    //console.log(idx);
+    const formData = {
+			is_api:1,				
+			pd_idx:idx,
+		};
+
+    Api.send('POST', 'del_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);				
+				navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
         headertitle={itemInfo.pd_name} 
-        ModalEvent={ModalOn} 
+        ModalEvent={ModalOn}        
       />
 
       {isLoading ? (
@@ -171,6 +228,7 @@ const UsedView = ({navigation, route}) => {
                   <Text style={styles.profileResultText}>거래평가 : {itemInfo.mb_score}</Text>
                 </View>
               </View>
+              {myInfo.mb_idx != itemInfo.pd_mb_idx ? (
               <TouchableOpacity
                 style={[styles.profileZzim, zzim==1 ? styles.profileZzimOn : null]}
                 activeOpacity={opacityVal}
@@ -184,6 +242,7 @@ const UsedView = ({navigation, route}) => {
               >
                 <Text style={[styles.profileZzimText, zzim==1 ? styles.profileZzimTextOn : null]}>관심판매자</Text>
               </TouchableOpacity>
+              ) : null}
             </View>
             <View style={styles.viewSubjectBox}>
               <View style={styles.viewSubject}>
@@ -451,7 +510,9 @@ const UsedView = ({navigation, route}) => {
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
 							onPress={() => {
-								navigation.navigate(naviPage, {idx:itemInfo.pd_idx});
+                setVisible(false);
+                //console.log("naviPage : ",naviPage);
+								navigation.navigate(naviPage, {idx:idx});
 						}}
 						>
 							<Text style={styles.modalCont2BtnText}>수정하기</Text>
@@ -459,18 +520,14 @@ const UsedView = ({navigation, route}) => {
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								setVisible(false)
-						}}
+							onPress={() => {chgState('2')}}
 						>
 							<Text style={styles.modalCont2BtnText}>예약중</Text>
 						</TouchableOpacity>
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								setVisible(false)
-							}}
+							onPress={() => {chgState('1')}}
 						>
 							<Text style={styles.modalCont2BtnText}>판매중</Text>
 						</TouchableOpacity>
@@ -488,7 +545,7 @@ const UsedView = ({navigation, route}) => {
 							style={[styles.modalCont2Btn, styles.delete]}
 							activeOpacity={opacityVal}
 							onPress={() => {
-								setVisible(false)
+                deleteItem(idx);
 							}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
@@ -499,6 +556,48 @@ const UsedView = ({navigation, route}) => {
 						activeOpacity={opacityVal}
 						onPress={() => {
 							setVisible(false)
+						}}
+					>
+						<Text style={styles.modalCont2BtnText}>취소</Text>
+					</TouchableOpacity>
+				</View>
+      </Modal>
+
+      <Modal
+				visible={visible3}
+				transparent={true}
+				onRequestClose={() => {setVisible3(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVissetVisible3ible(false)}}
+				></Pressable>
+				<View style={styles.modalCont2}>
+					<View style={styles.modalCont2Box}>
+						<TouchableOpacity 
+							style={[styles.modalCont2Btn, styles.choice]}
+							activeOpacity={opacityVal}
+							onPress={() => {
+								//navigation.navigate(naviPage, {idx:itemInfo.pd_idx});
+						}}
+						>
+							<Text style={styles.modalCont2BtnText}>차단하기</Text>
+						</TouchableOpacity>
+						<TouchableOpacity 
+							style={[styles.modalCont2Btn, styles.delete]}
+							activeOpacity={opacityVal}
+							onPress={() => {
+								setVisible3(false)
+							}}
+						>
+							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>신고하기</Text>
+						</TouchableOpacity>
+					</View>
+					<TouchableOpacity 
+						style={[styles.modalCont2Btn, styles.cancel]}
+						activeOpacity={opacityVal}
+						onPress={() => {
+							setVisible3(false)
 						}}
 					>
 						<Text style={styles.modalCont2BtnText}>취소</Text>
@@ -540,6 +639,37 @@ const UsedView = ({navigation, route}) => {
           </View>
 				</View>
       </Modal>
+
+      <Modal
+        visible={toastModal}
+				animationType={"slide"}
+				transparent={true}
+      >
+				<View style={styles.toastModal}>
+					<View
+						style={{
+							backgroundColor: '#000',
+							borderRadius: 10,
+							paddingVertical: 10,
+							paddingHorizontal: 20,
+							opacity: 0.7,
+						}}
+					>
+						<Text
+							style={{
+								textAlign: 'center',
+								color: '#FFFFFF',
+								fontSize: 15,
+								lineHeight: 22,
+								fontFamily: Font.NotoSansRegular,
+								letterSpacing: -0.38,
+							}}
+						>
+							{toastText}
+						</Text>
+					</View>
+				</View>
+			</Modal>
 		</SafeAreaView>
 	)
 }
@@ -651,6 +781,16 @@ const styles = StyleSheet.create({
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
+  toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
 })
 
-export default UsedView
+//export default UsedView
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(UsedView);

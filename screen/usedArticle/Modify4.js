@@ -17,7 +17,7 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 //스크랩 글쓰기
-const Write4 = ({navigation, route}) => {
+const Modify4 = ({navigation, route}) => {
   const fileListData = [
     {'idx': 1, 'txt': '파일1', 'path': ''},
     {'idx': 2, 'txt': '파일2', 'path': ''},
@@ -29,7 +29,7 @@ const Write4 = ({navigation, route}) => {
     {'idx': 8, 'txt': '파일8', 'path': ''},
     {'idx': 9, 'txt': '파일9', 'path': ''},
     {'idx': 10, 'txt': '파일10', 'path': ''},
-  ];
+  ];  
 
   const periodAry = [
 		{ label: '3일', value: '3' },
@@ -42,6 +42,7 @@ const Write4 = ({navigation, route}) => {
     { label: '10일', value: '10' },
 	]
 
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -92,9 +93,6 @@ const Write4 = ({navigation, route}) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			select1();
-			select5();
-			check1();
 		}
 
 		return () => isSubscribed = false;
@@ -127,8 +125,8 @@ const Write4 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v) => {
-		setIngred('');
+	const select2 = async (v, z) => {
+		if(!z || z==''){ setIngred(''); }
 		setIngreAry([]);
 		if(v == 27){
 			await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
@@ -139,6 +137,7 @@ const Write4 = ({navigation, route}) => {
 				if(responseJson.result === 'success' && responseJson){
 					//console.log("성분 : ",responseJson);
 					setIngreAry(responseJson.data);
+          if(z){ setIngred(z); }
 				}else{
 					//console.log("성분 err :",responseJson.result_text);
 				}
@@ -147,7 +146,7 @@ const Write4 = ({navigation, route}) => {
 	}
 
 	//검수
-	const check1 = async () => {
+	const check1 = async (testList) => {
 		await Api.send('GET', 'product_cate5', {is_api:1, cate1:4}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -165,6 +164,14 @@ const Write4 = ({navigation, route}) => {
 					}
 					chkMetAry.push(subAry);
 				});
+
+        if(testList.length > 0){
+					//console.log("testList : ",testList);
+					testList.map((item) => {
+						const id = (item.val)-1;
+						chkMetAry[id].isChecked=true;
+					});
+				}
 				setChkMethod(chkMetAry);
 			}else{
 				console.log("검수 err : ",responseJson.result_text);
@@ -254,31 +261,51 @@ const Write4 = ({navigation, route}) => {
 		let img8Path = '';
 		let img9Path = '';
 		let img10Path = '';
-		
+
+    let img1Idx = '';
+		let img2Idx = '';
+		let img3Idx = '';
+		let img4Idx = '';
+		let img5Idx = '';
+		let img6Idx = '';
+		let img7Idx = '';
+		let img8Idx = '';
+		let img9Idx = '';
+		let img10Idx = '';		
 
 		fileList.map((item, index)=>{
 			if(item.idx == 1 && item.path != ''){ 
 				img1Path = item.path;
+				img1Idx = item.pf_idx;
 			}else if(item.idx == 2 && item.path != ''){ 
 				img2Path = item.path;
+				img2Idx = item.pf_idx;
 			}else if(item.idx == 3 && item.path != ''){ 
 				img3Path = item.path;
+				img3Idx = item.pf_idx;
 			}else if(item.idx == 4 && item.path != ''){ 
 				img4Path = item.path;
+				img4Idx = item.pf_idx;
 			}else if(item.idx == 5 && item.path != ''){ 
 				img5Path = item.path;
+				img5Idx = item.pf_idx;
 			}else if(item.idx == 6 && item.path != ''){ 
 				img6Path = item.path;
+				img6Idx = item.pf_idx;
 			}else if(item.idx == 7 && item.path != ''){ 
 				img7Path = item.path;
+				img7Idx = item.pf_idx;
 			}else if(item.idx == 8 && item.path != ''){ 
 				img8Path = item.path;
+				img8Idx = item.pf_idx;
 			}else if(item.idx == 9 && item.path != ''){ 
 				img9Path = item.path;
+				img9Idx = item.pf_idx;
 			}else if(item.idx == 10 && item.path != ''){ 
 				img10Path = item.path;
+				img10Idx = item.pf_idx;
 			}
-		})
+		});
 	
 		if(img1Path == ""){ ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); return false; }
 
@@ -315,7 +342,8 @@ const Write4 = ({navigation, route}) => {
 		if(content == ""){ ToastMessage('내용을 입력해 주세요.'); return false; }
 
 		const formData = {
-			is_api:1,				
+			is_api:1,
+      pd_idx:idx,		
 			pd_name:subject,
 			pd_contents:content,
 			c1_idx:4,
@@ -329,20 +357,20 @@ const Write4 = ({navigation, route}) => {
 			pd_test:selectedList,
 		};
 
-		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
-		if(img2Path != ''){ formData.pf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'pf_img2.png'}; }
-		if(img3Path != ''){ formData.pf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'pf_img3.png'}; }
-		if(img4Path != ''){ formData.pf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'pf_img4.png'}; }
-		if(img5Path != ''){ formData.pf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'pf_img5.png'}; }
-		if(img6Path != ''){ formData.pf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'pf_img6.png'}; }
-		if(img7Path != ''){ formData.pf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'pf_img7.png'}; }
-		if(img8Path != ''){ formData.pf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'pf_img8.png'}; }
-		if(img9Path != ''){ formData.pf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'pf_img9.png'}; }
-		if(img10Path != ''){ formData.pf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'pf_img10.png'}; }
+		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png', 'pf_idx':img1Idx}; }
+		if(img2Path != ''){ formData.pf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'pf_img2.png', 'pf_idx':img2Idx}; }
+		if(img3Path != ''){ formData.pf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'pf_img3.png', 'pf_idx':img3Idx}; }
+		if(img4Path != ''){ formData.pf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'pf_img4.png', 'pf_idx':img4Idx}; }
+		if(img5Path != ''){ formData.pf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'pf_img5.png', 'pf_idx':img5Idx}; }
+		if(img6Path != ''){ formData.pf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'pf_img6.png', 'pf_idx':img6Idx}; }
+		if(img7Path != ''){ formData.pf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'pf_img7.png', 'pf_idx':img7Idx}; }
+		if(img8Path != ''){ formData.pf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'pf_img8.png', 'pf_idx':img8Idx}; }
+		if(img9Path != ''){ formData.pf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'pf_img9.png', 'pf_idx':img9Idx}; }
+		if(img10Path != ''){ formData.pf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'pf_img10.png', 'pf_idx':img10Idx}; }
 
 		//console.log("formData : ",formData);
 
-		Api.send('POST', 'save_product', formData, (args)=>{
+		Api.send('POST', 'modify_product', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
@@ -356,9 +384,62 @@ const Write4 = ({navigation, route}) => {
 		});
 	}
 
+  const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("modify : ",responseJson);
+				const imgList = responseJson.pf_data;				
+				if(imgList.length > 0){
+					let selectCon = fileList.map((item,index) => {
+						//console.log(item);
+						if(imgList[index]){
+							return {...item, path: imgList[index].pf_name_org, pf_idx:imgList[index].pf_idx};
+						}else{
+							return {...item, path: item.path, pf_idx:''};
+						}
+					});
+					setFileList(selectCon);
+					getFileCount(selectCon);
+				}
+
+        setSubject(responseJson.pd_name);                        								
+				select1();
+				setSort((responseJson.c2_idx).toString());
+				select2(responseJson.c2_idx, (responseJson.c3_idx).toString());
+				
+				const testList = responseJson.pd_test;
+				check1(testList);
+				
+				setDealMethod1(responseJson.pd_trade1);
+				if(responseJson.pd_trade1 == 1){
+					select4(1);
+					setDealMethod2(responseJson.pd_trade2);
+				}
+        setPeriod(responseJson.pd_bidding_day);
+				select5();
+				setPayMethod(responseJson.pd_method);
+				setContent(responseJson.pd_contents);
+
+        setIsLoading(false);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!');
+			}
+		});
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'폐기물 글쓰기'} />
+			<Header navigation={navigation} headertitle={'폐기물 글수정'} />
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>
 					<View style={[styles.registBox]}>
@@ -758,4 +839,4 @@ const styles = StyleSheet.create({
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:56,color:'#000'},
 })
 
-export default Write4
+export default Modify4

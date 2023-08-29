@@ -5,7 +5,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import RNPickerSelect from 'react-native-picker-select';
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -30,42 +30,6 @@ const Write2 = ({navigation, route}) => {
 		{'idx': 9, 'txt': '파일9', 'path': ''},
 		{'idx': 10, 'txt': '파일10', 'path': ''},
 	];
-	
-	const chkMethodData = [
-		{'idx': 1, 'txt': '성분분석표 유', 'isChecked': false},
-	];
-	
-	const sortAry = [
-		{ label: '고철', value: '1' },
-		{ label: '스테인레스 강', value: '2' },
-		{ label: '특수강', value: '3' },
-	]
-	
-	const ingreAry = [
-		{ label: '생철', value: '1' },
-		{ label: '중량', value: '2' },
-		{ label: '경량', value: '3' },
-	]
-
-	const shapeAry = [
-		{ label: '레이저', value: '1' },
-		{ label: '뻔지', value: '2' },
-		{ label: '금형', value: '3' },
-	]
-
-	const dealMethod2Ary = [
-		{ label: '집게차 요청', value: '1' },
-		{ label: '지게차 요청', value: '2' },
-		{ label: '운반차량 요청', value: '3' },
-		{ label: '상담필요', value: '4' },
-	]
-
-	const payMethodAry = [
-		{ label: '계산서', value: '1' },
-		{ label: '계좌이체', value: '2' },
-		{ label: '현금', value: '3' },
-		{ label: '협의가능', value: '4' },
-	]
 
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -77,7 +41,7 @@ const Write2 = ({navigation, route}) => {
 	const [sort, setSort] = useState(''); //분류
 	const [ingred, setIngred] = useState(''); //성분
 	const [shape, setShape] = useState(''); //형태
-	const [chkMethod, setChkMethod] = useState(chkMethodData); //검수
+	const [chkMethod, setChkMethod] = useState([]); //검수
   const [size1, setSize1] = useState(''); //중량
   const [size2, setSize2] = useState(''); //두께
   const [size3, setSize3] = useState(''); //외경
@@ -85,11 +49,18 @@ const Write2 = ({navigation, route}) => {
   const [size5, setSize5] = useState(''); //길이
 	const [dealMethod1, setDealMethod1] = useState(''); //거래방식1
 	const [dealMethod2, setDealMethod2] = useState(''); //거래방식2
-	const [priceUnit, setPriceUnit] = useState(''); //가격단위
+	const [priceUnit, setPriceUnit] = useState(1); //가격단위
 	const [price, setPrice] = useState(''); //가격
-	const [priceOpt, setPriceOpt] = useState(''); //가격옵션
+	const [priceOpt, setPriceOpt] = useState(1); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [sortAry, setSortAry] = useState([]); //분류 리스트
+	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
+	const [shapeAry, setShapeAry] = useState([]); //형태 리스트
+	const [dealMethod2Ary, setDealMethod2Ary] = useState([]); //거래방식2 리스트
+	const [payMethodAry, setPayMethodAry] = useState([]); //결제방식 리스트
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -97,14 +68,13 @@ const Write2 = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				useState();
 				setFileConfirm(false);
 				setFileList(fileListData);
 				setSubject('');
 				setSort('');
 				setIngred('');
 				setShape('');
-				setChkMethod(chkMethodData);
+				setChkMethod([]);
         setSize1('');
         setSize2('');
         setSize3('');
@@ -112,25 +82,137 @@ const Write2 = ({navigation, route}) => {
         setSize5('');
 				setDealMethod1('');
 				setDealMethod2('');
-				setPriceUnit('');
+				setPriceUnit(1);
 				setPrice('');
-				setPriceOpt('');
+				setPriceOpt(1);
 				setPayMethod('');
 				setContent('');
+				setIsLoading(false);
+				setSortAry([]);
+				setIngreAry([]);
+				setShapeAry([]);
+				setDealMethod2Ary([]);
+				setPayMethodAry([]);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			select1();
+			select5();
+			check1();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	//분류
+	const select1 = async () => {
+		await Api.send('GET', 'product_cate2', {is_api:1, cate1:2}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				setSortAry(responseJson.data);
+			}else{
+				console.log("분류 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//성분
+	const select2 = async (v) => {
+		setIngred('');
+		setIngreAry([]);
+
+		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("성분 : ",responseJson);
+				setIngreAry(responseJson.data);
+			}else{
+				console.log("성분 err :",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//등급(형태)
+	const select3 = async (v) => {
+		setShape('');
+		await Api.send('GET', 'product_cate4', {is_api:1, cate3:v}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("형태 : ",responseJson);
+				setShapeAry(responseJson.data);
+			}else{
+				console.log("형태 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//검수
+	const check1 = async () => {
+		await Api.send('GET', 'product_cate5', {is_api:1, cate1:2}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("검수 : ",responseJson);
+				//setChkMethod(responseJson.data);
+				let chkMetAry = [];
+				(responseJson.data).map((item, index)=>{
+					const subAry = {
+						'idx': item.val, 
+						'txt': item.txt, 
+						'isChecked': false
+					}
+					chkMetAry.push(subAry);
+				});
+				setChkMethod(chkMetAry);
+			}else{
+				console.log("검수 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//거래방식2
+	const select4 = async (v) => {
+		await Api.send('GET', 'product_cate7', {is_api:1, cate1:2, cate6:v}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setDealMethod2Ary(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+	}
+
+	//결제방식
+	const select5 = async () => {
+		await Api.send('GET', 'product_cate8', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("결제방식 : ",responseJson);
+				setPayMethodAry(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+	}
 
   function getFileCount(selectCon){
 		let cnt = 0;
@@ -182,6 +264,149 @@ const Write2 = ({navigation, route}) => {
 		setChkMethod(temp);
 	};
 
+	function writeUpdate(){
+		let img1Path = '';
+		let img2Path = '';
+		let img3Path = '';
+		let img4Path = '';
+		let img5Path = '';
+		let img6Path = '';
+		let img7Path = '';
+		let img8Path = '';
+		let img9Path = '';
+		let img10Path = '';
+		
+
+		fileList.map((item, index)=>{
+			if(item.idx == 1 && item.path != ''){ 
+				img1Path = item.path;
+			}else if(item.idx == 2 && item.path != ''){ 
+				img2Path = item.path;
+			}else if(item.idx == 3 && item.path != ''){ 
+				img3Path = item.path;
+			}else if(item.idx == 4 && item.path != ''){ 
+				img4Path = item.path;
+			}else if(item.idx == 5 && item.path != ''){ 
+				img5Path = item.path;
+			}else if(item.idx == 6 && item.path != ''){ 
+				img6Path = item.path;
+			}else if(item.idx == 7 && item.path != ''){ 
+				img7Path = item.path;
+			}else if(item.idx == 8 && item.path != ''){ 
+				img8Path = item.path;
+			}else if(item.idx == 9 && item.path != ''){ 
+				img9Path = item.path;
+			}else if(item.idx == 10 && item.path != ''){ 
+				img10Path = item.path;
+			}
+		})
+	
+		if(img1Path == ""){ ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); return false; }
+
+		if(subject == ""){ ToastMessage('글 제목을 입력해 주세요.'); return false; }
+
+		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
+
+		if(sort != 9){
+			if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }
+		}
+
+		if(shape == ""){ ToastMessage('형태를 선택해 주세요.'); return false; }
+
+		let selectedList = '';
+		let selectedTotal = chkMethod.filter((item) => item.isChecked);
+		if(selectedTotal){
+			selectedTotal.map((item)=>{
+				if(selectedList != ''){
+					selectedList += ',';
+				}
+				selectedList += item.idx;			
+			});
+		}
+		if(selectedList == ''){ ToastMessage('검수를 선택해 주세요.'); return false; }
+
+		if(size1 == ""){ ToastMessage('중량을 입력해 주세요.'); return false; }
+		if(size2 == ""){ ToastMessage('두께를 입력해 주세요.'); return false; }
+		if(size3 == ""){ ToastMessage('외경을 입력해 주세요.'); return false; }
+		if(size4 == ""){ ToastMessage('폭을 입력해 주세요.'); return false; }
+		if(size5 == ""){ ToastMessage('길이를 입력해 주세요.'); return false; }
+		
+		if(!priceUnit || priceUnit == ""){ ToastMessage('가격 단위를 선택해 주세요.'); return false; }		
+
+		if(dealMethod1 == ""){ ToastMessage('거래방식1을 선택해 주세요.'); return false; }
+		
+		if(dealMethod1 == 1){
+			if(dealMethod2 == ""){ ToastMessage('거래방식2를 선택해 주세요.'); return false; }
+		}
+
+		if(priceOpt==1 && price == ""){ ToastMessage('가격을 입력해 주세요.'); return false; }
+
+		if(payMethod == ""){ ToastMessage('결제방식을 선택해 주세요.'); return false; }
+
+		if(content == ""){ ToastMessage('내용을 입력해 주세요.'); return false; }
+
+		let sellType = 1;
+		let option1 = 0;
+		if(priceOpt == 1 || priceOpt == 2 || priceOpt == 3){
+			sellType = priceOpt;
+			option1 = 0;
+		}else{
+			sellType = 1;
+			option1 = 1;
+		}
+
+		let resPrice = (price).split(',').join('');
+
+		const formData = {
+			is_api:1,				
+			pd_name:subject,
+			pd_contents:content,
+			c1_idx:2,
+			c2_idx:sort,
+			c3_idx:ingred,
+			c4_idx:shape,
+			pd_price:resPrice,
+			pd_unit:priceUnit, 
+			pd_sell_type:sellType, 
+			pd_option1:option1, 
+			pd_trade1:dealMethod1, 
+			pd_trade2:dealMethod2, 
+			pd_method:payMethod, 			
+			pd_test:selectedList,
+			pd_weight:size1,
+			pd_thickness:size2,
+			pd_outside:size3,
+			pd_width:size4,
+			pd_length:size5,
+		};
+
+		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
+		if(img2Path != ''){ formData.pf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'pf_img2.png'}; }
+		if(img3Path != ''){ formData.pf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'pf_img3.png'}; }
+		if(img4Path != ''){ formData.pf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'pf_img4.png'}; }
+		if(img5Path != ''){ formData.pf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'pf_img5.png'}; }
+		if(img6Path != ''){ formData.pf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'pf_img6.png'}; }
+		if(img7Path != ''){ formData.pf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'pf_img7.png'}; }
+		if(img8Path != ''){ formData.pf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'pf_img8.png'}; }
+		if(img9Path != ''){ formData.pf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'pf_img9.png'}; }
+		if(img10Path != ''){ formData.pf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'pf_img10.png'}; }
+
+		//console.log("formData : ",formData);
+
+		Api.send('POST', 'save_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);				
+				navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+	}
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'중고자재 글쓰기'} />
@@ -190,7 +415,7 @@ const Write2 = ({navigation, route}) => {
 					<View style={[styles.registBox]}>
 						<View style={[styles.typingBox, styles.typingBox2]}>
 							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>사진첨부(0/10)</Text>
+								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
 							<ScrollView
 								horizontal={true}
@@ -253,7 +478,15 @@ const Write2 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setSort(value)}
+									value={sort}
+									onValueChange={(value) => {
+										setSort(value);
+										if(value == 9){
+											select3(value);
+										}else{
+											select2(value);
+										}										
+									}}
 									placeholder={{
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
@@ -274,14 +507,19 @@ const Write2 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
-
+						
+						{sort != 9 ? (
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>성분</Text>
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setIngred(value)}
+									value={ingred}
+									onValueChange={(value) => {
+										setIngred(value);
+										select3(value);
+									}}
 									placeholder={{
 										label: '성분을 선택해 주세요.',
 										inputLabel: '성분을 선택해 주세요.',
@@ -302,6 +540,7 @@ const Write2 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -309,7 +548,10 @@ const Write2 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setShape(value)}
+									value={shape}
+									onValueChange={(value) => {
+										setShape(value);										
+									}}
 									placeholder={{
 										label: '형태를 선택해 주세요.',
 										inputLabel: '형태를 선택해 주세요.',
@@ -463,7 +705,10 @@ const Write2 = ({navigation, route}) => {
 											setDealMethod1('');
 										}else{
 											setDealMethod1(1);
+											select4(1);
 										}
+										setDealMethod2('');
+										setDealMethod2Ary([]);
 									}}
 								>
 									<Text style={[styles.dealBtnText, dealMethod1 == 1 ? styles.dealBtnTextOn : null]}>상차도(차량요청)</Text>
@@ -477,19 +722,23 @@ const Write2 = ({navigation, route}) => {
 										}else{
 											setDealMethod1(2);
 										}
+										setDealMethod2('');
+										setDealMethod2Ary([]);
 									}}
 								>
 									<Text style={[styles.dealBtnText, dealMethod1 == 2 ? styles.dealBtnTextOn : null]}>도착도(직접운반)</Text>
 								</TouchableOpacity>
 							</View>
 						</View>
-
+						
+						{dealMethod1 == 1 ? (
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>거래방식2</Text>
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={dealMethod2}
 									onValueChange={(value) => setDealMethod2(value)}
 									placeholder={{
 										label: '거래방식2를 선택해 주세요.',
@@ -511,6 +760,7 @@ const Write2 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
+						) : null}
 						
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -518,30 +768,31 @@ const Write2 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.filterBtnList]}>
 								<TouchableOpacity
-									style={[styles.filterChkBtn, priceUnit=='kg' ? styles.filterChkBtnOn : null]}
+									style={[styles.filterChkBtn, priceUnit==1 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
-										if(priceUnit && priceUnit =='kg'){
-											setPriceUnit('');
+										if(priceUnit && priceUnit ==1){
+											setPriceUnit();
 										}else{
-											setPriceUnit('kg');
+											setPriceUnit(1);
 										}
 									}}
 								>
-									<Text style={[styles.filterChkBtnText, priceUnit=='kg' ? styles.filterChkBtnTextOn : null]}>kg ₩</Text>
+									<Text style={[styles.filterChkBtnText, priceUnit==1 ? styles.filterChkBtnTextOn : null]}>kg ₩</Text>
 								</TouchableOpacity>
+								
                 <TouchableOpacity
-									style={[styles.filterChkBtn, priceUnit=='m' ? styles.filterChkBtnOn : null]}
+									style={[styles.filterChkBtn, priceUnit==2 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
-										if(priceUnit && priceUnit =='m'){
-											setPriceUnit('');
+										if(priceUnit && priceUnit ==2){
+											setPriceUnit();
 										}else{
-											setPriceUnit('m');
+											setPriceUnit(2);
 										}
 									}}
 								>
-									<Text style={[styles.filterChkBtnText, priceUnit=='m' ? styles.filterChkBtnTextOn : null]}>m ₩</Text>
+									<Text style={[styles.filterChkBtnText, priceUnit==2 ? styles.filterChkBtnTextOn : null]}>m ₩</Text>
 								</TouchableOpacity>
 							</View>
 						</View>
@@ -552,46 +803,51 @@ const Write2 = ({navigation, route}) => {
 							</View>							
 							<View style={[styles.filterBtnList]}>
 								<TouchableOpacity
-									style={[styles.filterChkBtn, priceOpt==1 ? styles.filterChkBtnOn : null]}
-									activeOpacity={opacityVal}
-									onPress={() => {
-										if(priceOpt && priceOpt == 1){											
-											setPriceOpt('');											
-										}else{
-											setPriceOpt(1);
-											setPrice('0');
-										}										
-									}}
-								>
-									<Text style={[styles.filterChkBtnText, priceOpt==1 ? styles.filterChkBtnTextOn : null]}>나눔</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
 									style={[styles.filterChkBtn, priceOpt==2 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
 										if(priceOpt && priceOpt == 2){											
-											setPriceOpt('');											
+											setPriceOpt(1);											
 										}else{
 											setPriceOpt(2);
+											setPrice('');
 										}										
 									}}
 								>
-									<Text style={[styles.filterChkBtnText, priceOpt==2 ? styles.filterChkBtnTextOn : null]}>가격협상</Text>
+									<Text style={[styles.filterChkBtnText, priceOpt==2 ? styles.filterChkBtnTextOn : null]}>나눔</Text>
 								</TouchableOpacity>
+
+								<TouchableOpacity
+									style={[styles.filterChkBtn, priceOpt==4 ? styles.filterChkBtnOn : null]}
+									activeOpacity={opacityVal}
+									onPress={() => {
+										if(priceOpt && priceOpt == 4){											
+											setPriceOpt(1);											
+										}else{
+											setPriceOpt(4);
+										}										
+									}}
+								>
+									<Text style={[styles.filterChkBtnText, priceOpt==4 ? styles.filterChkBtnTextOn : null]}>가격협상</Text>
+								</TouchableOpacity>
+
 								<TouchableOpacity
 									style={[styles.filterChkBtn, priceOpt==3 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
 										if(priceOpt && priceOpt == 3){											
-											setPriceOpt('');											
+											setPriceOpt(1);											
 										}else{
 											setPriceOpt(3);
+											setPrice('');
 										}										
 									}}
 								>
 									<Text style={[styles.filterChkBtnText, priceOpt==3 ? styles.filterChkBtnTextOn : null]}>입찰받기</Text>
 								</TouchableOpacity>
 							</View>
+							
+							{priceOpt == 1 || priceOpt == 4 ? (
 							<View style={[styles.typingInputBox, styles.typingInputBox2, styles.typingFlexBox]}>
 								<TextInput
 									value={price}
@@ -601,8 +857,8 @@ const Write2 = ({navigation, route}) => {
 										comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 										setPrice(comma);
 
-										if(priceOpt == 1){											
-											setPriceOpt('');											
+										if(priceOpt == 2){											
+											setPriceOpt(1);											
 										}
 									}}
 									placeholder={'가격을 입력해 주세요.'}
@@ -613,6 +869,7 @@ const Write2 = ({navigation, route}) => {
 									<Text style={styles.inputUnitText}>원</Text>
 								</View>
 							</View>
+							) : null}
 						</View>
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
@@ -621,6 +878,7 @@ const Write2 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={payMethod}
 									onValueChange={(value) => setPayMethod(value)}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
@@ -668,7 +926,7 @@ const Write2 = ({navigation, route}) => {
 				<TouchableOpacity 
 					style={styles.nextBtn}
 					activeOpacity={opacityVal}
-					onPress={() => {}}
+					onPress={() => {writeUpdate();}}
 				>
 					<Text style={styles.nextBtnText}>확인</Text>
 				</TouchableOpacity>
@@ -689,6 +947,12 @@ const Write2 = ({navigation, route}) => {
 					/>
 				</View>
       </Modal>
+
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -743,6 +1007,7 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 	inputUnit: {position:'absolute',top:0,right:20,},
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:56,color:'#000'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default Write2
