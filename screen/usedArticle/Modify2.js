@@ -84,35 +84,36 @@ const Modify2 = ({navigation, route}) => {
 			if(!pageSt){
 				setFileConfirm(false);
 				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setShape('');
-				setChkMethod([]);
-        setSize1('');
-        setSize2('');
-        setSize3('');
-        setSize4('');
-        setSize5('');
-				setC3Etc('');
-				setDealMethod1('');
-				setDealMethod2('');
-				setPeriod('');
-				setPriceUnit(1);
-				setPrice('');
-				setPriceOpt(1);
-				setPayMethod('');
-				setContent('');
-        setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setShapeAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setShape('');
+				// setChkMethod([]);
+        // setSize1('');
+        // setSize2('');
+        // setSize3('');
+        // setSize4('');
+        // setSize5('');
+				// setC3Etc('');
+				// setDealMethod1('');
+				// setDealMethod2('');
+				// setPeriod('');
+				// setPriceUnit(1);
+				// setPrice('');
+				// setPriceOpt(1);
+				// setPayMethod('');
+				// setContent('');
+        // setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setShapeAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getData();
 		}
 
 		return () => isSubscribed = false;
@@ -532,10 +533,6 @@ const Modify2 = ({navigation, route}) => {
 			}
 		});
   }
-
-  useEffect(() => {
-    getData();
-  }, []);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

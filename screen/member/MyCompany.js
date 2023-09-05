@@ -6,7 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Geolocation from 'react-native-geolocation-service';
 import Postcode from '@actbase/react-daum-postcode';
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -48,6 +48,7 @@ const MyCompany = ({navigation, route}) => {
 	const [factActive, setFactActive] = useState();
 	const [my1, setMy1] = useState(false);
 	const [my2, setMy2] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
   const isFocused = useIsFocused();
 	useEffect(() => {
@@ -60,32 +61,27 @@ const MyCompany = ({navigation, route}) => {
 				setModal4(false);
 				setModal5(false);
 				setModal6(false);
-				setModal7(false);	
-        setMbCompanyNumber('');
-				setMbCompanyName('');
-				setMbName('');
-				setMbCompanyAddr('');
-        setPickture('');
-				setState(false);				
-				setLocation('');
-				setPostcodeOn(false);
-				setFactName1('');
-				setFactCode1('');
-				setFactAddr1('');
-				setFactAddrDt1('');
-				setFactName2('');
-				setFactCode2('');
-				setFactAddr2('');
-				setFactAddrDt2('');
-				setFactActive();
+				// setModal7(false);	
+        // setMbCompanyNumber('');
+				// setMbCompanyName('');
+				// setMbName('');
+				// setMbCompanyAddr('');
+        // setPickture('');
+				// setState(false);				
+				// setLocation('');
+				// setPostcodeOn(false);
+				// setFactName1('');
+				// setFactCode1('');
+				// setFactAddr1('');
+				// setFactAddrDt1('');
+				// setFactName2('');
+				// setFactCode2('');
+				// setFactAddr2('');
+				// setFactAddrDt2('');
+				// setFactActive();
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -840,6 +836,12 @@ const MyCompany = ({navigation, route}) => {
 					</View>
 				</View>
 			</Modal>
+
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -933,6 +935,8 @@ const styles = StyleSheet.create({
 
   inputAlert: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
 	inputAlertText: {width:(innerWidth-14),paddingLeft:7,fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#ED0000'},
+
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default MyCompany

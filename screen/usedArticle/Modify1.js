@@ -78,29 +78,30 @@ const Modify1 = ({navigation, route}) => {
 			if(!pageSt){
 				setFileConfirm(false);
 				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setShape('');
-				setChkMethod([]);
-				setDealMethod1('');
-				setDealMethod2('');
-				setPeriod('');
-				setPriceUnit(1);
-				setPrice('');
-				setPriceOpt(1);
-				setPayMethod('');
-				setContent('');
-				setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setShapeAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setShape('');
+				// setChkMethod([]);
+				// setDealMethod1('');
+				// setDealMethod2('');
+				// setPeriod('');
+				// setPriceUnit(1);
+				// setPrice('');
+				// setPriceOpt(1);
+				// setPayMethod('');
+				// setContent('');
+				// setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setShapeAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getData();
 		}
 
 		return () => isSubscribed = false;
@@ -496,10 +497,6 @@ const Modify1 = ({navigation, route}) => {
 			}
 		});
   }
-
-  useEffect(() => {
-    getData();
-  }, []);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

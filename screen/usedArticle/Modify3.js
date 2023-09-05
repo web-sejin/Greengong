@@ -74,25 +74,26 @@ const Modify3 = ({navigation, route}) => {
 			if(!pageSt){
 				setFileConfirm(false);
 				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setDealMethod1('');
-				setDealMethod2('');
-				setPeriod('');
-				setPrice('');
-				setPriceOpt(1);
-				setPayMethod('');
-				setContent('');
-				setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setDealMethod1('');
+				// setDealMethod2('');
+				// setPeriod('');
+				// setPrice('');
+				// setPriceOpt(1);
+				// setPayMethod('');
+				// setContent('');
+				// setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getData();
 		}
 
 		return () => isSubscribed = false;
@@ -402,10 +403,6 @@ const Modify3 = ({navigation, route}) => {
 			}
 		});
   }
-
-  useEffect(() => {
-    getData();
-  }, []);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

@@ -64,32 +64,56 @@ const Keyword = ({navigation, route}) => {
     setIsLoading(false);
   }
 
-  function _submit(){
-    if(keywords == ''){
-      ToastMessage('키워드를 입력해 주세요.');
-      return false;
-    }
+  function deleteKeyword(al_idx){
+    let formData = {
+      is_api:1,				
+      al_idx:al_idx,
+    };
 
-    setIsLoading(true);
+    Api.send('POST', 'del_push_keyword', formData, (args)=>{
+      let resultItem = args.resultItem;
+      let responseJson = args.responseJson;
 
-		let formData = {
-			is_api:1,				
-			keyword:keywords,
-		};
-
-		Api.send('POST', 'save_push_keyword', formData, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-
-			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);
+      if(responseJson.result === 'success'){
+        console.log('성공 : ',responseJson);
         getData();
-			}else{
-				console.log('결과 출력 실패!', resultItem);
-				setIsLoading(false);
-				ToastMessage(responseJson.result_text);
-			}
-		});
+      }else{
+        console.log('결과 출력 실패!', resultItem);
+        ToastMessage(responseJson.result_text);
+      }
+    });
+  }
+
+  function _submit(){
+    if(totalCnt >= 10){
+      ToastMessage('키워드는 최대 10개까지 등록할 수 있습니다.\n키워드를 삭제 후 등록해 주세요.');
+    }else{
+      if(keywords == ''){
+        ToastMessage('키워드를 입력해 주세요.');
+        return false;
+      }
+
+      setIsLoading(true);
+
+      let formData = {
+        is_api:1,				
+        keyword:keywords,
+      };
+
+      Api.send('POST', 'save_push_keyword', formData, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+
+        if(responseJson.result === 'success'){
+          console.log('성공 : ',responseJson);
+          getData();
+        }else{
+          console.log('결과 출력 실패!', resultItem);
+          setIsLoading(false);
+          ToastMessage(responseJson.result_text);
+        }
+      });
+    }
   }
 
 	return (
@@ -128,13 +152,23 @@ const Keyword = ({navigation, route}) => {
         </View>
         {totalCnt > 0 ? (
         <View style={styles.keywordList}>
-          <View style={[styles.keywordLi, styles.keywordLiFst]}>
-            <Text style={styles.keywordLiText}>1. 중고</Text>
-            <TouchableOpacity>
-              <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keywordLi}>
+          {keywordList.map((item, index) => {
+            return(
+              <View 
+                key={item.al_idx}
+                style={[styles.keywordLi, index==0 ? styles.keywordLiFst : null]}
+              >
+                <Text style={styles.keywordLiText}>{index+1}. {item.al_msg}</Text>
+                <TouchableOpacity
+                  activeOpacity={opacityVal}
+                  onPress={()=>{deleteKeyword(item.al_idx)}}
+                >
+                  <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
+                </TouchableOpacity>
+              </View>
+            )
+          })}
+          {/* <View style={styles.keywordLi}>
             <Text style={styles.keywordLiText}>2. 쌉니다</Text>
             <TouchableOpacity>
               <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
@@ -145,12 +179,12 @@ const Keyword = ({navigation, route}) => {
             <TouchableOpacity>
               <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
             </TouchableOpacity>
-          </View>        
+          </View> */}
         </View>
         ) : (
         <View style={styles.notData}>
           <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-          <Text style={styles.notDataText}>등록된 입찰내역이 없습니다.</Text>
+          <Text style={styles.notDataText}>등록된 키워드가 없습니다.</Text>
         </View>
         )}
       </ScrollView>
