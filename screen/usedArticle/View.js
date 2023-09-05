@@ -30,6 +30,8 @@ const UsedView = (props) => {
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [visible3, setVisible3] = useState(false);
+  const [visible4, setVisible4] = useState(false);
+  const [visible5, setVisible5] = useState(false);
   const [toastModal, setToastModal] = useState(false);
   const [toastText, setToastText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,27 +40,12 @@ const UsedView = (props) => {
   const [latest, setLatest] = useState({});
   const [naviPage, setNaviPage] = useState('');
   const [myInfo, setMyInfo] = useState({});
+  const [prdMbIdx, setPrdMbIdx] = useState();
+  const [radio, setRadio] = useState(1);
+  const [radioList, setRadioList] = useState([]);
 
 	const isFocused = useIsFocused();
-	useEffect(() => {
-		let isSubscribed = true;
-
-		if(!isFocused){
-			if(!pageSt){
-				setVisible(false);
-        setVisible2(false);
-        setVisible3(false);
-        setToastModal(false);
-        setToastText('');
-			}
-		}else{
-			setRouteLoad(true);
-			setPageSt(!pageSt);
-		}
-
-		return () => isSubscribed = false;
-	}, [isFocused]);
-
+	
   function notBuy(){
     ToastMessage('판매완료된 상품은 가격협상이 불가합니다.');
   }
@@ -84,6 +71,13 @@ const UsedView = (props) => {
         setSwp(responseJson.pf_data);
         setLatest(responseJson.mb_latest);
         setZzim(responseJson.is_scrap);
+        setPrdMbIdx(responseJson.pd_mb_idx);
+
+        if(responseJson.is_product_like == 1){
+          setLike(1);
+        }else{
+          setLike(0);
+        }
 
         if(responseJson.c1_idx == 1){
           setNaviPage('UsedModify1');
@@ -102,7 +96,7 @@ const UsedView = (props) => {
 		});
   }
 
-  const getMyDate = async () => {
+  const getMyData = async () => {
     await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -112,33 +106,99 @@ const UsedView = (props) => {
 				//console.log("get_member_info : ",responseJson);
         setMyInfo(responseJson);
 			}else{
-				console.log(responseJson.result_text);
+				ToastMessage(responseJson.result_text);
 			}
 		});  
   }
 
+  const getRadioList = async () => {
+    await Api.send('GET', 'insert_report', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("getRadioList : ",responseJson);
+        setRadioList(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+  }
+
   useEffect(() => {
-    getData();
-    getMyDate();
-  }, []);
+		let isSubscribed = true;
 
-  //판매 상태 변경
-  const chgState = async (v) => {
-    /*
-    v=1 : 판매중
-    v=2 : 예약중
-    */
-    if(itemInfo.pd_status_org == v){
-      if(v == '1'){
-        setToastText('이미 판매중 상태인 상품입니다.');        
-      }else if(v == '2'){
-        setToastText('이미 예약중 상태인 상품입니다.');
-      }
+		if(!isFocused){
+			if(!pageSt){
+				setVisible(false);
+        setVisible2(false);
+        setVisible3(false);
+        setVisible4(false);
+        setVisible5(false);
+        setToastModal(false);
+        setToastText('');
+			}
+		}else{
+			setRouteLoad(true);
+			setPageSt(!pageSt);
+      getData();
+      getMyData();
+      getRadioList();
+		}
 
+		return () => isSubscribed = false;
+	}, [isFocused]);
+
+  //상태 변경 - 예약중
+  const chgStateRes = async () => {
+    if(itemInfo.pd_status_org == 2){
+      setToastText('이미 예약중 상태인 상품입니다.');      
       setToastModal(true);
       setTimeout(()=>{ setToastModal(false) },2000);
       return false;
     }
+
+    const formData = {
+			is_api:1,
+      pd_idx:idx,
+		};
+
+    Api.send('POST', 'reserve_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setVisible(false);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //상태변경 - 판매중
+  function chgStateSell(){
+    const formData = {
+			is_api:1,
+      pd_idx:idx,
+		};
+
+    Api.send('POST', 'selling_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setVisible(false);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
   //삭제
@@ -154,8 +214,133 @@ const UsedView = (props) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);				
+				//console.log('성공 : ',responseJson);				
 				navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //관심판매자
+  function fnScrap(){
+    const formData = {
+			is_api:1,				
+			mb_idx:prdMbIdx,
+      sr_code:'product'
+		};
+
+    Api.send('POST', 'save_scrap', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);				
+        if(responseJson.scrap_type == 'save'){
+          setZzim(1);
+        }else{
+          setZzim(0);
+        }
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //좋아요
+  function fnLike(){
+    const formData = {
+			is_api:1,				
+			pd_idx:idx,
+		};
+
+    Api.send('POST', 'save_like_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        if(responseJson.is_like == 1){
+          setLike(1);
+        }else{
+          setLike(0);
+        }
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //신고하기
+  function fnSingo(){
+    const formData = {
+			is_api:1,				
+			reason_idx:radio,
+      page_code:'product',
+      article_idx:idx
+		};
+
+    Api.send('POST', 'save_report', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('신고 성공 : ',responseJson);
+        navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //차단하기
+  function fnBlock(){
+    const formData = {
+			is_api:1,				
+			recv_idx:prdMbIdx
+		};
+
+    Api.send('POST', 'save_block', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('차단 성공 : ',responseJson);
+        navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  } 
+
+  //비딩체크
+  function bidChk(){
+    if(itemInfo.is_bidding == 1){
+      setVisible2(true);
+    }else{
+      navigation.navigate('Bid', {idx:idx});
+    }                  
+  }
+
+  function deleteBidding(){
+    const formData = {
+			is_api:1,
+      pd_idx:idx,
+		};
+
+    Api.send('POST', 'del_bidding_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible2(false);
+        navigation.navigate('Bid', {idx:idx});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
@@ -211,10 +396,14 @@ const UsedView = (props) => {
               <TouchableOpacity
                 activeOpacity={opacityVal}
                 onPress={()=>{
-                  navigation.navigate('Other', {});
+                  navigation.navigate('Other', {idx:itemInfo.pd_mb_idx});
                 }}
               >
-                <AutoHeightImage width={58} source={require("../../assets/img/profile_img.png")} />
+                {itemInfo.mb_img ? (
+                  <AutoHeightImage width={58} source={{uri: itemInfo.mb_img}} />
+                ) : (
+                  <AutoHeightImage width={58} source={require("../../assets/img/not_profile.png")} />	
+                )}
               </TouchableOpacity>
               <View style={styles.profileBoxInfo}>
                 <View style={styles.profileName}>
@@ -233,11 +422,7 @@ const UsedView = (props) => {
                 style={[styles.profileZzim, zzim==1 ? styles.profileZzimOn : null]}
                 activeOpacity={opacityVal}
                 onPress={() => {
-                  if(zzim == 0){
-                    setZzim(1);
-                  }else{
-                    setZzim(0);
-                  }                
+                  fnScrap();                  
                 }}
               >
                 <Text style={[styles.profileZzimText, zzim==1 ? styles.profileZzimTextOn : null]}>관심판매자</Text>
@@ -293,7 +478,7 @@ const UsedView = (props) => {
               </View>
               <View style={styles.viewSubInfoLine}></View>
               <View style={styles.viewSubInfo}>
-                <Text style={styles.viewSubInfoText}>찜 : {itemInfo.pd_scrap_cnt}</Text>
+                <Text style={styles.viewSubInfoText}>찜 : {itemInfo.pd_like_cnt}</Text>
               </View>
               <View style={styles.viewSubInfoLine}></View>
               <View style={styles.viewSubInfo}>
@@ -302,13 +487,7 @@ const UsedView = (props) => {
               <TouchableOpacity
                 style={styles.likeBtn}
                 activeOpacity={opacityVal}
-                onPress={() => {
-                  if(like == 0){
-                    setLike(1);
-                  }else{
-                    setLike(0);
-                  }                
-                }}
+                onPress={() => {fnLike()}}
               >
                 {like == 1 ? (
                   <AutoHeightImage width={20} source={require("../../assets/img/icon_heart.png")} />
@@ -453,7 +632,7 @@ const UsedView = (props) => {
               </>
               ) : null}
 
-              {itemInfo.pd_sell_type==3 ? (
+              {itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? (
               <>
               <View style={styles.fixPrice}>              
                 <Text style={[styles.fixPriceText]}>입찰상품</Text>
@@ -463,24 +642,22 @@ const UsedView = (props) => {
             </View>
             
             <View style={styles.fixBtnBox}>
-              {itemInfo.pd_sell_type==3 ? (
+              {itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? (
               <TouchableOpacity 
                 style={[styles.nextBtn, styles.nextBtn2]}
                 activeOpacity={opacityVal}
                 //onPress={() => {notBuy()}}
-                onPress={() => {
-                  navigation.navigate('Bid', {idx:itemInfo.pd_idx});
-                }}
+                onPress={() => {bidChk();}}
               >
                 <Text style={styles.nextBtnText}>입찰하기</Text>
               </TouchableOpacity>
               ) : null } 
 
               <TouchableOpacity 
-                style={[styles.nextBtn, itemInfo.pd_sell_type==3 ? styles.nextBtn2 : styles.nextBtn4, styles.nextBtn3]}
+                style={[styles.nextBtn, itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? styles.nextBtn2 : styles.nextBtn4, styles.nextBtn3]}
                 activeOpacity={opacityVal}
                 onPress={() => {
-                  navigation.navigate('UsedChat', {idx:itemInfo.pd_idx});
+                  navigation.navigate('UsedChat', {idx:idx});
                 }}
               >
                 <Text style={styles.nextBtnText}>채팅하기</Text>
@@ -517,20 +694,25 @@ const UsedView = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>수정하기</Text>
 						</TouchableOpacity>
+            
+            {itemInfo.pd_status_org == 3 ? null : (     
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {chgState('2')}}
+							onPress={() => {chgStateRes()}}
 						>
 							<Text style={styles.modalCont2BtnText}>예약중</Text>
 						</TouchableOpacity>
+            )}
+            
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {chgState('1')}}
+							onPress={() => {chgStateSell()}}
 						>
 							<Text style={styles.modalCont2BtnText}>판매중</Text>
 						</TouchableOpacity>
+
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
@@ -541,12 +723,11 @@ const UsedView = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>판매완료</Text>
 						</TouchableOpacity>
+
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.delete]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-                deleteItem(idx);
-							}}
+							onPress={() => {setVisible4(true)}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
 						</TouchableOpacity>
@@ -570,16 +751,14 @@ const UsedView = (props) => {
       >
 				<Pressable 
 					style={styles.modalBack}
-					onPress={() => {setVissetVisible3ible(false)}}
+					onPress={() => {setVisible3(false)}}
 				></Pressable>
 				<View style={styles.modalCont2}>
 					<View style={styles.modalCont2Box}>
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								//navigation.navigate(naviPage, {idx:itemInfo.pd_idx});
-						}}
+							onPress={() => {fnBlock()}}
 						>
 							<Text style={styles.modalCont2BtnText}>차단하기</Text>
 						</TouchableOpacity>
@@ -587,8 +766,9 @@ const UsedView = (props) => {
 							style={[styles.modalCont2Btn, styles.delete]}
 							activeOpacity={opacityVal}
 							onPress={() => {
-								setVisible3(false)
-							}}
+                setVisible3(false);
+                setVisible5(true);
+              }}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>신고하기</Text>
 						</TouchableOpacity>
@@ -632,13 +812,102 @@ const UsedView = (props) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {}}
+              onPress={() => {deleteBidding();}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
           </View>
 				</View>
       </Modal>
+
+      <Modal
+        visible={visible4}
+				transparent={true}
+				onRequestClose={() => {setVisible4(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVisible4(false)}}
+				></Pressable>
+				<View style={styles.modalCont3}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>삭제</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>삭제를 하면 다시 복구되지 않습니다.</Text>
+            <Text style={styles.avatarDescText}>채팅도 불가능하게 됩니다.</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {setVisible4(false)}}
+            >
+              <Text style={styles.avatarBtnText}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+              onPress={() => {deleteItem(idx);}}
+            >
+              <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+				</View>
+      </Modal>
+
+      <Modal
+        visible={visible5}
+				animationType={"slide"}
+				onRequestClose={() => {setVisible5(false)}}
+      >
+				<View style={styles.header}>
+					<>
+					<TouchableOpacity
+						style={styles.headerCloseBtn}
+						activeOpacity={opacityVal}
+						onPress={() => {setVisible5(false)}} 						
+					>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_close.png")} />
+					</TouchableOpacity>
+					<Text style={styles.headerTitle}>신고하기</Text>
+					</>
+				</View>
+				<ScrollView>
+          <View	View style={[styles.alertWrap]}>
+            <View style={styles.alertBox}>
+              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+              <Text style={styles.alertBoxText}>비매너 메세지 건에 대해서 신고해 주세요.</Text>
+            </View>
+          </View>
+
+          <View style={styles.radioList}>
+            <View style={styles.borderTop2}></View>
+            {radioList.map((item, index) => {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.radioBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{setRadio(item.val)}}
+                >
+                  <View style={[styles.circle, radio==item.val ? styles.circleOn : null]}>              
+                    <AutoHeightImage width={11} source={require("../../assets/img/icon_chk_on.png")} />
+                  </View>
+                  <Text style={styles.radioBtnText}>{item.txt}</Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
+				</ScrollView>								
+				<View style={styles.nextFix}>
+					<TouchableOpacity 
+						style={styles.nextBtn}
+						activeOpacity={opacityVal}
+						onPress={() => {fnSingo()}}
+					>
+						<Text style={styles.nextBtnText}>신고하기</Text>
+					</TouchableOpacity>
+				</View>						
+			</Modal>
 
       <Modal
         visible={toastModal}
@@ -782,6 +1051,28 @@ const styles = StyleSheet.create({
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
   toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
+
+  header: {height:50,backgroundColor:'#fff',position:'relative',display:'flex',justifyContent:'center',paddingLeft:20, paddingRight:20},
+	headerBackBtn: {width:30,height:50,position:'absolute',left:20,top:0,zIndex:10,display:'flex',justifyContent:'center'},
+  headerCloseBtn: {width:34,height:50,position:'absolute',right:10,top:0,zIndex:10,display:'flex',alignItems:'center',justifyContent:'center'},
+	headerTitle: {fontFamily:Font.NotoSansMedium,textAlign:'center',fontSize:17,lineHeight:50,color:'#000'},
+
+  alertWrap: {padding:20,},
+  alertBox: {width:innerWidth,padding:15,paddingLeft:45,backgroundColor:'#F3FAF8',borderRadius:12,position:'relative',},
+	icon_alert: {position:'absolute',left:15,top:15},
+	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
+	alertBoxText2: {marginTop:3,},
+  nextFix: {height:105,padding:20,paddingTop:12,},
+	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
+	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+
+  radioList: {paddingHorizontal:20,paddingBottom:30,},
+  radioBtn: {paddingVertical:20,flexDirection:'row',alignItems:'center'},  
+  radioBtnText: {width:(innerWidth-21),fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:21,color:'#000',paddingLeft:15},
+  circle: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,alignItems:'center',justifyContent:'center'},
+  circleOn: {backgroundColor:'#31B481',borderColor:'#31B481'},
+
+  borderTop2: {borderTopWidth:1,borderTopColor:'#E3E3E4'},
 })
 
 //export default UsedView

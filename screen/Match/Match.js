@@ -435,7 +435,8 @@ const Match = ({navigation, route}) => {
 						style={styles.modalCont2Btn}
 						activeOpacity={opacityVal}
 						onPress={() => {
-							setVisible2(false)
+							setVisible2(false);
+							navigation.navigate('MatchComparison', {});
 							//마이페이지					
 						}}
 					>
@@ -445,8 +446,8 @@ const Match = ({navigation, route}) => {
 						style={[styles.modalCont2Btn]}
 						activeOpacity={opacityVal}
 						onPress={() => {
-							setVisible2(false)
-							//마이페이지			
+							setVisible2(false);
+							navigation.navigate('MatchOrder', {});
 						}}
 					>
 						<Text style={styles.modalCont2BtnText}>발주목록</Text>
@@ -456,7 +457,7 @@ const Match = ({navigation, route}) => {
 						activeOpacity={opacityVal}
 						onPress={() => {
 							setVisible2(false)
-							navigation.navigate('MatchWrite')							
+							navigation.navigate('MatchWrite');					
 						}}
 					>
 						<Text style={styles.modalCont2BtnText}>견적요청</Text>

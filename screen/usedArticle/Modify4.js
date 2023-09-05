@@ -420,7 +420,7 @@ const Modify4 = ({navigation, route}) => {
 					select4(1);
 					setDealMethod2(responseJson.pd_trade2);
 				}
-        setPeriod(responseJson.pd_bidding_day);
+        setPeriod((responseJson.pd_bidding_day).toString());
 				select5();
 				setPayMethod(responseJson.pd_method);
 				setContent(responseJson.pd_contents);

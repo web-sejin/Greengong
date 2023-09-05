@@ -21,7 +21,8 @@ const Mypage = (props) => {
 	const [pageSt, setPageSt] = useState(false);
 	const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
-	const [memberData, setMemberData] = useState([]); //회원 정보		
+	const [memberData, setMemberData] = useState([]); //회원 정보	
+	const [profileImg, setProfileImg] = useState(userInfo?.mb_img1);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -118,7 +119,11 @@ const Mypage = (props) => {
 						<View style={styles.mypage1InfoBox}>
 							<View style={styles.mypage1InfoBox2}>
 								<View style={styles.mypage1InfoProfile}>
-									<AutoHeightImage width={69} source={require("../../assets/img/sample1.jpg")} />
+									{profileImg ? (
+										<AutoHeightImage width={69} source={{uri: profileImg}} />
+									) : (
+										<AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />	
+									)}
 								</View>
 								<View style={styles.mypage1Info}>
 									<View style={styles.mypage1InfoEmail}>

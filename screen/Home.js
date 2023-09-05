@@ -5,6 +5,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../assets/common/Font"
 import Api from '../Api';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -39,6 +40,7 @@ const Home = (props) => {
 	const [allFilter, setAllFilter] = useState(false); //모두 선택
 	const [itemList, setItemList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);
+	const [totalPage, setTotalPage] = useState(1);
 	const [myInfo, setMyInfo] = useState({});
 	const [myFac, setMyFac] = useState({});
 	const [myFacOn, setMyFacOn] = useState('');
@@ -79,6 +81,7 @@ const Home = (props) => {
 			if(responseJson.result === 'success' && responseJson){
 				//console.log(responseJson.data);
 				setItemList(responseJson.data);
+				//setTotalPage(responseJson);
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -110,17 +113,27 @@ const Home = (props) => {
 	}
 
 	useEffect(()=>{
-			getMyInfo();
-			//console.log("initLoading : ",initLoading);
-			//console.log("isSubmit : ",params?.isSubmit);
-			if(!initLoading){
-				getItemList();
-				setInitLoading(true);
-			}else if(params?.isSubmit){
+		getMyInfo();
+		//console.log("initLoading : ",initLoading);
+		//console.log("isSubmit : ",params?.isSubmit);
+		if(!initLoading){
+			getItemList();
+			setInitLoading(true);
+		}else if(params?.isSubmit){
+			setNowPage(1);
+			getItemList();
+			delete params?.isSubmit
+		}
+
+		AsyncStorage.getItem('mainReload', (err, result) => {
+			//console.log("result : ",result);
+			if(result == 'on'){
 				setNowPage(1);
 				getItemList();
-				delete params?.isSubmit
+				delete params?.isSubmit;
+				AsyncStorage.removeItem('mainReload');
 			}
+		});
 	},[isFocused]);
 
 	useEffect(()=>{
@@ -169,7 +182,7 @@ const Home = (props) => {
 					</View>
 					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
 						<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.pd_scrap_cnt}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.pd_like_cnt}</Text>
 					</View>
 				</View>
 				<View style={styles.listInfoPriceBox}>
@@ -366,7 +379,7 @@ const Home = (props) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);
+				//console.log('성공 : ',responseJson);
 				setItemList([]);
 				setNowPage(1);
 				setVisible(false);

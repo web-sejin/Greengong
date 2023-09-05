@@ -31,6 +31,17 @@ const Write2 = ({navigation, route}) => {
 		{'idx': 10, 'txt': '파일10', 'path': ''},
 	];
 
+	const periodAry = [
+		{ label: '3일', value: '3' },
+		{ label: '4일', value: '4' },
+		{ label: '5일', value: '5' },
+		{ label: '6일', value: '6' },
+    { label: '7일', value: '7' },
+    { label: '8일', value: '8' },
+    { label: '9일', value: '9' },
+    { label: '10일', value: '10' },
+	]
+
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [fileCnt, setFileCnt] = useState(0);
@@ -54,7 +65,9 @@ const Write2 = ({navigation, route}) => {
 	const [priceOpt, setPriceOpt] = useState(1); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
+	const [period, setPeriod] = useState(''); //입찰기간
 	const [isLoading, setIsLoading] = useState(false);
+	const [c3Etc, setC3Etc] = useState('');
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
@@ -80,6 +93,8 @@ const Write2 = ({navigation, route}) => {
         setSize3('');
         setSize4('');
         setSize5('');
+				setC3Etc('');
+				setPeriod('');
 				setDealMethod1('');
 				setDealMethod2('');
 				setPriceUnit(1);
@@ -111,7 +126,7 @@ const Write2 = ({navigation, route}) => {
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
-			//console.log('args ', responseJson);
+			console.log('분류 args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
 				setSortAry(responseJson.data);
 			}else{
@@ -141,8 +156,20 @@ const Write2 = ({navigation, route}) => {
 
 	//등급(형태)
 	const select3 = async (v) => {
+		setC3Etc('');
 		setShape('');
-		await Api.send('GET', 'product_cate4', {is_api:1, cate3:v}, (args)=>{
+
+		const select3Data = {
+			is_api:1
+		}
+
+		if(v == 9){
+			select3Data.cate2 = v;
+		}else{
+			select3Data.cate3 = v;
+		}
+
+		await Api.send('GET', 'product_cate4', select3Data, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -311,6 +338,10 @@ const Write2 = ({navigation, route}) => {
 			if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }
 		}
 
+		if(ingred == 76){
+			if(c3Etc == ""){ ToastMessage('성분을 입력해 주세요.'); return false; }
+		}
+
 		if(shape == ""){ ToastMessage('형태를 선택해 주세요.'); return false; }
 
 		let selectedList = '';
@@ -378,6 +409,8 @@ const Write2 = ({navigation, route}) => {
 			pd_outside:size3,
 			pd_width:size4,
 			pd_length:size5,
+			c3_etc:c3Etc,
+			pd_bidding_day:period,
 		};
 
 		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
@@ -482,6 +515,7 @@ const Write2 = ({navigation, route}) => {
 									onValueChange={(value) => {
 										setSort(value);
 										if(value == 9){
+											setIngred('');
 											select3(value);
 										}else{
 											select2(value);
@@ -516,9 +550,9 @@ const Write2 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={ingred}
-									onValueChange={(value) => {
+									onValueChange={(value) => {										
 										setIngred(value);
-										select3(value);
+										select3(value);										
 									}}
 									placeholder={{
 										label: '성분을 선택해 주세요.',
@@ -538,6 +572,23 @@ const Write2 = ({navigation, route}) => {
 									}}
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+							</View>
+						</View>
+						) : null}
+
+						{ingred == 76 ? (
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>성분 직접입력</Text>
+							</View>
+							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+								<TextInput
+									value={c3Etc}
+									onChangeText={(v) => {setC3Etc(v)}}
+									placeholder={'성분을 입력해 주세요.'}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
 							</View>
 						</View>
 						) : null}
@@ -806,6 +857,7 @@ const Write2 = ({navigation, route}) => {
 									style={[styles.filterChkBtn, priceOpt==2 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
+										setPeriod('');
 										if(priceOpt && priceOpt == 2){											
 											setPriceOpt(1);											
 										}else{
@@ -821,6 +873,7 @@ const Write2 = ({navigation, route}) => {
 									style={[styles.filterChkBtn, priceOpt==4 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
+										setPeriod('');
 										if(priceOpt && priceOpt == 4){											
 											setPriceOpt(1);											
 										}else{
@@ -840,7 +893,7 @@ const Write2 = ({navigation, route}) => {
 										}else{
 											setPriceOpt(3);
 											setPrice('');
-										}										
+										}													
 									}}
 								>
 									<Text style={[styles.filterChkBtnText, priceOpt==3 ? styles.filterChkBtnTextOn : null]}>입찰받기</Text>
@@ -871,6 +924,37 @@ const Write2 = ({navigation, route}) => {
 							</View>
 							) : null}
 						</View>
+
+						{priceOpt == 3 ? (
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>입찰 기간</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<RNPickerSelect
+									value={period}
+									onValueChange={(value) => setPeriod(value)}
+									placeholder={{
+										label: '결제방식을 선택해 주세요.',
+										inputLabel: '결제방식을 선택해 주세요.',
+										value: '',
+										color: '#8791A1',
+									}}
+									items={periodAry}
+									fixAndroidTouchableBug={true}
+									useNativeAndroidPickerStyle={false}
+									style={{
+										placeholder: {color: '#8791A1'},
+										inputAndroid: styles.input,
+										inputAndroidContainer: styles.inputContainer,
+										inputIOS: styles.input,
+										inputIOSContainer: styles.inputContainer,
+									}}
+								/>
+								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+							</View>
+						</View>
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>

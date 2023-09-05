@@ -31,6 +31,17 @@ const Write1 = ({navigation, route}) => {
 		{'idx': 10, 'txt': '파일10', 'path': ''},
 	];	
 
+	const periodAry = [
+		{ label: '3일', value: '3' },
+		{ label: '4일', value: '4' },
+		{ label: '5일', value: '5' },
+		{ label: '6일', value: '6' },
+    { label: '7일', value: '7' },
+    { label: '8일', value: '8' },
+    { label: '9일', value: '9' },
+    { label: '10일', value: '10' },
+	]
+
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -49,6 +60,7 @@ const Write1 = ({navigation, route}) => {
 	const [priceOpt, setPriceOpt] = useState(1); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
+	const [period, setPeriod] = useState(''); //입찰기간
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
@@ -77,6 +89,7 @@ const Write1 = ({navigation, route}) => {
 				setPriceOpt(1);
 				setPayMethod('');
 				setContent('');
+				setPeriod('');
 				setIsLoading(false);
 				setSortAry([]);
 				setIngreAry([]);
@@ -129,9 +142,9 @@ const Write1 = ({navigation, route}) => {
 				//console.log("성분 : ",responseJson);
 				setIngreAry(responseJson.data);
 			}else{
-				console.log("성분 err :",responseJson.result_text);
+				//console.log("성분 err :",responseJson.result_text);
 			}
-		}); 
+		});
 	}
 
 	//형태
@@ -361,6 +374,7 @@ const Write1 = ({navigation, route}) => {
 			pd_trade2:dealMethod2, 
 			pd_method:payMethod, 			
 			pd_test:selectedList,
+			pd_bidding_day:period,
 		};
 
 		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
@@ -667,6 +681,7 @@ const Write1 = ({navigation, route}) => {
 									style={[styles.filterChkBtn, priceOpt==2 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
+										setPeriod('');
 										if(priceOpt && priceOpt == 2){											
 											setPriceOpt(1);											
 										}else{
@@ -682,6 +697,7 @@ const Write1 = ({navigation, route}) => {
 									style={[styles.filterChkBtn, priceOpt==4 ? styles.filterChkBtnOn : null]}
 									activeOpacity={opacityVal}
 									onPress={() => {
+										setPeriod('');
 										if(priceOpt && priceOpt == 4){											
 											setPriceOpt(1);											
 										}else{
@@ -731,6 +747,37 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							) : null}
 						</View>
+
+						{priceOpt == 3 ? (
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>입찰 기간</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<RNPickerSelect
+									value={period}
+									onValueChange={(value) => setPeriod(value)}
+									placeholder={{
+										label: '결제방식을 선택해 주세요.',
+										inputLabel: '결제방식을 선택해 주세요.',
+										value: '',
+										color: '#8791A1',
+									}}
+									items={periodAry}
+									fixAndroidTouchableBug={true}
+									useNativeAndroidPickerStyle={false}
+									style={{
+										placeholder: {color: '#8791A1'},
+										inputAndroid: styles.input,
+										inputAndroidContainer: styles.inputContainer,
+										inputIOS: styles.input,
+										inputIOSContainer: styles.inputContainer,
+									}}
+								/>
+								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+							</View>
+						</View>
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>

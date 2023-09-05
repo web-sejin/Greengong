@@ -56,10 +56,10 @@ const Setting = (props) => {
 		const logout =  await member_logout(formData);
 		console.log("logout : ",logout);
 
-		// ToastMessage('로그아웃처리 되었습니다.');
-		// navigation.reset({
-		// 	routes: [{ name: 'Login'}],
-		// });
+		ToastMessage('로그아웃처리 되었습니다.');
+		navigation.reset({
+			routes: [{ name: 'Login'}],
+		});
 	}
 
 	//회원탈퇴

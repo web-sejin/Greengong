@@ -22,8 +22,8 @@ const QnaList = ({navigation, route}) => {
 	const [isLoading, setIsLoading] = useState(true);  
 	const [itemList, setItemList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);  
-	const isFocused = useIsFocused();	
 	const [initLoading, setInitLoading] = useState(false)
+	const isFocused = useIsFocused();		
 
 	const getItemList = async () =>{
 		setIsLoading(false);

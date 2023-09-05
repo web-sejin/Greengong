@@ -9,6 +9,10 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -17,7 +21,10 @@ const opacityVal = 0.8;
 const Keyword = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [keywords, setKeywords] = useState('');
+  const [keywordList, setKeywordList] = useState([]);
+  const [totalCnt, setTotalCnt] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -27,31 +34,68 @@ const Keyword = ({navigation, route}) => {
 			if(!pageSt){
 				setKeywords('');
 			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
+		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'list_push_keyword', {'is_api': 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log(responseJson);
+        setKeywordList(responseJson.data);
+        setTotalCnt(responseJson.total);
+			}else{
+        setKeywordList([]);
+				setTotalCnt(0);
+				//console.log('결과 출력 실패!', responseJson.result_text);
+        ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(false);
+  }
 
   function _submit(){
     if(keywords == ''){
       ToastMessage('키워드를 입력해 주세요.');
       return false;
     }
+
+    setIsLoading(true);
+
+		let formData = {
+			is_api:1,				
+			keyword:keywords,
+		};
+
+		Api.send('POST', 'save_push_keyword', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'키워드 등록'} />			               
-      <ScrollView>
+      <ScrollView>        
         <View style={styles.registArea}>
           <View style={[styles.registBox]}>
             <View style={[styles.typingBox]}>
@@ -82,6 +126,7 @@ const Keyword = ({navigation, route}) => {
             </View>            
           </View>
         </View>
+        {totalCnt > 0 ? (
         <View style={styles.keywordList}>
           <View style={[styles.keywordLi, styles.keywordLiFst]}>
             <Text style={styles.keywordLiText}>1. 중고</Text>
@@ -102,10 +147,12 @@ const Keyword = ({navigation, route}) => {
             </TouchableOpacity>
           </View>        
         </View>
+        ) : (
         <View style={styles.notData}>
           <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
           <Text style={styles.notDataText}>등록된 입찰내역이 없습니다.</Text>
         </View>
+        )}
       </ScrollView>
 		</SafeAreaView>
 	)

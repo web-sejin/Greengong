@@ -9,6 +9,11 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -17,8 +22,10 @@ const opacityVal = 0.8;
 const MessageWrite = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
+	const [contLen, setContLen] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -28,14 +35,9 @@ const MessageWrite = ({navigation, route}) => {
 			if(!pageSt){
 				setSubject('');
         setContent('');
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -49,16 +51,41 @@ const MessageWrite = ({navigation, route}) => {
       return false;
     }
     
-
     if(content == ''){
       ToastMessage('내용을 입력해 주세요.');
       return false;
     }
+
+		setIsLoading(true);
+
+		let formData = {
+			is_api:1,				
+			subject:subject,
+			content:content
+		};
+
+		Api.send('POST', 'save_text', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				navigation.navigate('Message');
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
+
+	useEffect(()=>{
+		setContLen(content.length);
+	},[content])
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'자주 쓰는 메세지'} />
+			<Header navigation={navigation} headertitle={'자주 쓰는 메세지'} />			
 			<KeyboardAwareScrollView>
         <View style={styles.registArea}>
 					<View style={[styles.registBox]}>
@@ -86,12 +113,16 @@ const MessageWrite = ({navigation, route}) => {
 									onChangeText={(v) => {
 										setContent(v);
 									}}
+									maxLength={100}
 									placeholder={'내용을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
 									multiline={true}
 									style={[styles.input, styles.textarea]}
-								/>
-							</View>
+								/>	
+								<View style={styles.textCnt}>
+									<Text style={styles.textCntText}>{contLen}/100</Text>
+								</View>							
+							</View>							
 						</View>
             <View style={[styles.btnList, styles.mgTop35]}>
               <TouchableOpacity
@@ -116,6 +147,12 @@ const MessageWrite = ({navigation, route}) => {
           </View>
         </View>
       </KeyboardAwareScrollView>
+
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -124,8 +161,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
   mgTop30: {marginTop:30},
 	mgTop35: {marginTop:35},
   registArea: {},
@@ -146,6 +182,8 @@ const styles = StyleSheet.create({
   btn: {display:'flex',alignItems:'center',justifyContent:'center',width:120,height:58,backgroundColor:'#656565',borderRadius:12,},
   btn2: {width:innerWidth-130,backgroundColor:'#31B481'},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:22,color:'#fff'},
+	textCnt: {position:'absolute',right:10,bottom:10},
+	textCntText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:15,},
 })
 
 export default MessageWrite

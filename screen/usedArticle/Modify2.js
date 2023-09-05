@@ -30,6 +30,18 @@ const Modify2 = ({navigation, route}) => {
 		{'idx': 9, 'txt': '파일9', 'path': ''},
 		{'idx': 10, 'txt': '파일10', 'path': ''},
 	];
+
+	const periodAry = [
+		{ label: '3일', value: '3' },
+		{ label: '4일', value: '4' },
+		{ label: '5일', value: '5' },
+		{ label: '6일', value: '6' },
+    { label: '7일', value: '7' },
+    { label: '8일', value: '8' },
+    { label: '9일', value: '9' },
+    { label: '10일', value: '10' },
+	]
+
   const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -49,12 +61,14 @@ const Modify2 = ({navigation, route}) => {
   const [size5, setSize5] = useState(''); //길이
 	const [dealMethod1, setDealMethod1] = useState(''); //거래방식1
 	const [dealMethod2, setDealMethod2] = useState(''); //거래방식2
+	const [period, setPeriod] = useState(''); //입찰기간
 	const [priceUnit, setPriceUnit] = useState(1); //가격단위
 	const [price, setPrice] = useState(''); //가격
 	const [priceOpt, setPriceOpt] = useState(1); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
 	const [isLoading, setIsLoading] = useState(false);
+	const [c3Etc, setC3Etc] = useState('');
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
@@ -80,8 +94,10 @@ const Modify2 = ({navigation, route}) => {
         setSize3('');
         setSize4('');
         setSize5('');
+				setC3Etc('');
 				setDealMethod1('');
 				setDealMethod2('');
+				setPeriod('');
 				setPriceUnit(1);
 				setPrice('');
 				setPriceOpt(1);
@@ -139,7 +155,20 @@ const Modify2 = ({navigation, route}) => {
 
 	//등급(형태)
 	const select3 = async (v, z) => {
-		await Api.send('GET', 'product_cate4', {is_api:1, cate3:v}, (args)=>{
+		setC3Etc('');
+		setShape('');
+
+		const select3Data = {
+			is_api:1
+		}
+
+		if(v == 9){
+			select3Data.cate2 = v;
+		}else{
+			select3Data.cate3 = v;
+		}
+
+		await Api.send('GET', 'product_cate4', select3Data, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -337,6 +366,10 @@ const Modify2 = ({navigation, route}) => {
 			if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }
 		}
 
+		if(ingred == 76){
+			if(c3Etc == ""){ ToastMessage('성분을 입력해 주세요.'); return false; }
+		}
+
 		if(shape == ""){ ToastMessage('형태를 선택해 주세요.'); return false; }
 
 		let selectedList = '';
@@ -366,6 +399,8 @@ const Modify2 = ({navigation, route}) => {
 		}
 
 		if(priceOpt==1 && price == ""){ ToastMessage('가격을 입력해 주세요.'); return false; }
+
+		if(priceOpt == 3 && period == ""){ ToastMessage('입찰 기간을 선택해 주세요.'); return false; }
 
 		if(payMethod == ""){ ToastMessage('결제방식을 선택해 주세요.'); return false; }
 
@@ -405,6 +440,8 @@ const Modify2 = ({navigation, route}) => {
 			pd_outside:size3,
 			pd_width:size4,
 			pd_length:size5,
+			c3_etc:c3Etc,
+			pd_bidding_day:period,
 		};
 
 		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png', 'pf_idx':img1Idx}; }
@@ -486,6 +523,7 @@ const Modify2 = ({navigation, route}) => {
         setSize3(responseJson.pd_outside);
         setSize4(responseJson.pd_width);
         setSize5(responseJson.pd_length);
+				setPeriod((responseJson.pd_bidding_day).toString());
 
         setIsLoading(false);
 			}else{
@@ -965,6 +1003,37 @@ const Modify2 = ({navigation, route}) => {
 							</View>
 							) : null}
 						</View>
+
+						{priceOpt == 3 ? (
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>입찰 기간</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<RNPickerSelect
+									value={period}
+									onValueChange={(value) => setPeriod(value)}
+									placeholder={{
+										label: '결제방식을 선택해 주세요.',
+										inputLabel: '결제방식을 선택해 주세요.',
+										value: '',
+										color: '#8791A1',
+									}}
+									items={periodAry}
+									fixAndroidTouchableBug={true}
+									useNativeAndroidPickerStyle={false}
+									style={{
+										placeholder: {color: '#8791A1'},
+										inputAndroid: styles.input,
+										inputAndroidContainer: styles.inputContainer,
+										inputIOS: styles.input,
+										inputIOSContainer: styles.inputContainer,
+									}}
+								/>
+								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+							</View>
+						</View>
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>

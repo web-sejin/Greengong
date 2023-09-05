@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -16,35 +16,51 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const UsedLikeView = ({navigation, route}) => {
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [otherInfo, setOtherInfo] = useState({});
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [totalCnt, setTotalCnt] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '100,000',
-			category: '스크랩',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '120,000',
-			category: '중고자재',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '110,000',
-			category: '중고기계/장비',
-		},
-	]; 
+  const getMbData = async () => {
+    await Api.send('GET', 'profile_member', {'is_api': 1, mb_idx: idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setOtherInfo(responseJson);
+			}else{
+				console.log('결과 출력 실패!', responseJson.result_text);
+        ToastMessage(responseJson.result_text);
+			}
+		}); 
+  }
+
+  const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'other_sale_list_product', {'is_api': 1, other_mb_idx: idx, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log(responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);
+        setTotalCnt(responseJson.total_count);
+			}else{
+				console.log('결과 출력 실패!', responseJson.result_text);
+        ToastMessage(responseJson.result_text);
+			}
+		});
+    setIsLoading(false);
+  }
 
   const getList = ({item, index}) => (
 		<View style={styles.borderBot}>
@@ -53,29 +69,35 @@ const UsedLikeView = ({navigation, route}) => {
         style={[styles.listLi]}
         activeOpacity={opacityVal}
         onPress={() => {
-          navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+          navigation.navigate('UsedView', {idx:item.pd_idx})
         }}
       >    
-        <AutoHeightImage width={73} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+        {item.pd_image ? (
+        <View style={styles.pdImage}>
+          <AutoHeightImage width={73} source={{uri: item.pd_image}}  style={styles.listImg} />
+        </View>
+        ) : null}
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
+              {item.pd_name}
             </Text>
           </View>
           <View style={styles.listInfoDesc}>
-            <Text style={styles.listInfoDescText}>{item.desc}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_summary}</Text>
           </View>
           <View style={styles.listInfoPriceBox}>
             <View style={[styles.listInfoPriceArea]}>
               <View style={styles.listInfoPrice}>
-                <Text style={styles.listInfoPriceText}>{item.price}원</Text>
+                <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
               </View>
             </View>					
-          </View>        
+          </View>
+          {item.pd_status_org == 3 ? (
           <View style={styles.listInfoStateBox}>
             <Text style={styles.listInfoStateBoxText}>판매완료</Text>
           </View>
+          ) : null}
         </View>
       </TouchableOpacity>
 			</>
@@ -85,32 +107,53 @@ const UsedLikeView = ({navigation, route}) => {
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
-
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
-			setPageSt(!pageSt);
+			setPageSt(!pageSt);      
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
+  useEffect(() => {
+    getMbData();
+    getData();
+  }, [])
+
+  const moreData = async () => {
+    if(totalPage > nowPage){
+      await Api.send('GET', 'other_sale_list_product', {is_api: 1, other_mb_idx: idx, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'관심목록'} />    
+			<Header navigation={navigation} headertitle={'관심목록'} />
+      {!isLoading ? (
       <FlatList
-        data={DATA}
+        data={itemList}
         renderItem={(getList)}
-        keyExtractor={item => item.id}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+				onEndReached={moreData}
         ListHeaderComponent={
           <View style={[styles.listLi, styles.listLi2, styles.borderBot]}>
             <>
@@ -118,14 +161,19 @@ const UsedLikeView = ({navigation, route}) => {
               style={styles.otherPeople}
               activeOpacity={opacityVal}
               onPress={()=>{
-                navigation.navigate('Other', {});
+                navigation.navigate('Other', {idx:idx});
               }}
             >
-              <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
+              {otherInfo.mb_img != '' ? (
+                <AutoHeightImage width={69} source={{uri: otherInfo.mb_img}} />
+              ) : (
+                <AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} style={styles.listImg} />
+              )}
+              {/* <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} /> */}
             </TouchableOpacity>
             <View style={[styles.listInfoBox, styles.listInfoBox2]}>
               <View style={styles.listInfoTitle}>
-                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>참좋은공장</Text>
+                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{otherInfo.mb_nick}</Text>
               </View>
               <View style={[styles.listLikeBtn, styles.listLikeBtn2]}>
                 <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
@@ -141,6 +189,11 @@ const UsedLikeView = ({navigation, route}) => {
           </View>
         }
       />
+      ) : (
+      <View style={[styles.indicator]}>
+        <ActivityIndicator size="large" />
+      </View>
+      )}
 		</SafeAreaView>
 	)
 }
@@ -151,10 +204,11 @@ const styles = StyleSheet.create({
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
-  listLi: {display:'flex',flexDirection:'row',alignItems:'center',padding:20,},
+  listLi: {display:'flex',flexDirection:'row',padding:20,},
   listLi2: {alignItems:'stretch',paddingVertical:0,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
   otherPeople: {paddingVertical:20,},
+  pdImage: {width:73,height:73,overflow:'hidden',borderRadius:50,},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,position:'relative'},
   listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},
@@ -172,6 +226,7 @@ const styles = StyleSheet.create({
   listInfoStateBoxText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:21,color:'#353636',},
   listLikeBtn: {width:42,height:40,position:'absolute',top:10,right:10,display:'flex',alignItems:'center',justifyContent:'center',},
   listLikeBtn2: {top:25,right:0,},
+  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
 })
 
 export default UsedLikeView

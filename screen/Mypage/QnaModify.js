@@ -132,8 +132,7 @@ const QnaModify = (props) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'1:1 문의'} />
-			{isLoading ? (
+			<Header navigation={navigation} headertitle={'1:1 문의'} />			
 			<KeyboardAwareScrollView>
         <View style={styles.registArea}>
 					<View style={[styles.registBox]}>
@@ -198,12 +197,7 @@ const QnaModify = (props) => {
             </View>
           </View>
         </View>
-      </KeyboardAwareScrollView>
-			) : (
-			<View style={[styles.indicator]}>
-				<ActivityIndicator size="large" />
-			</View>
-			)}
+      </KeyboardAwareScrollView>			
 
 			<Modal
         visible={visible}
@@ -238,6 +232,12 @@ const QnaModify = (props) => {
           </View>
 				</View>
       </Modal>
+
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -246,8 +246,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
   mgTop30: {marginTop:30},
 	mgTop35: {marginTop:35},
   registArea: {},

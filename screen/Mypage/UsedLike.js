@@ -9,6 +9,10 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -19,65 +23,12 @@ const UsedLike = ({navigation, route}) => {
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 	const [tabState, setTabState] = useState(1);
-
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '100,000',
-			category: '스크랩',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '120,000',
-			category: '중고자재',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '110,000',
-			category: '중고기계/장비',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '90,000',
-			category: '폐기물',
-		},
-		{
-			id: '78694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '120,000',
-			category: '스크랩',
-		},
-		{
-			id: '88694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '70,000',
-			category: '스크랩',
-		},
-		{
-			id: '98694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-		},
-	];  
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [itemList2, setItemList2] = useState([]);
+  const [nowPage2, setNowPage2] = useState(1);
+  const [totalPage2, setTotalPage2] = useState(1);
 
   const getList = ({item, index}) => (
 		<View style={styles.borderBot}>
@@ -86,29 +37,31 @@ const UsedLike = ({navigation, route}) => {
         style={[styles.listLi]}
         activeOpacity={opacityVal}
         onPress={() => {
-          navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+          navigation.navigate('UsedView', {idx:item.pd_idx})
         }}
       >    
         <AutoHeightImage width={73} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
+              {item.pd_name}
             </Text>
           </View>
           <View style={styles.listInfoDesc}>
-            <Text style={styles.listInfoDescText}>{item.desc}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_summary}</Text>
           </View>
           <View style={styles.listInfoPriceBox}>
             <View style={[styles.listInfoPriceArea]}>
               <View style={styles.listInfoPrice}>
-                <Text style={styles.listInfoPriceText}>{item.price}원</Text>
+                <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
               </View>
             </View>					
-          </View>        
+          </View>
+          {item.pd_status_org == 3 ? (
           <View style={styles.listInfoStateBox}>
             <Text style={styles.listInfoStateBoxText}>판매완료</Text>
           </View>
+          ) : null}
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -122,21 +75,6 @@ const UsedLike = ({navigation, route}) => {
 		</View>
 	);
 
-  const DATA2 = [
-		{
-			id: '1',
-			title: '참좋은공장',
-		},
-		{
-			id: '2',
-			title: '참좋은공장2',
-		},
-		{
-			id: '3',
-			title: '참좋은공장3',
-		},
-	];
-
   const getList2 = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
@@ -145,21 +83,25 @@ const UsedLike = ({navigation, route}) => {
           style={styles.otherPeople}
           activeOpacity={opacityVal}
           onPress={()=>{
-            navigation.navigate('Other', {});
+            navigation.navigate('Other', {idx:item.mb_idx});
           }}
         >
-          <AutoHeightImage width={50} source={require("../../assets/img/profile_img.png")} style={styles.listImg} />
+          {item.image != '' ? (
+            <AutoHeightImage width={69} source={{uri: item.image}} />
+          ) : (
+            <AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} style={styles.listImg} />
+          )}
         </TouchableOpacity> 
         <TouchableOpacity 
           style={[styles.listInfoBox, styles.listInfoBox2]}
           activeOpacity={opacityVal}
           onPress={() => {
-            navigation.navigate('UsedLikeView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+            navigation.navigate('UsedLikeView', {idx:item.mb_idx})
           }}
         >
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
+              {item.mb_nick}
             </Text>
           </View>
           <View style={[styles.listLikeBtn, styles.listLikeBtn2]}>
@@ -181,31 +123,100 @@ const UsedLike = ({navigation, route}) => {
         //setTabState(1);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      setNowPage(1);
+      setNowPage2(1);
+      getData();
+      getData2();      
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  useEffect(() => {
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
-  }, []);
+  const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'list_scrap_product', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);        
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(false);
+  }
+	const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_scrap_product', {is_api: 1, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          console.log(responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
+
+  const getData2 = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'list_scrap', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+				setItemList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);
+			}else{
+				setItemList2([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(false);
+  }
+
+  const moreData2 = async () => {
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_scrap', {is_api: 1, page:nowPage2+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          console.log(responseJson.data);				
+          const addItem = itemList2.concat(responseJson.data);				
+          setItemList2(addItem);			
+          setNowPage2(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
 
   function fnTab(v){
-    setIsLoading(false);
     setTabState(v);
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
   }
 
 	return (
@@ -241,12 +252,14 @@ const UsedLike = ({navigation, route}) => {
           )}
         </TouchableOpacity>
       </View>
-      {isLoading ? (
+      {!isLoading ? (
         tabState == 1 ? (
           <FlatList
-            data={DATA}
+            data={itemList}
             renderItem={(getList)}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.6}
+					  onEndReached={moreData}
             ListEmptyComponent={
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
@@ -256,9 +269,11 @@ const UsedLike = ({navigation, route}) => {
           />
         ) : (
           <FlatList
-            data={DATA2}
+            data={itemList2}
             renderItem={(getList2)}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.6}
+					  onEndReached={moreData2}
             ListEmptyComponent={
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
@@ -314,4 +329,12 @@ const styles = StyleSheet.create({
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
-export default UsedLike
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(UsedLike);

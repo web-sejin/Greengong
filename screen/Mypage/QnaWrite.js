@@ -144,6 +144,7 @@ const QnaWrite = (props) => {
           </View>
         </View>
       </KeyboardAwareScrollView>
+			
 			{isLoading ? (
 				<View style={[styles.indicator]}>
 					<ActivityIndicator size="large" />

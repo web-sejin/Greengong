@@ -145,7 +145,7 @@ const UsedBidList = ({navigation, route}) => {
 
         {tabState == 2 ? (
         <>
-          {item.state2 == 1 ? (
+          {/* {item.state2 == 1 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn3]}
             activeOpacity={opacityVal}
@@ -184,7 +184,7 @@ const UsedBidList = ({navigation, route}) => {
             <Text style={styles.btnText}>채팅하기</Text>
           </TouchableOpacity>
           </>
-          ) : null }
+          ) : null } */}
         </>
         ) : null }
       </View>  
