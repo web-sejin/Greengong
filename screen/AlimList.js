@@ -5,7 +5,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {Swipeable, GestureHandlerRootView} from 'react-native-gesture-handler';
-
+import Api from '../Api';
 import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
 import Header from '../components/Header';
@@ -19,6 +19,7 @@ const AlimList = ({navigation, route}) => {
   const pan = useRef(new Animated.ValueXY()).current;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -26,17 +27,12 @@ const AlimList = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				//setAll(false);
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
@@ -105,9 +101,27 @@ const AlimList = ({navigation, route}) => {
     </GestureHandlerRootView>
 	);  
 
+  const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'list_alarm', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_alarm : ",responseJson);     
+			}else{
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(false);
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'알림'} />
+      {isLoading ? (
       <FlatList
 				data={DATA}
 				renderItem={(getList)}
@@ -119,6 +133,11 @@ const AlimList = ({navigation, route}) => {
 					</View>
 				}
       />
+      ) : (
+      <View style={[styles.indicator]}>
+        <ActivityIndicator size="large" />
+      </View>
+      )}
 		</SafeAreaView>
 	)
 }

@@ -43,8 +43,9 @@ const UsedLikeView = ({navigation, route}) => {
   }
 
   const getData = async () => {
+    console.log(idx);
     setIsLoading(true);
-    await Api.send('GET', 'other_sale_list_product', {'is_api': 1, other_mb_idx: idx, page:1}, (args)=>{
+    await Api.send('GET', 'list_scrap_seller2', {'is_api': 1, recv_idx: idx, page:1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -56,7 +57,7 @@ const UsedLikeView = ({navigation, route}) => {
         setTotalCnt(responseJson.total_count);
 			}else{
 				console.log('결과 출력 실패!', responseJson.result_text);
-        ToastMessage(responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
 			}
 		});
     setIsLoading(false);
@@ -125,8 +126,9 @@ const UsedLikeView = ({navigation, route}) => {
   }, [])
 
   const moreData = async () => {
+    console.log(totalPage+"//"+nowPage);
     if(totalPage > nowPage){
-      await Api.send('GET', 'other_sale_list_product', {is_api: 1, other_mb_idx: idx, page:nowPage+1}, (args)=>{
+      await Api.send('GET', 'list_scrap_seller2', {is_api: 1, recv_idx: idx, page:nowPage+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -155,7 +157,7 @@ const UsedLikeView = ({navigation, route}) => {
         onEndReachedThreshold={0.6}
 				onEndReached={moreData}
         ListHeaderComponent={
-          <View style={[styles.listLi, styles.listLi2, styles.borderBot]}>
+          <View style={[styles.listLi, styles.listLi2, styles.listLi3, styles.borderBot]}>
             <>
             <TouchableOpacity
               style={styles.otherPeople}
@@ -165,7 +167,7 @@ const UsedLikeView = ({navigation, route}) => {
               }}
             >
               {otherInfo.mb_img != '' ? (
-                <AutoHeightImage width={69} source={{uri: otherInfo.mb_img}} />
+                <AutoHeightImage width={50} source={{uri: otherInfo.mb_img}} style={styles.listImg} />
               ) : (
                 <AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} style={styles.listImg} />
               )}
@@ -206,8 +208,9 @@ const styles = StyleSheet.create({
   indicator2: {marginTop:62},
   listLi: {display:'flex',flexDirection:'row',padding:20,},
   listLi2: {alignItems:'stretch',paddingVertical:0,},
+  listLi3: {alignItems:'center',},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-  otherPeople: {paddingVertical:20,},
+  otherPeople: {width:50,height:50,borderRadius:50,overflow:'hidden'},
   pdImage: {width:73,height:73,overflow:'hidden',borderRadius:50,},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,position:'relative'},

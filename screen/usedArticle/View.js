@@ -394,6 +394,7 @@ const UsedView = (props) => {
           <View style={[styles.viewBox1, styles.borderBot]}>
             <View style={styles.profileBox}>
               <TouchableOpacity
+                style={styles.otherProfile}
                 activeOpacity={opacityVal}
                 onPress={()=>{
                   navigation.navigate('Other', {idx:itemInfo.pd_mb_idx});
@@ -972,6 +973,7 @@ const styles = StyleSheet.create({
   swiperNavi: {marginTop:-5},
   viewBox1: {paddingHorizontal:20,},
   profileBox: {paddingTop:25,paddingBottom:30,borderBottomWidth:1,borderBottomColor:'#E9EEF6',display:'flex',flexDirection:'row',position:'relative',},
+  otherProfile: {width:58,height:58,borderRadius:50,overflow:'hidden'},
   profileBoxInfo: {width:(innerWidth-58),paddingLeft:10,},
   profileName: {},
   profileNameText: {fontFamily:Font.NotoSansBold,fontSize:18,lineHeight:22,color:'#000'},

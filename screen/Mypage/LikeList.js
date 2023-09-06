@@ -111,7 +111,7 @@ const LikeList = ({navigation, route}) => {
 				setLikeList([]);
 				setNowPage(1);
 				//console.log('결과 출력 실패!', responseJson.result_text);
-        ToastMessage(responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(false);
@@ -125,7 +125,7 @@ const LikeList = ({navigation, route}) => {
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
-          //console.log(responseJson.data);				
+          console.log('list_scrap : ',responseJson.data);				
           const addItem = itemList.concat(responseJson.data);				
           setLikeList(addItem);			
           setNowPage(nowPage+1);
@@ -172,8 +172,8 @@ const styles = StyleSheet.create({
   indicator2: {marginTop:62},
 	notData: {height:(widnowHeight-200),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
-	listLi: {display:'flex',flexDirection:'row',paddingHorizontal:20,},
-  otherPeople: {paddingVertical:20,},
+	listLi: {display:'flex',flexDirection:'row',alignItems:'center',paddingHorizontal:20,},
+  otherPeople: {width:50,height:50,borderRadius:50,overflow:'hidden'},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 50),height:90,paddingLeft:15,paddingRight:65,display:'flex',justifyContent:'center',position:'relative'},
   listInfoTitle: {},

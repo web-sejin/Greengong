@@ -19,16 +19,16 @@ const opacityVal = 0.8;
 //스크랩 글쓰기
 const Modify1 = ({navigation, route}) => {  
 	const fileListData = [
-		{'idx': 1, 'txt': '파일1', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 2, 'txt': '파일2', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 3, 'txt': '파일3', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 4, 'txt': '파일4', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 5, 'txt': '파일5', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 6, 'txt': '파일6', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 7, 'txt': '파일7', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 8, 'txt': '파일8', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 9, 'txt': '파일9', 'path': '', 'pf_idx':'', 'del_idx':0},
-		{'idx': 10, 'txt': '파일10', 'path': '', 'pf_idx':'', 'del_idx':0},
+		{'idx': 1, 'txt': '파일1', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 2, 'txt': '파일2', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 3, 'txt': '파일3', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 4, 'txt': '파일4', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 5, 'txt': '파일5', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 6, 'txt': '파일6', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 7, 'txt': '파일7', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 8, 'txt': '파일8', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 9, 'txt': '파일9', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 10, 'txt': '파일10', 'path': '', 'pf_idx':'', 'del':0, 'del_idx':''},
 	];	
 
 	const periodAry = [
@@ -258,18 +258,18 @@ const Modify1 = ({navigation, route}) => {
   };
 
 	function deleteFile(v){
-		let selectCon = fileList.map((item) => {
-			if(item.idx === v){
-				return {...item, path: '', pf_idx:'', del_idx:1};
+		let selectCon = fileList.map((item) => {		
+			if(item.idx === v){				
+				return {...item, path: '', pf_idx:'', del:1, del_idx:item.pf_idx};
 			}else{
 				let val = ''
 				if(item.pf_idx != ''){
 					val = item.pf_idx;
 				}
-				return {...item, path: item.path, pf_idx:val, del_idx:0};
+				return {...item, path: item.path, pf_idx:val, del:0, del_idx:item.pf_idx};
 			}
 		});
-		console.log("delete selectCon : ",selectCon);
+		//console.log("delete selectCon : ",selectCon);
 		setFileList(selectCon);
 		getFileCount(selectCon);
 	}
@@ -310,16 +310,27 @@ const Modify1 = ({navigation, route}) => {
 		let img9Idx = '';
 		let img10Idx = '';
 		
-		let del1Idx = 0;
-		let del2Idx = 0;
-		let del3Idx = 0;
-		let del4Idx = 0;
-		let del5Idx = 0;
-		let del6Idx = 0;
-		let del7Idx = 0;
-		let del8Idx = 0;
-		let del9Idx = 0;
-		let del10Idx = 0;
+		let del1 = 0;
+		let del2 = 0;
+		let del3 = 0;
+		let del4 = 0;
+		let del5 = 0;
+		let del6 = 0;
+		let del7 = 0;
+		let del8 = 0;
+		let del9 = 0;
+		let del10 = 0;
+
+		let del1Idx = '';
+		let del2Idx = '';
+		let del3Idx = '';
+		let del4Idx = '';
+		let del5Idx = '';
+		let del6Idx = '';
+		let del7Idx = '';
+		let del8Idx = '';
+		let del9Idx = '';
+		let del10Idx = '';
 
 		fileList.map((item, index)=>{
 			if(item.idx == 1 && item.path != ''){ 
@@ -354,26 +365,36 @@ const Modify1 = ({navigation, route}) => {
 				img10Idx = item.pf_idx;
 			}
 
-			if(item.idx == 1 && item.del_idx == 1){
-				del1Idx = 1;
-			}else if(item.idx == 2 && item.del_idx == 1){
-				del2Idx = 1;
-			}else if(item.idx == 3 && item.del_idx == 1){
-				del3Idx = 1;
-			}else if(item.idx == 4 && item.del_idx == 1){
-				del4Idx = 1;
-			}else if(item.idx == 5 && item.del_idx == 1){
-				del5Idx = 1;
-			}else if(item.idx == 6 && item.del_idx == 1){
-				del6Idx = 1;
-			}else if(item.idx == 7 && item.del_idx == 1){
-				del7Idx = 1;
-			}else if(item.idx == 8 && item.del_idx == 1){
-				del8Idx = 1;
-			}else if(item.idx == 9 && item.del_idx == 1){
-				del9Idx = 1;
-			}else if(item.idx == 10 && item.del_idx == 1){
-				del10Idx = 1;
+			if(item.idx == 1 && item.del == 1){
+				del1 = 1;
+				del1Idx = item.del_idx
+			}else if(item.idx == 2 && item.del == 1){
+				del2 = 1;
+				del2Idx = item.del_idx
+			}else if(item.idx == 3 && item.del == 1){
+				del3 = 1;
+				del3Idx = item.del_idx
+			}else if(item.idx == 4 && item.del == 1){
+				del4 = 1;
+				del4Idx = item.del_idx
+			}else if(item.idx == 5 && item.del == 1){
+				del5 = 1;
+				del5Idx = item.del_idx
+			}else if(item.idx == 6 && item.del == 1){
+				del6 = 1;
+				del6Idx = item.del_idx
+			}else if(item.idx == 7 && item.del == 1){
+				del7 = 1;
+				del7Idx = item.del_idx
+			}else if(item.idx == 8 && item.del == 1){
+				del8 = 1;
+				del8Idx = item.del_idx
+			}else if(item.idx == 9 && item.del == 1){
+				del9 = 1;
+				del9Idx = item.del_idx
+			}else if(item.idx == 10 && item.del == 1){
+				del10 = 1;
+				del10Idx = item.del_idx
 			}
 		});
 	
@@ -450,55 +471,86 @@ const Modify1 = ({navigation, route}) => {
 		if(img1Path != ''){ 
 			formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; 
 			formData.pf_idx_0 = img1Idx;
-			formData.pf_file_del_0 = del1Idx;
 		}
 		if(img2Path != ''){ 
 			formData.pf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'pf_img2.png'}; 
 			formData.pf_idx_1 = img2Idx;
-			formData.pf_file_del_1 = del2Idx;
 		}
 		if(img3Path != ''){ 
 			formData.pf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'pf_img3.png'}; 
 			formData.pf_idx_2 = img3Idx;
-			formData.pf_file_del_2 = del3Idx;
 		}
 		if(img4Path != ''){ 
 			formData.pf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'pf_img4.png'}; 
 			formData.pf_idx_3 = img4Idx;
-			formData.pf_file_del_3 = del4Idx;
 		}
 		if(img5Path != ''){ 
 			formData.pf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'pf_img5.png'}; 
 			formData.pf_idx_4 = img5Idx;
-			formData.pf_file_del_4 = del5Idx;
 		}
 		if(img6Path != ''){ 
 			formData.pf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'pf_img6.png'}; 
 			formData.pf_idx_5 = img6Idx;
-			formData.pf_file_del_5 = del6Idx;
 		}
 		if(img7Path != ''){ 
 			formData.pf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'pf_img7.png'}; 
 			formData.pf_idx_6 = img7Idx;
-			formData.pf_file_del_6 = del7Idx;
 		}
 		if(img8Path != ''){ 
 			formData.pf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'pf_img8.png'}; 
 			formData.pf_idx_7 = img8Idx;
-			formData.pf_file_del_7 = del8Idx;
 		}
 		if(img9Path != ''){ 
 			formData.pf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'pf_img9.png'}; 
 			formData.pf_idx_8 = img9Idx;
-			formData.pf_file_del_8 = del9Idx;
 		}
 		if(img10Path != ''){ 
 			formData.pf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'pf_img10.png'}; 
 			formData.pf_idx_9 = img10Idx;
-			formData.pf_file_del_9 = del10Idx;
 		}
 
-		//console.log("formData : ",formData);
+		if(del1 == 1){ 
+			formData.pf_file_del_0 = del1;
+			formData.pf_file_del_0_idx = del1Idx;
+		}
+		if(del2 == 1){ 
+			formData.pf_file_del_1 = del2;
+			formData.pf_file_del_1_idx = del2Idx;
+		}
+		if(del3 == 1){ 
+			formData.pf_file_del_2 = del3;
+			formData.pf_file_del_2_idx = del3Idx;
+		}
+		if(del4 == 1){ 
+			formData.pf_file_del_3 = del4;
+			formData.pf_file_del_3_idx = del4Idx;
+		}
+		if(del5 == 1){ 
+			formData.pf_file_del_4 = del5;
+			formData.pf_file_del_4_idx = del5Idx;
+		}
+		if(del6 == 1){ 
+			formData.pf_file_del_5 = del6;
+			formData.pf_file_del_5_idx = del6Idx;
+		}
+		if(del7 == 1){ 
+			formData.pf_file_del_6 = del7;
+			formData.pf_file_del_6_idx = del7Idx;
+		}
+		if(del8 == 1){ 
+			formData.pf_file_del_7 = del8;
+			formData.pf_file_del_7_idx = del8Idx;
+		}
+		if(del9 == 1){ 
+			formData.pf_file_del_8 = del9;
+			formData.pf_file_del_8_idx = del9Idx;
+		}
+		if(del10 == 1){ 
+			formData.pf_file_del_9 = del10;
+			formData.pf_file_del_9_idx = del10Idx;
+		}
+
+		console.log("formData : ",formData);
 
 		Api.send('POST', 'modify_product', formData, (args)=>{
 			let resultItem = args.resultItem;
@@ -509,7 +561,7 @@ const Modify1 = ({navigation, route}) => {
 				navigation.navigate('Home', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
-				ToastMessage(responseJson.result_text);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
 	}
@@ -523,10 +575,10 @@ const Modify1 = ({navigation, route}) => {
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
 				//console.log("modify : ",responseJson.pf_data);
-				const imgList = responseJson.pf_data;				
+				const imgList = responseJson.pf_data;			
+				//console.log(imgList);	
 				if(imgList.length > 0){
-					let selectCon = fileList.map((item,index) => {
-						//console.log(item);
+					let selectCon = fileList.map((item,index) => {					
 						if(imgList[index]){
 							return {...item, path: imgList[index].pf_name_org, pf_idx:imgList[index].pf_idx};
 						}else{

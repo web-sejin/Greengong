@@ -78,7 +78,7 @@ const UsedLike = ({navigation, route}) => {
   const getList2 = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
-      <View style={[styles.listLi, styles.listLi2]}>   
+      <View style={[styles.listLi, styles.listLi2, styles.listLi3]}>   
         <TouchableOpacity
           style={styles.otherPeople}
           activeOpacity={opacityVal}
@@ -86,8 +86,8 @@ const UsedLike = ({navigation, route}) => {
             navigation.navigate('Other', {idx:item.mb_idx});
           }}
         >
-          {item.image != '' ? (
-            <AutoHeightImage width={69} source={{uri: item.image}} />
+          {item.mb_img1 != '' ? (
+            <AutoHeightImage width={50} source={{uri: item.mb_img1}} style={styles.listImg} />
           ) : (
             <AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} style={styles.listImg} />
           )}
@@ -149,7 +149,7 @@ const UsedLike = ({navigation, route}) => {
 				setItemList([]);
 				setNowPage(1);
 				console.log('결과 출력 실패!', responseJson.result_text);
-        ToastMessage(responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(false);
@@ -176,20 +176,20 @@ const UsedLike = ({navigation, route}) => {
 
   const getData2 = async () => {
     setIsLoading(true);
-    await Api.send('GET', 'list_scrap', {'is_api': 1, page: 1}, (args)=>{
+    await Api.send('GET', 'list_scrap_seller', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson);
+				console.log('list_scrap_seller : ',responseJson);
 				setItemList2(responseJson.data);
         setTotalPage2(responseJson.total_page);
 			}else{
 				setItemList2([]);
 				setNowPage2(1);
 				console.log('결과 출력 실패!', responseJson.result_text);
-        ToastMessage(responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(false);
@@ -197,7 +197,7 @@ const UsedLike = ({navigation, route}) => {
 
   const moreData2 = async () => {
     if(totalPage2 > nowPage2){
-      await Api.send('GET', 'list_scrap', {is_api: 1, page:nowPage2+1}, (args)=>{
+      await Api.send('GET', 'list_scrap_seller', {is_api: 1, page:nowPage2+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -302,10 +302,11 @@ const styles = StyleSheet.create({
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
   indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
-  listLi: {display:'flex',flexDirection:'row',alignItems:'center',padding:20,},
+  listLi: {display:'flex',flexDirection:'row',padding:20,},
   listLi2: {alignItems:'stretch',paddingVertical:0,},
+  listLi3: {alignItems:'center',},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-  otherPeople: {paddingVertical:20,},
+  otherPeople: {width:50,height:50,borderRadius:50,overflow:'hidden'},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,paddingRight:40,position:'relative',},
   listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},

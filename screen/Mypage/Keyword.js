@@ -33,6 +33,7 @@ const Keyword = ({navigation, route}) => {
 		if(!isFocused){
 			if(!pageSt){
 				setKeywords('');
+        setIsLoading(false);
 			}
 		}else{			
 			setRouteLoad(true);
