@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -15,7 +15,8 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const Profile = ({navigation, route}) => {
+const Profile = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -30,24 +31,56 @@ const Profile = ({navigation, route}) => {
 				setVisible(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    Api.send('GET', '	get_member_info', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			//console.log(args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('get_member_info', responseJson);
+        setPickture(responseJson.mb_img1);
+			}else{
+        console.log('에러 : ', responseJson.result_text);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
 
   const onAvatarChange = (image: ImageOrVideo) => {
     console.log(image);
 		setVisible(false);
 		setPickture(image.path);
     // upload image to server here 
+
+    let formData = {
+			is_api:1,					
+      mb_img: {
+        'uri': image.path,
+        'type': 'image/png',
+        'name': 'profile_setting.png',
+      }
+		};
+
+    Api.send('POST', 'save_profile_image', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);        
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   };
 
 	return (

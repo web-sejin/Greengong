@@ -42,6 +42,12 @@ const Mypage = (props) => {
 			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+
+			if(userInfo){
+				if(userInfo.mb_img1){
+					setProfileImg(userInfo.mb_img1);
+				}
+			}
 		}
 
 		return () => isSubscribed = false;

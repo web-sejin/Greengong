@@ -84,10 +84,44 @@ const MyCompany = ({navigation, route}) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			//getData();
+			getData2();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	const getData = async () => {
+    setIsLoading(true);
+    await Api.send('GET', 'insert_fac', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("insert_fac : ",responseJson);				
+        setIsLoading(false);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!');
+			}
+		});
+  }
+
+	const getData2 = async () => {
+    await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("get_member_info : ",responseJson);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!');
+			}
+		});
+  }
 
   const onAvatarChange = (image: ImageOrVideo) => {
     console.log(image);
