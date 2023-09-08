@@ -58,7 +58,7 @@ const LikeList = ({navigation, route}) => {
 				getData();
 			}else{
 				console.log('결과 출력 실패!', resultItem.result_text);
-				ToastMessage(responseJson.result_text);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
 	}
@@ -125,7 +125,7 @@ const LikeList = ({navigation, route}) => {
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
-          console.log('list_scrap : ',responseJson.data);				
+          //console.log('list_scrap : ',responseJson.data);				
           const addItem = itemList.concat(responseJson.data);				
           setLikeList(addItem);			
           setNowPage(nowPage+1);

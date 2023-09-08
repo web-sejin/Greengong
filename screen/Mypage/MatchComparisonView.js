@@ -167,13 +167,7 @@ const MatchComparisonView = ({navigation, route}) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'발주업체 비교내역'} />			
       <View style={styles.borderBot}>
-        <View
-          style={[styles.listLi]}
-          activeOpacity={opacityVal}
-          onPress={() => {
-            navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
-          }}
-        >    
+        <View style={[styles.listLi]}>    
           <AutoHeightImage width={68} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
           <View style={styles.listInfoBox}>
             <View style={styles.listInfoCate}>

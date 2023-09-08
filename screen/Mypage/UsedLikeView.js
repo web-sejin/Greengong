@@ -43,7 +43,7 @@ const UsedLikeView = ({navigation, route}) => {
   }
 
   const getData = async () => {
-    console.log(idx);
+    //console.log(idx);
     setIsLoading(true);
     await Api.send('GET', 'list_scrap_seller2', {'is_api': 1, recv_idx: idx, page:1}, (args)=>{
 			let resultItem = args.resultItem;
@@ -51,7 +51,7 @@ const UsedLikeView = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(responseJson);
+				//console.log(responseJson);
 				setItemList(responseJson.data);
         setTotalPage(responseJson.total_page);
         setTotalCnt(responseJson.total_count);
@@ -63,7 +63,7 @@ const UsedLikeView = ({navigation, route}) => {
     setIsLoading(false);
   }
 
-  const getList = ({item, index}) => (
+  const getList = ({item, index}) => (    
 		<View style={styles.borderBot}>
 			<>
       <TouchableOpacity
@@ -78,7 +78,8 @@ const UsedLikeView = ({navigation, route}) => {
           <AutoHeightImage width={73} source={{uri: item.pd_image}}  style={styles.listImg} />
         </View>
         ) : null}
-        <View style={styles.listInfoBox}>
+
+        <View style={[styles.listInfoBox, item.pd_image ? null : styles.listInfoBox3]}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.pd_name}
@@ -114,7 +115,9 @@ const UsedLikeView = ({navigation, route}) => {
 			}
 		}else{
 			setRouteLoad(true);
-			setPageSt(!pageSt);      
+			setPageSt(!pageSt);
+      setNowPage(1);
+      setTotalPage(1);
 		}
 
 		return () => isSubscribed = false;
@@ -134,7 +137,7 @@ const UsedLikeView = ({navigation, route}) => {
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
-          //console.log(responseJson.data);				
+          console.log(responseJson.data);				
           const addItem = itemList.concat(responseJson.data);				
           setItemList(addItem);			
           setNowPage(nowPage+1);
@@ -215,6 +218,7 @@ const styles = StyleSheet.create({
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,position:'relative'},
   listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},
+  listInfoBox3 : {width:innerWidth,paddingLeft:0,},
   listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
   listInfoPriceBox: {marginTop:5},

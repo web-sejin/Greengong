@@ -9,167 +9,187 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const UsedBidList = ({navigation, route}) => {
+  const {params} = route;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);  
   const [tabState, setTabState] = useState(1);
   const [idxVal, setIdxVal] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [itemList2, setItemList2] = useState([]);
+  const [nowPage2, setNowPage2] = useState(1);
+  const [totalPage2, setTotalPage2] = useState(1);
+  
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		let isSubscribed = true;
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-      nick: '참좋은공장',
-			title: '[스크랩] 스크랩 싸게 팝니다.1',	
-			state: 1,
-      sate2: 0,
-			period: ' ~2023.07.30',
-      price: '100,000',
-      price2: '90,000',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			nick: '참좋은공장',
-			title: '[스크랩] 스크랩 싸게 팝니다.2',		
-			state: 1,
-      sate2: 0,
-			period: ' ~2023.07.30',
-      price: '100,000',
-      price2: '90,000',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			nick: '참좋은공장',
-			title: '[스크랩] 스크랩 싸게 팝니다.3',
-			state: 2,
-      state2: 1,
-			period: ' ~2023.07.30',
-      price: '100,000',
-      price2: '90,000',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			nick: '참좋은공장',
-			title: '[스크랩] 스크랩 싸게 팝니다.4',
-			state: 2,
-      state2: 2,
-			period: ' ~2023.07.30',
-      price: '100,000',
-      price2: '90,000',
-		},
-    {
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			nick: '참좋은공장',
-			title: '[스크랩] 스크랩 싸게 팝니다.5',
-			state: 2,
-      state2: 3,
-			period: ' ~2023.07.30',
-      price: '100,000',
-      price2: '90,000',
-		},
-	];
+		if(!isFocused){
+			if(!pageSt){
+				setIsLoading(false);
+        setTabState(1);
+        setIdxVal('');
+        setItemList([]);
+        setNowPage(1);
+        setTotalPage(1);
+        setItemList2([]);
+        setNowPage2(1);
+        setTotalPage2(1);
+			}
+		}else{
+			setRouteLoad(true);
+			setPageSt(!pageSt);      
+		}
 
-  const dataLen = DATA.length;
+		return () => isSubscribed = false;
+	}, [isFocused]);
 
-  const getList = ({item, index}) => (    
-    item.state == tabState ? (
-    <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != dataLen ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
+  useEffect(()=>{
+    getData();
+    getData2();
+  },[])
+
+  function fnTab(v){
+    setTabState(v);
+  }
+
+  //판매자가 입찰 승인
+  const bidOk = async (idx) => {
+    const formData = {
+			is_api:1,
+      bd_idx:idx,
+		};
+
+    Api.send('POST', 'ok_bidding', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem.result_text);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //판매자가 입찰 거절
+  const bidReject = async (idx) => {
+    const formData = {
+			is_api:1,
+      bd_idx:idx,
+		};
+
+    Api.send('POST', 'reject_bidding', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem.result_text);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //구매자가 입찰 취소
+  const deleteBidding = async (idx) => {
+    const formData = {
+			is_api:1,
+      pd_idx:idx,
+		};
+
+    Api.send('POST', 'del_bidding_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        getData2();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  const getList = ({item, index}) => (
+    <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
           <View style={styles.compInfo}>
             <View style={styles.compInfoDate}>
-              {tabState == 1 ? (
-              <Text style={styles.compInfoDateText}>판매자 공장 : {item.nick}</Text>
-              ) : null}
-
-              {tabState == 2 ? (
-              <Text style={styles.compInfoDateText}>구매자 공장 : {item.nick}</Text>
-              ) : null}
+              <Text style={styles.compInfoDateText}>판매자 공장 : {item.mb_nick}</Text>
             </View>
             <View style={styles.compInfoName}>
-              <Text style={styles.compInfoNameText}>{item.title}</Text>
+              <Text style={styles.compInfoNameText}>{item.pd_name}</Text>
             </View>
             <View style={styles.compInfoLoc}>
               <AutoHeightImage width={12} source={require("../../assets/img/icon_calendar2.png")}  style={styles.compInfoLocImg}/>
-              <Text style={styles.compInfoLocText}>입찰기간 : {item.period}</Text>
+              <Text style={styles.compInfoLocText}>입찰기간 : {item.pd_bidding_enday}</Text>
             </View>
           </View>
           <TouchableOpacity 
             style={styles.compThumb}
             activeOpacity={opacityVal}
             onPress={()=>{
-              navigation.navigate('Other', {});
+              navigation.navigate('Other', {idx:item.bd_mb_idx});
             }}
           >
-            <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
+            {item.pd_image ? (
+              <AutoHeightImage width={63} source={{uri: item.pd_image}} />
+            ) : (
+              <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
+            )}
           </TouchableOpacity>
         </View>
         <View style={styles.matchPrice}>
           <Text style={styles.matchPriceText}>판매가</Text>
-          <Text style={styles.matchPriceText2}>{item.price}원</Text>
+          <Text style={styles.matchPriceText2}>{item.pd_price}원</Text>
         </View>
         <View style={styles.matchPrice}>
           <Text style={styles.matchPriceText}>제안가</Text>
-          <Text style={styles.matchPriceText2}>{item.price2}원</Text>
+          <Text style={styles.matchPriceText2}>{item.bd_price}원</Text>
         </View>
       </View>
-      
+
       <View style={styles.btnBox}>
-        {tabState == 1 ? (
         <>
+          {item.bd_status_org == 1 ? (
+          <>
           <TouchableOpacity
             style={[styles.btn]}
             activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            onPress={()=>{bidReject(item.bd_idx)}}
           >
             <Text style={styles.btnText}>거절</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.btn, styles.btn2]}
             activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            onPress={()=>{bidOk(item.bd_idx)}}
           >
             <Text style={styles.btnText}>승인</Text>
           </TouchableOpacity>
-        </>
-        ) : null }
-
-        {tabState == 2 ? (
-        <>
-          {/* {item.state2 == 1 ? (
-          <TouchableOpacity
-            style={[styles.btn, styles.btn3]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
-          >
-            <Text style={styles.btnText}>취소</Text>
-          </TouchableOpacity>
+          </>
           ) : null }
 
-          {item.state2 == 2 ? (
-          <TouchableOpacity
-            style={[styles.btn, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
-          >
-            <Text style={[styles.btnText, styles.btnText2]}>가격 입찰 제안이 거절되었습니다.</Text>
-          </TouchableOpacity>
-          ) : null }
-
-          {item.state2 == 3 ? (
+          {item.bd_status_org == 2 ? (
           <>
           <View style={styles.btn3TextBox}>
             <Text style={styles.btn3TextBoxText}>가격 입찰 제안이 수락되었습니다.</Text>
@@ -184,51 +204,211 @@ const UsedBidList = ({navigation, route}) => {
             <Text style={styles.btnText}>채팅하기</Text>
           </TouchableOpacity>
           </>
-          ) : null } */}
+          ) : null }
+
+          {item.bd_status_org == 3 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3, styles.btn4]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              
+            }}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>입찰을 취소했습니다.</Text>
+          </TouchableOpacity>
+          ) : null }
+
+          {item.bd_status_org == 4 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3, styles.btn4]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              
+            }}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>입찰자가 입찰을 취소했습니다.</Text>
+          </TouchableOpacity>
+          ) : null }       
         </>
-        ) : null }
+        
       </View>  
     </View>
-    ) : null
 	);
 
-	const isFocused = useIsFocused();
-	useEffect(() => {
-		let isSubscribed = true;
-
-		if(!isFocused){
-			if(!pageSt){
-				setIsLoading(false);
-        setTabState(1);
-        setIdxVal('');
-			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
-			setRouteLoad(true);
-			setPageSt(!pageSt);
-		}
-
-		return () => isSubscribed = false;
-	}, [isFocused]);
-
-  useEffect(() => {
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
-  }, []);
-
-  function fnTab(v){
+  const getData = async () => {
     setIsLoading(false);
-    setTabState(v);
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
+    await Api.send('GET', 'list_sale_bid_product', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_sale_bid_product : ",responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);        
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
   }
+
+  const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_sale_bid_product', {is_api: 1, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
+
+  const getList2 = ({item, index}) => (
+    <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList2.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
+      <View style={[styles.compBtn]}>
+        <View style={[styles.compWrap, styles.compWrapFst]}>
+          <View style={styles.compInfo}>
+            <View style={styles.compInfoDate}>
+              <Text style={styles.compInfoDateText}>구매자 공장 : {item.mb_nick}</Text>
+            </View>
+            <View style={styles.compInfoName}>
+              <Text style={styles.compInfoNameText}>{item.pd_name}</Text>
+            </View>
+          </View>
+          <TouchableOpacity 
+            style={styles.compThumb}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('Other', {idx:item.bd_mb_idx});
+            }}
+          >
+            {item.pd_image ? (
+              <AutoHeightImage width={63} source={{uri: item.pd_image}} />
+            ) : (
+              <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
+            )}            
+          </TouchableOpacity>
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>판매가</Text>
+          <Text style={styles.matchPriceText2}>{item.pd_price}원</Text>
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>제안가</Text>
+          <Text style={styles.matchPriceText2}>{item.bd_price}원</Text>
+        </View>
+      </View>
+      
+      <View style={styles.btnBox}>
+        <>
+          {item.bd_status == 1 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{deleteBidding(item.pd_idx)}}
+          >
+            <Text style={styles.btnText}>취소</Text>
+          </TouchableOpacity>
+          ) : null }
+
+          {item.bd_status == 2 ? (
+          <>
+          <View style={styles.btn3TextBox}>
+            <Text style={styles.btn3TextBoxText}>가격 입찰 제안이 수락되었습니다.</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('ChatRoom', {});
+            }}
+          >
+            <Text style={styles.btnText}>채팅하기</Text>
+          </TouchableOpacity>
+          </>
+          ) : null }
+
+          {item.bd_status == 3 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3, styles.btn4]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              
+            }}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>입찰을 취소했습니다.</Text>
+          </TouchableOpacity>
+          ) : null }
+
+          {item.bd_status == 4 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3, styles.btn4]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              
+            }}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>가격 입찰 제안이 거절되었습니다.</Text>
+          </TouchableOpacity>
+          ) : null }       
+        </>
+      </View>  
+    </View>
+	)
+
+  const getData2 = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_buy_bid_product', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("list_buy_bid_product : ",responseJson);
+				setItemList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);        
+			}else{
+				setItemList2([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+
+  const moreData2 = async () => {
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_buy_bid_product', {is_api: 1, page:nowPage2+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = itemList2.concat(responseJson.data);				
+          setItemList2(addItem);			
+          setNowPage2(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -264,17 +444,35 @@ const UsedBidList = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
 			{isLoading ? (
-        <FlatList
-				data={DATA}
-				renderItem={(getList)}
-				keyExtractor={item => item.id}		
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 입찰내역이 없습니다.</Text>
-					</View>
-				}
-			/>
+        tabState == 1 ? (
+          <FlatList
+            data={itemList}
+            renderItem={(getList)}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.6}
+            onEndReached={moreData}	
+            ListEmptyComponent={
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>등록된 판매내역이 없습니다.</Text>
+              </View>
+            }
+          />
+        ) : (
+          <FlatList
+            data={itemList2}
+            renderItem={(getList2)}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.6}
+            onEndReached={moreData2}	
+            ListEmptyComponent={
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>등록된 구매내역이 없습니다.</Text>
+              </View>
+            }
+          />
+        )
       ) : (
         <View style={[styles.indicator]}>
           <ActivityIndicator size="large" />

@@ -7,7 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import RNPickerSelect from 'react-native-picker-select';
 import DocumentPicker from 'react-native-document-picker'
 import { Calendar, CalendarList, Agenda, LocaleConfig } from 'react-native-calendars';
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -37,36 +37,17 @@ LocaleConfig.defaultLocale = 'kr';
 //스크랩 글쓰기
 const MatchWrite = ({navigation, route}) => {
 	const fileListData = [
-		{'idx': 1, 'txt': '파일1', 'path': ''},
-		{'idx': 2, 'txt': '파일2', 'path': ''},
-		{'idx': 3, 'txt': '파일3', 'path': ''},
-		{'idx': 4, 'txt': '파일4', 'path': ''},
-		{'idx': 5, 'txt': '파일5', 'path': ''},
-		{'idx': 6, 'txt': '파일6', 'path': ''},
-		{'idx': 7, 'txt': '파일7', 'path': ''},
-		{'idx': 8, 'txt': '파일8', 'path': ''},
-		{'idx': 9, 'txt': '파일9', 'path': ''},
-		{'idx': 10, 'txt': '파일10', 'path': ''},
+		{'idx': 1, 'txt': '파일1', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 2, 'txt': '파일2', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 3, 'txt': '파일3', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 4, 'txt': '파일4', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 5, 'txt': '파일5', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 6, 'txt': '파일6', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 7, 'txt': '파일7', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 8, 'txt': '파일8', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 9, 'txt': '파일9', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
+		{'idx': 10, 'txt': '파일10', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
 	];
-	
-	const sortAry = [
-		{ label: '고철', value: '1' },
-		{ label: '스테인레스 강', value: '2' },
-		{ label: '특수강', value: '3' },
-	]
-	
-	const ingreAry = [
-		{ label: '생철', value: '1' },
-		{ label: '중량', value: '2' },
-		{ label: '경량', value: '3' },
-	]
-
-	const shapeAry = [
-		{ label: '레이저', value: '1' },
-		{ label: '뻔지', value: '2' },
-		{ label: '금형', value: '3' },
-		{ label: '직접입력', value: '4' },
-	]
 
 	const dealMethod2Ary = [
 		{ label: '집게차 요청', value: '1' },
@@ -100,7 +81,7 @@ const MatchWrite = ({navigation, route}) => {
 	const [floorFile, setFloorFile] = useState(''); //도면 파일
 	const [floorFileType, setFloorFileType] = useState(''); //도면 파일
 	const [floorFileUri, setFloorFileUri] = useState(''); //도면 파일
-	const [call, setCall] = useState(false); //설계요청
+	const [call, setCall] = useState(0); //설계요청
 	const [security, setSecurity] = useState(''); //도면보안설정
 	const [advice, setAdvice] = useState(''); //상담방식(견적서)
 	const [projectName, setProjectName] = useState(''); //프로젝트명
@@ -112,6 +93,12 @@ const MatchWrite = ({navigation, route}) => {
 	const [endDateObj, setEndDateObj] = useState(); //납기일
 	const [price, setPrice] = useState(''); //추정예산범위(금액)
 	const [content, setContent] = useState(contentMsg); //도면상세정보
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [cateAry, setCateAry] = useState([]); //카테고리 리스트
+	const [sortAry, setSortAry] = useState([]); //분류 리스트
+	const [matt1Ary, setMatt1Ary] = useState([]); //재료1 리스트
+	const [matt2Ary, setMatt2Ary] = useState([]); //재료2 리스트
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -119,7 +106,6 @@ const MatchWrite = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				useState();
 				setFileConfirm(false);
 				setFileList(fileListData);
 				setSubject('');
@@ -132,7 +118,7 @@ const MatchWrite = ({navigation, route}) => {
 				setFloorFile('');
 				setFloorFileType('');
 				setFloorFileUri('');
-				setCall(false);
+				setCall(0);
 				setSecurity('');
 				setAdvice('');
 				setProjectName('');
@@ -144,20 +130,113 @@ const MatchWrite = ({navigation, route}) => {
 				setEndDateObj();
 				setPrice('');
 				setContent(contentMsg);
+				setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			select1();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	//카테고리
+	const select1 = async () => {
+		await Api.send('GET', 'match_cate1', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("카테고리 : ",responseJson);
+				setCateAry(responseJson.data);
+			}else{
+				//console.log("카테고리 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//분류
+	const select2 = async () => {
+		//console.log('cate : ',cate);
+		await Api.send('GET', 'match_cate2', {is_api:1, cate1:cate}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("분류 : ",responseJson);
+				setSortAry(responseJson.data);
+			}else{
+				//console.log("분류 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//분류 체크
+	const sortChk = async () => {
+		//console.log('sort : ',sort);
+		setMatt1('');
+		setMatt1Ary([]);		
+		if(sort){
+			if(sort==40 || cate==6 || cate==7){
+				console.log('재료1 X');
+
+				setMatt2('');
+				setMatt2Ary([]);
+			}else{
+				select3();
+			}
+		}
+	}
+
+	//재료1
+	const select3 = async () => {
+		setMatt2('');
+		setMatt2Ary([]);
+		await Api.send('GET', 'match_cate3', {is_api:1, cate2:sort}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("재료1 : ",responseJson);
+				setMatt1Ary(responseJson.data);
+			}else{
+				//console.log("재료1 err : ",responseJson.result_text);
+			}
+		});
+	}
+
+	//재료1 체크
+	const matt1Chk = async () => {
+		console.log(cate+"//"+matt1);
+		if(matt1){
+			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83)){
+				console.log('재료2 X');
+				setMatt2('');
+				setMatt2Ary([]);
+			}else{
+				select4();
+			}
+		}
+	}
+
+	const select4 = async () => {
+		await Api.send('GET', 'match_cate4', {is_api:1, cate3:matt1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("재료2 : ",responseJson);
+				setMatt2Ary(responseJson.data);
+			}else{
+				//console.log("재료2 err : ",responseJson.result_text);
+			}
+		});
+	}
 
 	function getFileCount(selectCon){
 		let cnt = 0;
@@ -215,18 +294,11 @@ const MatchWrite = ({navigation, route}) => {
 			const res = await DocumentPicker.pick({
 				type: [DocumentPicker.types.allFiles],
 			})
+			console.log(res[0]);
 			setFloorFile(res[0].name);
 			setFloorFileType(res[0].type);
 			setFloorFileUri(res[0].uri);
-
-			// console.log(
-			// 	res.uri,
-			// 	res.type, // mime type
-			// 	res.name,
-			// 	res.size
-			// )
-			// console.tron.debug('URI')
-			// console.tron.debug(res)
+			
 			const name = decodeURIComponent(res.uri)
 	
 			if (name.startsWith(CONTENT_PREFIXES.RESILLIO_SYNC)) {
@@ -247,6 +319,133 @@ const MatchWrite = ({navigation, route}) => {
 		setEndDateObj(obj);
 		setCalendarVisible(false);
   }
+
+	function writeUpdate(){
+		let img1Path = '';
+		let img2Path = '';
+		let img3Path = '';
+		let img4Path = '';
+		let img5Path = '';
+		let img6Path = '';
+		let img7Path = '';
+		let img8Path = '';
+		let img9Path = '';
+		let img10Path = '';
+		
+
+		fileList.map((item, index)=>{
+			if(item.idx == 1 && item.path != ''){ 
+				img1Path = item.path;
+			}else if(item.idx == 2 && item.path != ''){ 
+				img2Path = item.path;
+			}else if(item.idx == 3 && item.path != ''){ 
+				img3Path = item.path;
+			}else if(item.idx == 4 && item.path != ''){ 
+				img4Path = item.path;
+			}else if(item.idx == 5 && item.path != ''){ 
+				img5Path = item.path;
+			}else if(item.idx == 6 && item.path != ''){ 
+				img6Path = item.path;
+			}else if(item.idx == 7 && item.path != ''){ 
+				img7Path = item.path;
+			}else if(item.idx == 8 && item.path != ''){ 
+				img8Path = item.path;
+			}else if(item.idx == 9 && item.path != ''){ 
+				img9Path = item.path;
+			}else if(item.idx == 10 && item.path != ''){ 
+				img10Path = item.path;
+			}
+		})
+	
+		if(img1Path == ""){ ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); return false; }
+
+		if(subject == ""){ ToastMessage('글 제목을 입력해 주세요.'); return false; }
+
+		if(cate == ""){ ToastMessage('카테고리를 선택해 주세요.'); return false; }
+
+		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
+
+		// if((sort!=7 && sort!=8) && (ingred!=32 && ingred!=33)){
+		// 	if(shape == ""){ ToastMessage('형태를 선택해 주세요.'); return false; }
+		// }
+
+		if(cnt == ""){ ToastMessage('수량을 입력해 주세요.'); return false; }
+		
+		if(security == ""){ ToastMessage('도면보안설정을 선택해 주세요.'); return false; }
+
+		if(advice == ""){ ToastMessage('상담방식(견적서)을 선택해 주세요.'); return false; }
+
+		if(projectName == ""){ ToastMessage('프로젝트명을 입력해 주세요.'); return false; }
+
+		if(useInfo == ""){ ToastMessage('제품용도를 선택해 주세요.'); return false; }
+
+		if(indCate == ""){ ToastMessage('[산업] 카테고리를 선택해 주세요.'); return false; }
+		//직접입력 체크 = indCateDirect
+
+		if(endDateMethod == ""){ ToastMessage('납기일방식을 선택해 주세요.'); return false; }
+		if(endDateMethod == 2 && endDate == ""){
+			ToastMessage('납기일을 선택해 주세요.'); return false;
+		}
+
+		if(content == ""){ ToastMessage('도면상세정보를 입력해 주세요.'); return false; }
+
+		let calcCnt = 0;
+		if(cnt != ''){
+			calcCnt = (cnt).split(',').join('');
+		}
+
+		let calcPrice = 0;
+		if(price != ''){
+			calcPrice = (price).split(',').join('');
+		}
+
+		const formData = {
+			is_api:1,				
+			mc_name:subject,
+			mc_contents:content,
+			c1_idx:cate,
+			c2_idx:sort,
+			c3_idx:matt1,
+			c4_idx:matt2,
+			c4_etc:matt2Direct,
+			mc_total:calcCnt,
+			mc_project_name:projectName,
+			mc_use_type:useInfo,
+			mc_use_type_etc:indCateDirect,
+			mc_use_type2:indCate,
+			mc_end_date:endDate,
+			mc_option1:call,
+			mc_option2:endDateMethod,
+			mc_price:calcPrice
+		};
+
+		if(floorFile != ''){ formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; }
+		if(img1Path != ''){ formData.mf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'mf_img1.png'}; }
+		if(img2Path != ''){ formData.mf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'mf_img2.png'}; }
+		if(img3Path != ''){ formData.mf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'mf_img3.png'}; }
+		if(img4Path != ''){ formData.mf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'mf_img4.png'}; }
+		if(img5Path != ''){ formData.mf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'mf_img5.png'}; }
+		if(img6Path != ''){ formData.mf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'mf_img6.png'}; }
+		if(img7Path != ''){ formData.mf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'mf_img7.png'}; }
+		if(img8Path != ''){ formData.mf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'mf_img8.png'}; }
+		if(img9Path != ''){ formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; }
+		if(img10Path != ''){ formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; }
+
+		//console.log("formData : ",formData);
+
+		Api.send('POST', 'save_match', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);				
+				navigation.navigate('Match', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -319,14 +518,21 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setCate(value)}
+									value={cate}
+									onValueChange={(value) => {
+										setCate(value);
+										select2();
+									}}
 									placeholder={{
 										label: '카테고리를 선택해 주세요.',
 										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}
-									items={sortAry}
+									items={cateAry.map(item => ({
+										label: item.txt,
+										value: item.val,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -347,14 +553,21 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setSort(value)}
+									value={sort}
+									onValueChange={(value) => {
+										setSort(value);
+										sortChk();
+									}}
 									placeholder={{
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}
-									items={sortAry}
+									items={sortAry.map(item => ({
+										label: item.c2_name,
+										value: item.c2_idx,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -368,21 +581,31 @@ const MatchWrite = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
-
+						
+						{(sort==40 || cate==6 || cate==7) ?
+							null 
+						: (
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>재료1</Text>
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setMatt1(value)}
+									value={matt1}
+									onValueChange={(value) => {
+										setMatt1(value);
+										matt1Chk();
+									}}
 									placeholder={{
 										label: '재료1을 선택해 주세요.',
 										inputLabel: '재료1을 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}
-									items={ingreAry}
+									items={matt1Ary.map(item => ({
+										label: item.c3_name,
+										value: item.c3_idx,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -396,48 +619,62 @@ const MatchWrite = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
+						)}
+												
+						{matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83) ? (
+							null
+						) : (
+							<View style={[styles.typingBox, styles.mgTop35]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>재료2</Text>
+								</View>
+								<View style={[styles.typingInputBox]}>
+									<RNPickerSelect
+										value={matt2}
+										onValueChange={(value) => {
+											console.log(value);
+											setMatt2(value);
+											if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
+												setMatt2Direct(''); 
+											}
+										}}
+										placeholder={{
+											label: '재료2를 선택해 주세요.',
+											inputLabel: '재료2를 선택해 주세요.',
+											value: '',
+											color: '#8791A1',
+										}}
+										items={matt2Ary.map(item => ({
+											label: item.c4_name,
+											value: item.c4_idx,
+										}))}
+										fixAndroidTouchableBug={true}
+										useNativeAndroidPickerStyle={false}
+										style={{
+											placeholder: {color: '#8791A1'},
+											inputAndroid: styles.input,
+											inputAndroidContainer: styles.inputContainer,
+											inputIOS: styles.input,
+											inputIOSContainer: styles.inputContainer,
+										}}
+									/>
+									<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+								</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>재료2</Text>
+								{matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70 ? (
+								<View style={[styles.typingInputBox]}>
+									<TextInput
+										value={matt2Direct}
+										onChangeText={(v) => {setMatt2Direct(v)}}
+										placeholder={'재료2 직접 입력을 입력해 주세요.'}
+										placeholderTextColor="#8791A1"
+										style={[styles.input]}
+									/>
+								</View>
+								) : null}
+
 							</View>
-							<View style={[styles.typingInputBox]}>
-								<RNPickerSelect
-									onValueChange={(value) => {
-										setMatt2(value);
-										if(value == '4'){ setMatt2Direct(''); }
-									}}
-									placeholder={{
-										label: '재료2를 선택해 주세요.',
-										inputLabel: '재료2를 선택해 주세요.',
-										value: '',
-										color: '#8791A1',
-									}}
-									items={shapeAry}
-									fixAndroidTouchableBug={true}
-									useNativeAndroidPickerStyle={false}
-									style={{
-										placeholder: {color: '#8791A1'},
-										inputAndroid: styles.input,
-										inputAndroidContainer: styles.inputContainer,
-										inputIOS: styles.input,
-										inputIOSContainer: styles.inputContainer,
-									}}
-								/>
-								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
-							</View>
-							{matt2 == '4' ? (
-							<View style={[styles.typingInputBox]}>
-								<TextInput
-									value={matt2Direct}
-									onChangeText={(v) => {setMatt2Direct(v)}}
-									placeholder={'재료2 직접 입력을 입력해 주세요.'}
-									placeholderTextColor="#8791A1"
-									style={[styles.input]}
-								/>
-							</View>
-							) : null}
-						</View>
+						)}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -448,7 +685,9 @@ const MatchWrite = ({navigation, route}) => {
 									value={cnt}
 									keyboardType = 'numeric'
 									onChangeText={(v) => {
-										setCnt(v);
+										let comma = (v).split(',').join('');
+										comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+										setCnt(comma);
 									}}
 									placeholder={'수량을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
@@ -481,10 +720,17 @@ const MatchWrite = ({navigation, route}) => {
 								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
 								<Text style={styles.inputAlertText}>도면이 없으면 자세한 견적을 받을 수 없습니다.</Text>
 							</View>
+							
 							<TouchableOpacity
-								style={[styles.floorBtn, call ? styles.floorBtnOn : null]}
+								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
 								activeOpacity={opacityVal}
-								onPress={() => {setCall(!call)}}
+								onPress={() => {
+									if(call == 1){
+										setCall(0)
+									}else{
+										setCall(1)
+									}	
+								}}
 							>
 								<AutoHeightImage width={15} source={require("../../assets/img/icon_chk_on.png")} style={styles.floorBtnImg} />
 								<Text style={styles.floorBtnText}>설계요청</Text>
@@ -664,6 +910,8 @@ const MatchWrite = ({navigation, route}) => {
 									onPress={() => {
 										if(endDateMethod && endDateMethod == 2){
 											setEndDateMethod('');
+											setEndDate('');
+											setEndDateObj();
 										}else{
 											setEndDateMethod(2);
 										}
@@ -714,7 +962,9 @@ const MatchWrite = ({navigation, route}) => {
 								<TextInput
 									value={price}
 									onChangeText={(v) => {
-										setPrice(v);
+										let comma = (v).split(',').join('');
+										comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+										setPrice(comma);
 									}}
 									placeholder={'추정예산범위를 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
@@ -748,7 +998,7 @@ const MatchWrite = ({navigation, route}) => {
 				<TouchableOpacity 
 					style={styles.nextBtn}
 					activeOpacity={opacityVal}
-					onPress={() => {}}
+					onPress={() => {writeUpdate();}}
 				>
 					<Text style={styles.nextBtnText}>확인</Text>
 				</TouchableOpacity>
@@ -797,7 +1047,11 @@ const MatchWrite = ({navigation, route}) => {
 				</View>
       </Modal>
 
-			
+			{isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -861,6 +1115,7 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default MatchWrite

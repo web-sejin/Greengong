@@ -157,7 +157,14 @@ const Bid = (props) => {
         <>
         <KeyboardAwareScrollView>
           <View style={[styles.listLi, styles.borderBot]}>
-            <AutoHeightImage width={116} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+            
+            <View style={styles.prdImage}>
+              {itemInfo?.pd_image ? (
+                <AutoHeightImage width={116} source={{uri: itemInfo?.pd_image}} style={styles.listImg} />
+              ) : (
+                <AutoHeightImage width={116} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+              )}
+            </View>
             <View style={styles.listInfoBox}>
               <View style={styles.listInfoSort}>
                 <Text style={styles.listInfoSortText}>[{itemInfo?.c1_name}]</Text>
@@ -282,7 +289,8 @@ const styles = StyleSheet.create({
   mgTop35: {marginTop:35,},
   listLi: {display:'flex',flexDirection:'row',paddingHorizontal:20,paddingTop:25,paddingBottom:35},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	listImg: {borderRadius:8},
+  prdImage: {width:116,height:116,borderRadius:8,overflow:'hidden'},
+	listImg: {},
 	listInfoBox: {width:(innerWidth - 116),paddingLeft:15,},
   listInfoSort: {},
   listInfoSortText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:19,color:'#000'},

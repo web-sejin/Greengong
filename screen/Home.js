@@ -169,7 +169,7 @@ const Home = (props) => {
 					<Text style={styles.listInfoDescText}>{item.pd_loc} · {item.pd_date}</Text>
 				</View>
 				<View style={styles.listInfoCate}>
-					<Text style={styles.listInfoCateText}>{item.pd_summary}</Text>
+					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.pd_summary}</Text>
 				</View>
 				<View style={styles.listInfoCnt}>
 					<View style={styles.listInfoCntBox}>

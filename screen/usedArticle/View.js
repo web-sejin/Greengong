@@ -239,8 +239,10 @@ const UsedView = (props) => {
 				//console.log('성공 : ',responseJson);				
         if(responseJson.scrap_type == 'save'){
           setZzim(1);
+          ToastMessage('관심판매자에 추가되었습니다.');
         }else{
           setZzim(0);
+          ToastMessage('관심판매자에서 삭제되었습니다.');
         }
 			}else{
 				console.log('결과 출력 실패!', resultItem);

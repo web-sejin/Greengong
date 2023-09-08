@@ -1,9 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -20,7 +21,9 @@ const filterListData = [
 	{'idx': 7, 'txt': '전자회로(PCB)', 'isChecked': false},
 ];
 
-const Match = ({navigation, route}) => {
+const Match = (props) => {
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const {params} = route;
 	const [searchVal, setSearchVal] = useState();
 	const [scrollEvent, setScrollEvent] = useState(new Animated.Value(1))	
 	const [scrollEvent2, setScrollEvent2] = useState(new Animated.Value(0))

@@ -60,7 +60,7 @@ const Message = ({navigation, route}) => {
         setMsgList([]);
 				setTotalCnt(0);
 				//console.log('결과 출력 실패!', responseJson.result_text);
-        ToastMessage(responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(false);

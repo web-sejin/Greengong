@@ -33,15 +33,29 @@ const UsedLike = ({navigation, route}) => {
   const getList = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
-      <TouchableOpacity
-        style={[styles.listLi]}
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('UsedView', {idx:item.pd_idx})
-        }}
+      <View
+        style={[styles.listLi]}        
       >    
-        <AutoHeightImage width={73} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
-        <View style={styles.listInfoBox}>
+        <TouchableOpacity
+          style={styles.otherPeople2}
+          activeOpacity={opacityVal}
+          onPress={()=>{
+            navigation.navigate('Other', {idx:item.mb_idx});
+          }}
+        >
+          {item.image ? (
+            <AutoHeightImage width={73} source={{uri: item.image}} />
+          ) : (
+            <AutoHeightImage width={73} source={require("../../assets/img/not_profile.png")} />	
+          )}
+        </TouchableOpacity>        
+        <TouchableOpacity 
+          style={styles.listInfoBox}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedView', {idx:item.pd_idx})
+          }}
+        >
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.pd_name}
@@ -62,8 +76,8 @@ const UsedLike = ({navigation, route}) => {
             <Text style={styles.listInfoStateBoxText}>판매완료</Text>
           </View>
           ) : null}
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
         style={styles.listLikeBtn}
         activeOpacity={opacityVal}
@@ -307,6 +321,7 @@ const styles = StyleSheet.create({
   listLi3: {alignItems:'center',},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
   otherPeople: {width:50,height:50,borderRadius:50,overflow:'hidden'},
+  otherPeople2: {width:73,height:73,borderRadius:50,overflow:'hidden'},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 73),paddingLeft:15,paddingRight:40,position:'relative',},
   listInfoBox2: {width:(innerWidth - 50),height:90,display:'flex',justifyContent:'center'},

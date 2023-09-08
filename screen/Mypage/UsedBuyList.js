@@ -9,17 +9,27 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const UsedBuyList = ({navigation, route}) => {
+  const {params} = route;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [mbId, setMbId] = useState();
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [buyList, setBuyList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [initLoading, setInitLoading] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -29,20 +39,40 @@ const UsedBuyList = ({navigation, route}) => {
 			if(!pageSt){
         setVisible(false);
         setVisible2(false);
+        setBuyList([]);
+        setNowPage(1);
+        setTotalPage(1);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () =>{
+		setIsLoading(false);
+
+		await Api.send('GET', 'list_buy', {is_api: 1, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('responseJson : ',responseJson.data);
+				setBuyList(responseJson.data);
+        //setNowPage();
+			}else{
+				setBuyList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', resultItem.result_text);
+			}
+		});
+
+		setIsLoading(true);
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

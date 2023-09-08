@@ -356,11 +356,11 @@ const Write2 = ({navigation, route}) => {
 		}
 		if(selectedList == ''){ ToastMessage('검수를 선택해 주세요.'); return false; }
 
-		if(size1 == ""){ ToastMessage('중량을 입력해 주세요.'); return false; }
-		if(size2 == ""){ ToastMessage('두께를 입력해 주세요.'); return false; }
-		if(size3 == ""){ ToastMessage('외경을 입력해 주세요.'); return false; }
-		if(size4 == ""){ ToastMessage('폭을 입력해 주세요.'); return false; }
-		if(size5 == ""){ ToastMessage('길이를 입력해 주세요.'); return false; }
+		// if(size1 == ""){ ToastMessage('중량을 입력해 주세요.'); return false; }
+		// if(size2 == ""){ ToastMessage('두께를 입력해 주세요.'); return false; }
+		// if(size3 == ""){ ToastMessage('외경을 입력해 주세요.'); return false; }
+		// if(size4 == ""){ ToastMessage('폭을 입력해 주세요.'); return false; }
+		// if(size5 == ""){ ToastMessage('길이를 입력해 주세요.'); return false; }
 		
 		if(!priceUnit || priceUnit == ""){ ToastMessage('가격 단위를 선택해 주세요.'); return false; }		
 

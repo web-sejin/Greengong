@@ -230,7 +230,6 @@ const Write1 = ({navigation, route}) => {
 				cnt = cnt + 1;
 			}
 		});
-
 		setFileCnt(cnt);
 	}
 

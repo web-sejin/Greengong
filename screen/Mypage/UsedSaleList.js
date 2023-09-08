@@ -9,6 +9,10 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -16,60 +20,140 @@ const opacityVal = 0.8;
 
 const SaleList = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
+  const {params} = route;
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [tabState, setTabState] = useState(1);
   const [idxVal, setIdxVal] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [itemList2, setItemList2] = useState([]);
+  const [nowPage2, setNowPage2] = useState(1);
+  const [totalPage2, setTotalPage2] = useState(1);
+  const [initLoading, setInitLoading] = useState(false);  
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '스크랩 싸게 팝니다.1',
-			loc: '중2동',
-			period: '2주전',
-			state: 1,
-			date: '2023.07.03',
-      cate: '스크랩',
-      price: '100,000',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '스크랩 싸게 팝니다.2',
-			loc: '중2동',
-			period: '2주전',
-			state: 1,
-			date: '2023.07.03',
-      cate: '스크랩',
-      price: '100,000',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '스크랩 싸게 팝니다.3',
-			loc: '중2동',
-			period: '2주전',
-			state: 2,
-			date: '2023.07.03',
-      cate: '스크랩',
-      price: '100,000',
-      score: 2,
-			review: 8,
-			like: 5,
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '스크랩 싸게 팝니다.4',
-			loc: '중2동',
-			period: '2주전',
-			state: 1,
-			date: '2023.07.03',
-      cate: '스크랩',
-      price: '100,000',
-		},
-	];
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		let isSubscribed = true;
 
+		if(!isFocused){
+			if(!pageSt){
+				setIsLoading(false);
+        setTabState(1);
+        setIdxVal('');
+        setVisible(false);
+        setVisible2(false);
+        getProfileData();
+			}
+		}else{
+			setRouteLoad(true);
+			setPageSt(!pageSt);
+		}
+
+		return () => isSubscribed = false;
+	}, [isFocused]);
+
+  useEffect(()=>{
+    getData();
+    getData2();
+  },[]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_sale', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_sale : ",responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);        
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
   const getList = ({item, index}) => (    
+    <View style={styles.saleListBox}>
+      <TouchableOpacity 
+        style={styles.modalOpenBtn}
+        activeOpacity={opacityVal}
+        onPress={()=>{
+          setIdxVal(item.id);
+          setVisible(true);
+        }}
+      >
+        <AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} />
+      </TouchableOpacity>
+      {index != 0 ? (
+      <>
+      <View style={styles.borderBot}></View>
+      <View style={styles.borderTop}></View>
+      </>
+      ) : null}
+      <View style={[styles.listInfoCate]}>
+        <Text style={styles.listInfoCateText}>{'['}{item.cate}{']'}</Text>
+      </View>
+      <View style={styles.listLi}>        
+        <View style={styles.listImgBox}>        
+          <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+        </View>			
+        <View style={styles.listInfoBox}>
+          <View style={styles.listInfoTitle}>
+            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+              {item.title}
+            </Text>
+          </View>
+          <View style={styles.listInfoDesc}>
+            <Text style={styles.listInfoDescText}>{item.loc}</Text>
+            <View style={styles.listInfoDescBar}></View>
+            <Text style={styles.listInfoDescText}>{item.period}</Text>
+          </View>         
+        </View>                 
+      </View>
+      <View style={styles.listInfoPriceBox}>
+        <View style={styles.listInfoPriceWrap}>
+          <View style={styles.listInfoPrice}>
+            <Text style={styles.listInfoPriceState}>예약중</Text>
+            <Text style={styles.listInfoPriceText}>{item.price}원</Text>
+          </View>
+          <View style={styles.listInfoDate}>
+            <Text style={styles.listInfoDateText}>{item.date}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+	);
+
+  const getData2 = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_end', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_end : ",responseJson);
+				setItemList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);        
+			}else{
+				setItemList2([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+  const getList2 = ({item, index}) => (    
     item.state == tabState ? (
 		<View style={styles.saleListBox}>
       <TouchableOpacity 
@@ -140,44 +224,8 @@ const SaleList = ({navigation, route}) => {
     ) : null
 	);
 
-	const isFocused = useIsFocused();
-	useEffect(() => {
-		let isSubscribed = true;
-
-		if(!isFocused){
-			if(!pageSt){
-				setIsLoading(false);
-        setTabState(1);
-        setIdxVal('');
-        setVisible(false);
-        setVisible2(false);
-			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
-			setRouteLoad(true);
-			setPageSt(!pageSt);
-		}
-
-		return () => isSubscribed = false;
-	}, [isFocused]);
-
-  useEffect(() => {
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
-  }, []);
-
   function fnTab(v){
-    setIsLoading(false);
     setTabState(v);
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
   }
 
   function fnDelete(){
@@ -195,11 +243,11 @@ const SaleList = ({navigation, route}) => {
         > 
           {tabState == 1 ? (
             <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 (3)</Text>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 ({itemList.length})</Text>
             <View style={styles.tabLine}></View>
             </>
           ) : (
-            <Text style={styles.tabBtnText}>판매중 (3)</Text>  
+            <Text style={styles.tabBtnText}>판매중 ({itemList.length})</Text>  
           )}
         </TouchableOpacity>
         <TouchableOpacity
@@ -209,27 +257,29 @@ const SaleList = ({navigation, route}) => {
         >
           {tabState == 2 ? (
             <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>거래완료 (27)</Text>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>거래완료 ({itemList2.length})</Text>
             <View style={styles.tabLine}></View>
             </>
           ) : (
-            <Text style={styles.tabBtnText}>거래완료 (27)</Text>  
+            <Text style={styles.tabBtnText}>거래완료 ({itemList2.length})</Text>  
           )}
         </TouchableOpacity>
       </View>
 
       {isLoading ? (
+        tabState == 1 ? (
         <FlatList
-				data={DATA}
-				renderItem={(getList)}
-				keyExtractor={item => item.id}		
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 판매글이 없습니다.</Text>
-					</View>
-				}
-			/>
+          data={itemList}
+          renderItem={(getList)}
+          keyExtractor={item => item.id}		
+          ListEmptyComponent={
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>등록된 판매글이 없습니다.</Text>
+            </View>
+          }
+        />
+        ) : null
       ) : (
         <View style={[styles.indicator]}>
           <ActivityIndicator size="large" />

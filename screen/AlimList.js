@@ -19,7 +19,10 @@ const AlimList = ({navigation, route}) => {
   const pan = useRef(new Animated.ValueXY()).current;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false); 
+  const [alimList, setAlimList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);	
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -28,6 +31,8 @@ const AlimList = ({navigation, route}) => {
 		if(!isFocused){
 			if(!pageSt){
 				setIsLoading(false);
+        setNowPage(1);
+        setTotalPage(1);
 			}
 		}else{
 			setRouteLoad(true);
@@ -38,26 +43,6 @@ const AlimList = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  const DATA = [
-		{
-			id: '1',
-      title: '문의 주신 내용의 답변입니다.',
-			date: '2023.02.02',
-		},
-		{
-			id: '2',
-      title: '[카워드] 상품이 등록되었습니다.',
-			date: '2023.02.02',
-		},
-		{
-			id: '10',
-      title: '[카워드] 상품이 등록되었습니다.',
-			date: '2023.02.02',
-		},
-	];
-
-  const dataLen = DATA.length;
-
   const renderRightActions = (dragX, index, idx) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
@@ -66,7 +51,8 @@ const AlimList = ({navigation, route}) => {
     return (
       <TouchableOpacity 
         style={[styles.deleteBtn]}
-        onPress={() => console.log(idx)}
+        activeOpacity={opacityVal}
+        onPress={() => {fnDelete(idx)}}
       >
         <Animated.Text
           style={[
@@ -86,14 +72,14 @@ const AlimList = ({navigation, route}) => {
       style={styles.noticeBtn}
       activeOpacity={opacityVal}
     >
-      <Swipeable renderRightActions={dragX => renderRightActions(dragX, index, item.id)}>                    
+      <Swipeable renderRightActions={dragX => renderRightActions(dragX, index, item.al_idx)}>                    
         <View style={[styles.noticeWrap, index == 0 ? styles.noticeWrap2 : null]}>
           <View style={styles.noticeListCont}>
             <View style={styles.noticeTit}>
-              <Text style={styles.noticeTitText}>{item.title}</Text>
+              <Text style={styles.noticeTitText}>{item.al_contents}</Text>
             </View>
             <View style={styles.noticeDate}>
-              <Text style={styles.noticeDateText}>2023.02.02</Text>
+              <Text style={styles.noticeDateText}>{item.al_date}</Text>
             </View>
           </View>
         </View>
@@ -102,20 +88,63 @@ const AlimList = ({navigation, route}) => {
 	);  
 
   const getData = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     await Api.send('GET', 'list_alarm', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_alarm : ",responseJson);     
+				//console.log("list_alarm : ",responseJson);   
+        setAlimList(responseJson.data);
+        setTotalPage(responseJson.total_page);
 			}else{
-				console.log('결과 출력 실패!', responseJson.result_text);
+				console.log('결과 출력 실패!', responseJson);
+        //console.log('결과 출력 실패!', responseJson.result_text);
         //ToastMessage(responseJson.result_text);
 			}
 		}); 
-    setIsLoading(false);
+    setIsLoading(true);
+  }
+  
+  const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_alarm', {is_api: 1, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          console.log('list_alarm more : ',responseJson.data);				
+          const addItem = alimList.concat(responseJson.data);				
+          setAlimList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
+
+  const fnDelete = async (idx) => {
+    const formData = {
+			is_api:1,				
+			al_idx:idx,
+		};
+
+    Api.send('POST', 'del_alarm', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('알람 삭제 성공 : ',responseJson);
+        getData();
+			}else{
+				console.log('알람 삭제 결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -123,9 +152,11 @@ const AlimList = ({navigation, route}) => {
 			<Header navigation={navigation} headertitle={'알림'} />
       {isLoading ? (
       <FlatList
-				data={DATA}
+				data={alimList}
 				renderItem={(getList)}
-				keyExtractor={item => item.id}		
+				keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+				onEndReached={moreData}
 				ListEmptyComponent={
 					<View style={styles.notData}>
 						<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
