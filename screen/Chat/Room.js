@@ -192,6 +192,7 @@ const Room = (props) => {
 	function fnMsgSelect(v){
 		setMsgText(v);
 		setVisible5(false);
+		scrollToBottom();
 	}
 
 	const scrollToBottom = () => {
@@ -245,7 +246,6 @@ const Room = (props) => {
 				onContentSizeChange={() => {
 					scrollToBottom();
           // 여기다가 어떤 경우에 스크롤을 하면 될지에 대한 조건문을 추가하면 된다.
-          //this.scrollView.scrollToEnd({animated:false});
         }}
 			>
 				<View style={styles.scrView}>
@@ -372,6 +372,10 @@ const Room = (props) => {
 							<TextInput
 								value={msgText}
 								onChangeText={(v) => {setMsgText(v)}}
+								onContentSizeChange={(event) => {
+									console.log("event : ".event);
+									//this.setState({ height: event.nativeEvent.contentSize.height })
+								}}
 								multiline={true}
 								placeholder={"메세지를 입력해 주세요."}
 								//신고하거나 신고 받아서 채팅이 불가능합니다.
@@ -383,7 +387,7 @@ const Room = (props) => {
 								activeOpacity={opacityVal}
 								onPress={()=>{addTodo()}}
 							>
-								<AutoHeightImage width={30} source={require("../../assets/img/icon_enter.png")} />
+								<AutoHeightImage width={35} source={require("../../assets/img/icon_enter.png")} />
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -725,12 +729,12 @@ const styles = StyleSheet.create({
 	otMessageDate: {fontFamily:Font.NotoSansRegular,fontSize:10,lineHeight:12,color:'#727272'},
 
 	msgArea: {paddingHorizontal:15,borderTopWidth:1,borderColor:'#E1E1E1'},	
-	msgAreaTop: {flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingVertical:20,},
-	msgPlusBtn: {width:30,height:42,alignItems:'center',justifyContent:'center',},
+	msgAreaTop: {flexDirection:'row',alignItems:'flex-end',justifyContent:'space-between',paddingVertical:15,},
+	msgPlusBtn: {width:30,height:50,alignItems:'center',justifyContent:'center',},
 	msgInputArea: {width:widnowWidth-72,position:'relative'},
-	msgInput: {width:widnowWidth-72,height:42,backgroundColor:'#fff',borderWidth:1,borderColor:'#E1E1E1',borderRadius:20,paddingLeft:15,paddingRight:45,fontSize:14,},
-	msgBtn: {position:'absolute',right:5,top:6,},
-	msgAreaBot: {flexDirection:'row',justifyContent:'center',paddingTop:10,paddingBottom:30,},
+	msgInput: {width:widnowWidth-72,maxHeight:80,backgroundColor:'#fff',borderWidth:1,borderColor:'#E1E1E1',borderRadius:20,paddingLeft:15,paddingRight:50,fontSize:14,},
+	msgBtn: {position:'absolute',right:5,top:7,},
+	msgAreaBot: {flexDirection:'row',justifyContent:'center',paddingTop:10,paddingBottom:20,},
 	msgOptBtn: {width:'25%',alignItems:'center'},
 	msgOptBtnText: {fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#353636',marginTop:10,},
 
