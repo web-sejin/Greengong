@@ -44,10 +44,13 @@ const Room = (props) => {
 	const [msgText, setMsgText] = useState('');
 	const [optionBox, setOptionBox] = useState(false);
 	const [radio, setRadio] = useState(1);
+	const [msgDbList, setDbMsgList] = useState([]);
 	const [msgList, setMsgList] = useState([]);
+	const [dbList, setDbList] = useState([]);
 	const [fireList, setFireList] = useState([]);
 	const [itemInfo, setItemInfo] = useState({});
 	const [isLoading, setIsLoading] = useState(false);
+	const [roomInfo, setRoomInfo] = useState({});
 	
 	let roomName = route.params.roomName;
 	if(!roomName || roomName==''){
@@ -69,7 +72,7 @@ const Room = (props) => {
 			}
 		}else{
 			setRouteLoad(true);
-			setPageSt(!pageSt);
+			setPageSt(!pageSt);			
 			getMsg();
 			getItemData();
 			getRoomData();
@@ -96,7 +99,7 @@ const Room = (props) => {
 	}
 
 	async function addTodo() {		
-		console.log(ref._collectionPath._parts[0]);
+		//console.log(ref._collectionPath._parts[0]);
     if(msgText == ""){
       ToastMessage("메세지를 입력해주세요.");
       return false;
@@ -104,6 +107,7 @@ const Room = (props) => {
 
 		const currentTime = currentTimer();
     Keyboard.dismiss();
+		//console.log("ref ::::", ref);
     await ref.add({
       content: msgText,
       userType: 1,
@@ -115,31 +119,47 @@ const Room = (props) => {
   }
 
   useEffect(() => {
-    return ref.orderBy('datetime', 'asc').limit(1).onSnapshot(querySnapshot => {
+		let TestArrayList = [];
+		let keyArrayList = ['test1', 'test2'];
+		let valArrayList = [{age:32, name:'빨강소'}, {age:28, name:'코알라'}, {age:21, name:'사오정'}];
+
+		// for(var i=0; i<keyArrayList.length; i++){
+		// 	let key = keyArrayList[i];
+		// 		TestArrayList[key] = valArrayList[i];
+		// }
+		// console.log("TestArrayList : ",TestArrayList);
+
+    return ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {
       const list = [];
-			const arr1 = [];
       //console.log("querySnapshot : ",querySnapshot)
       querySnapshot.forEach((doc, index) => {
-        const {content, complete, userType, datetime} = doc.data();
+        const {content, complete, userType, datetime} = doc.data();							
+				const dateSplit = datetime.split(' ')[0];			
+				console.log("doc id : ",doc.id);
 				
-				//console.log("doc : ",doc);
-				const dateSplit = datetime.split(' ')[0];	
-				//console.log(dateSplit);
-				
-				if(arr1.indexOf(dateSplit) !== -1){
-					console.log('a');					
-				}else{
-					console.log('b');
-					//arr1.push(dateSplit);
-				}
+				const formData = {
+					is_api:1,				
+					recv_idx:recv_idx,
+					page_code:page_code,
+					page_idx:page_idx,
+					ch_msg:content,
+					msg_key:doc.id,
+					ch_file:'',
+				};
 
-				// arr1.dateSplit.push({
-        //   id: doc.id,
-        //   content,
-        //   complete,
-        //   userType,
-        //   datetime,
-        // });
+				Api.send('POST', 'send_chat', formData, (args)=>{
+					let resultItem = args.resultItem;
+					let responseJson = args.responseJson;
+		
+					if(responseJson.result === 'success'){
+						console.log('성공 : ',responseJson);				
+						//navigation.navigate('Home', {isSubmit: true});
+					}else{
+						console.log('결과 출력 실패!', resultItem.result_text);
+						//ToastMessage(responseJson.result_text);
+					}
+				});
+
 
         list.push({
           id: doc.id,
@@ -149,8 +169,22 @@ const Room = (props) => {
           datetime,
         });
       });
-			//console.log(arr1);
-			//console.log(list);
+
+			//console.log("list : ",list);
+			let tmp = "";
+			let j = -1;
+			for(var i=0; i<list.length; i++){
+				let dateVal = list[i]['datetime'].split(' ')[0];
+				if(dateVal != tmp) {
+					j++;
+					TestArrayList[j] = { 'date':dateVal, 'list':[] };
+					TestArrayList[j].list.push(list[i]);
+					tmp = dateVal;
+				} else {
+					TestArrayList[j].list.push(list[i]);
+				}
+			}
+			//console.log("::::",TestArrayList[1].list);
       setFireList(list);
         
       // if (!loading) {
@@ -202,6 +236,7 @@ const Room = (props) => {
     setVisible(true);
   }
 
+	//자주 쓰는 메세지
 	const getMsg = async () => {
     await Api.send('GET', 'list_text', {'is_api': 1}, (args)=>{
 			let resultItem = args.resultItem;
@@ -244,7 +279,9 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("in_chat : ",responseJson);				
+				console.log("in_chat : ",responseJson);				
+				setRoomInfo(responseJson);
+				setDbList(responseJson.data);
 			}else{
 				//setItemList([]);				
 				//console.log('결과 출력 실패! : ', resultItem.result_text);
@@ -280,6 +317,7 @@ const Room = (props) => {
 		setVisible5(false);
 		scrollToBottom();
 	}
+	
 
 	const scrollToBottom = () => {
     if (scrollViewRef.current) {
