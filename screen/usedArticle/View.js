@@ -368,6 +368,14 @@ const UsedView = (props) => {
 		});
   }
 
+  function chatCheck(){    
+    if(myInfo.mb_idx == itemInfo.pd_mb_idx){
+      navigation.navigate('UsedChat', {idx:idx});
+    }else{
+      chatDeal();
+    }
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -677,10 +685,7 @@ const UsedView = (props) => {
               <TouchableOpacity 
                 style={[styles.nextBtn, itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? styles.nextBtn2 : styles.nextBtn4, styles.nextBtn3]}
                 activeOpacity={opacityVal}
-                onPress={() => {
-                  chatDeal();
-                  //navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'product', recv_idx:prdMbIdx});
-                }}
+                onPress={() => {chatCheck();}}
               >
                 <Text style={styles.nextBtnText}>채팅하기</Text>
               </TouchableOpacity>

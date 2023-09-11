@@ -1,25 +1,21 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {ActivityIndicator, Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Animated, BackHandler, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, Linking} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useRoute } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import {initializeApp} from "@react-native-firebase/app";
 import firestore from '@react-native-firebase/firestore';
 import {getStorage} from "@react-native-firebase/storage";
 
-import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
 
-const firebaseConfig = {
-  apiKey: '<your-api-key>',
-  authDomain: '<your-auth-domain>',
-  databaseURL: '<your-database-url>',
-  storageBucket: '<your-storage-bucket-url>'
-};
+import Api from '../../Api';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -44,13 +40,13 @@ const Room = (props) => {
 	const [msgText, setMsgText] = useState('');
 	const [optionBox, setOptionBox] = useState(false);
 	const [radio, setRadio] = useState(1);
-	const [msgDbList, setDbMsgList] = useState([]);
 	const [msgList, setMsgList] = useState([]);
 	const [dbList, setDbList] = useState([]);
 	const [fireList, setFireList] = useState([]);
 	const [itemInfo, setItemInfo] = useState({});
 	const [isLoading, setIsLoading] = useState(false);
 	const [roomInfo, setRoomInfo] = useState({});
+	const [phone, setPhone] = useState();
 	
 	let roomName = route.params.roomName;
 	if(!roomName || roomName==''){
@@ -113,6 +109,7 @@ const Room = (props) => {
       userType: 1,
       complete: false,
       datetime: currentTime,
+			mb_idx:userInfo?.mb_idx,
 			imgUrl: '',
     });
     setMsgText('');
@@ -120,30 +117,22 @@ const Room = (props) => {
 
   useEffect(() => {
 		let TestArrayList = [];
-		let keyArrayList = ['test1', 'test2'];
-		let valArrayList = [{age:32, name:'빨강소'}, {age:28, name:'코알라'}, {age:21, name:'사오정'}];
-
-		// for(var i=0; i<keyArrayList.length; i++){
-		// 	let key = keyArrayList[i];
-		// 		TestArrayList[key] = valArrayList[i];
-		// }
-		// console.log("TestArrayList : ",TestArrayList);
 
     return ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {
       const list = [];
       //console.log("querySnapshot : ",querySnapshot)
       querySnapshot.forEach((doc, index) => {
-        const {content, complete, userType, datetime} = doc.data();							
+        const {content, complete, userType, datetime, mb_idx} = doc.data();							
 				const dateSplit = datetime.split(' ')[0];			
-				console.log("doc id : ",doc.id);
-				
+				//console.log("doc id : ",doc.id);
+				//console.log(page_idx);
 				const formData = {
 					is_api:1,				
 					recv_idx:recv_idx,
 					page_code:page_code,
 					page_idx:page_idx,
 					ch_msg:content,
-					msg_key:doc.id,
+					msg_key:doc.id,					
 					ch_file:'',
 				};
 
@@ -152,14 +141,13 @@ const Room = (props) => {
 					let responseJson = args.responseJson;
 		
 					if(responseJson.result === 'success'){
-						console.log('성공 : ',responseJson);				
+						//console.log('채팅 성공 : ',responseJson);				
 						//navigation.navigate('Home', {isSubmit: true});
 					}else{
-						console.log('결과 출력 실패!', resultItem.result_text);
+						console.log('결과 출력 실패!!!', resultItem.result_text);
 						//ToastMessage(responseJson.result_text);
 					}
 				});
-
 
         list.push({
           id: doc.id,
@@ -167,6 +155,7 @@ const Room = (props) => {
           complete,
           userType,
           datetime,
+					mb_idx,
         });
       });
 
@@ -186,7 +175,7 @@ const Room = (props) => {
 			}
 			//console.log("::::",TestArrayList[1].list);
       setFireList(list);
-        
+			getRoomData();
       // if (!loading) {
       //   setLoading(true);
       // }
@@ -256,14 +245,15 @@ const Room = (props) => {
 
 	//판매 상품 정보
 	const getItemData = async () => {
-		await Api.send('GET', 'get_chat_room_product', {'is_api': 1, pd_idx:page_idx}, (args)=>{
+		await Api.send('GET', 'get_chat_room_product', {'is_api': 1, pd_idx:page_idx, cr_idx:route.params.cr_idx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_chat_room_product : ",responseJson);
+				console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
+				setPhone(responseJson.mb_hp050);
 			}else{
 				//setItemList([]);				
 				//console.log('결과 출력 실패! : ', resultItem.result_text);
@@ -281,7 +271,23 @@ const Room = (props) => {
 			if(responseJson.result === 'success' && responseJson){
 				console.log("in_chat : ",responseJson);				
 				setRoomInfo(responseJson);
-				setDbList(responseJson.data);
+
+				const dbList = responseJson.data;
+				let TestDbList = [];
+				let tmp = "";
+				let j = -1;
+				for(var i=0; i<dbList.length; i++){
+					let dateVal = dbList[i]['ch_regdate_org'].split(' ')[0];
+					if(dateVal != tmp) {
+						j++;
+						TestDbList[j] = { 'date':dateVal, 'list':[] };
+						TestDbList[j].list.push(dbList[i]);
+						tmp = dateVal;
+					} else {
+						TestDbList[j].list.push(dbList[i]);
+					}
+				}
+				setDbList(TestDbList);
 			}else{
 				//setItemList([]);				
 				//console.log('결과 출력 실패! : ', resultItem.result_text);
@@ -297,18 +303,18 @@ const Room = (props) => {
 		// 	recv_idx:prdMbIdx
 		// };
 
-    // Api.send('POST', 'save_block', formData, (args)=>{
-		// 	let resultItem = args.resultItem;
-		// 	let responseJson = args.responseJson;
+    Api.send('POST', 'save_block', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
 
-		// 	if(responseJson.result === 'success'){
-		// 		console.log('차단 성공 : ',responseJson);
-    //     navigation.navigate('Home', {isSubmit: true});
-		// 	}else{
-		// 		console.log('결과 출력 실패!', resultItem);
-		// 		ToastMessage(responseJson.result_text);
-		// 	}
-		// });
+			if(responseJson.result === 'success'){
+				console.log('차단 성공 : ',responseJson);
+        navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   } 
 
 	//자주 쓰는 메세지 선택
@@ -317,7 +323,11 @@ const Room = (props) => {
 		setVisible5(false);
 		scrollToBottom();
 	}
-	
+
+	//전화걸기
+	function fnCall(){
+		Linking.openURL(`tel:${phone}`)
+	}	
 
 	const scrollToBottom = () => {
     if (scrollViewRef.current) {
@@ -362,7 +372,7 @@ const Room = (props) => {
 						</Text>
 					</View>
 					<View style={styles.listInfoDesc}>
-						<Text style={styles.listInfoDescText}>30,000원</Text>
+						<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>
 					</View>
 					{/* <TouchableOpacity 
 						style={styles.listInfoState}
@@ -389,7 +399,71 @@ const Room = (props) => {
 						<Text style={styles.alertBoxText}>본 플랫폼은 기능 범주를 벗어난 사기 피해를 책임지지 않습니다.</Text>
 					</View>
 
-					<View style={styles.ChatDateBox}>
+					{dbList.map((item, index) => {
+						const date = (item.date).split('-');						
+						const innerList = item.list;
+						return (
+							<View 
+								key={index}
+								style={styles.ChatDateBox}
+							>
+								<View style={styles.dateArea}>
+									<Text style={styles.dateAreaText}>{date[0]}년 {date[1]}월 {date[2]}일</Text>
+								</View>
+
+								<View style={styles.chatMsgArea}>
+									{innerList.map((item2, index2) => {
+										const content = item2.ch_msg;
+										let prevContinue = styles.mgtop20;
+										if(index2 != 0){		
+											if(innerList[index2-1].recv_idx == innerList[index2].recv_idx){
+												prevContinue = styles.mgtop5;
+											}
+										}
+										
+										return(
+											item2.recv_idx==userInfo?.mb_idx ? (
+												<View 
+													key={item2.ch_idx}
+													style={[styles.myMessage, prevContinue]}
+												>
+													<View style={styles.myMessageTextDate}>
+														<Text style={styles.myMessageDate}>{item2.ch_date}</Text>
+													</View>
+													<View style={styles.myMessageTextBox}>
+														<Text style={styles.myMessageText}>{content}</Text>
+													</View>
+												</View>
+											) : (
+												<View 
+													key={item2.ch_idx}
+													style={[styles.otMessage, prevContinue]}
+												>
+													<View style={styles.otMessageWrap}>
+														<View style={styles.otImg}>														
+															{item2.image ? (
+																<AutoHeightImage width={35} source={{uri: item2.image}} />
+															) : (
+																<AutoHeightImage width={35} source={require("../../assets/img/sample1.jpg")} />
+															)}
+														</View>					
+														<View style={styles.otMessageTextBox}>
+															<Text style={styles.otMessageText}>{content}</Text>
+														</View>
+													</View>
+													<View style={styles.otMessageTextDate}>
+														<Text style={styles.myMessageDate}>{item2.ch_date}</Text>
+													</View>
+												</View>
+											)
+										)
+									})}
+								</View>
+							</View>
+						)
+					})}
+
+					{/* <View style={styles.ChatDateBox}>
 						<View style={styles.dateArea}>
 							<Text style={styles.dateAreaText}>2023년 07월 03일</Text>
 						</View>
@@ -402,20 +476,19 @@ const Room = (props) => {
 								
 								let prevContinue = styles.mgtop20;
 								if(index != 0){		
-									if(fireList[index-1].userType == item.userType){
+									if(fireList[index-1].mb_idx == userInfo?.mb_idx){
 										prevContinue = styles.mgtop5;
 									}
 								}
 
 								return(
-									item.userType==1 ? (
+									item.mb_idx==userInfo?.mb_idx ? (
 										<View 
 											key={item.id}
 											style={[styles.myMessage, prevContinue]}
 										>
 											<View style={styles.myMessageTextDate}>
 												<Text style={styles.myMessageDate}>
-													{/* 오후 05:05 */}
 													{onlyTIME}
 												</Text>
 											</View>
@@ -444,7 +517,7 @@ const Room = (props) => {
 								)
 							})}
 						</View>
-					</View>
+					</View> */}
 
 					{/* <View style={[styles.ChatDateBox, styles.mgtop80]}>
 						<View style={styles.dateArea}>
@@ -756,12 +829,12 @@ const Room = (props) => {
 				></Pressable>
 				<View style={[styles.modalCont3]}>
 					<View style={styles.avatarTitle}>
-            <Text style={styles.avatarTitleText}>상대방 차단</Text>
+            <Text style={styles.avatarTitleText}>전화걸기</Text>
           </View>
           <View style={styles.avatarDesc}>
             <Text style={styles.avatarDescText}>거래 완료 할 회원에게 별점으로</Text>
 						<Text style={styles.avatarDescText}>거래를 완료를 하여 주세요.</Text>
-						<Text style={[styles.avatarDescText, styles.avatarDescText2, styles.avatarDescText3]}>050-1234-5678</Text>
+						<Text style={[styles.avatarDescText, styles.avatarDescText2, styles.avatarDescText3]}>{phone}</Text>
           </View>
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
@@ -772,7 +845,7 @@ const Room = (props) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {}}
+              onPress={() => {fnCall()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -851,7 +924,7 @@ const styles = StyleSheet.create({
 	icon_alert: {position:'absolute',left:15,top:15},
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
-	ChatDateBox: {marginTop:15,},
+	ChatDateBox: {marginTop:40,},
 	dateArea: {marginBottom:0,},
 	dateAreaText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#727272'},
 	chatMsgArea: {},
@@ -939,4 +1012,13 @@ const styles = StyleSheet.create({
 	notMsgDataText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:17,color:'#999',textAlign:'center'},
 })
 
-export default Room
+//export default Room
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(Room);
