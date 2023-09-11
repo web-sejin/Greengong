@@ -350,6 +350,24 @@ const UsedView = (props) => {
 		});
   }
 
+  const chatDeal = async () => {
+    //
+    await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:prdMbIdx, page_code:'product', page_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("in_chat : ",responseJson);				
+        const roomName = 'product_'+responseJson.cr_idx;
+        navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'product', recv_idx:prdMbIdx, roomName:roomName});
+			}else{
+				//setItemList([]);				
+				//console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -660,7 +678,8 @@ const UsedView = (props) => {
                 style={[styles.nextBtn, itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? styles.nextBtn2 : styles.nextBtn4, styles.nextBtn3]}
                 activeOpacity={opacityVal}
                 onPress={() => {
-                  navigation.navigate('UsedChat', {idx:idx});
+                  chatDeal();
+                  //navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'product', recv_idx:prdMbIdx});
                 }}
               >
                 <Text style={styles.nextBtnText}>채팅하기</Text>

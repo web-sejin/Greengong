@@ -5,12 +5,21 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
+import {initializeApp} from "@react-native-firebase/app";
 import firestore from '@react-native-firebase/firestore';
+import {getStorage} from "@react-native-firebase/storage";
 
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
+
+const firebaseConfig = {
+  apiKey: '<your-api-key>',
+  authDomain: '<your-auth-domain>',
+  databaseURL: '<your-database-url>',
+  storageBucket: '<your-storage-bucket-url>'
+};
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -20,6 +29,10 @@ const opacityVal = 0.8;
 const Room = (props) => {
 	let scrollViewRef = useRef(null);
 	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const page_idx = route.params.pd_idx;
+	const page_code = route.params.page_code;
+	const recv_idx = route.params.recv_idx;
+
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [visible, setVisible] = useState(false);
@@ -27,14 +40,20 @@ const Room = (props) => {
 	const [visible3, setVisible3] = useState(false);
 	const [visible4, setVisible4] = useState(false);
 	const [visible5, setVisible5] = useState(false);
+	const [img, setImg] = useState('');
 	const [msgText, setMsgText] = useState('');
 	const [optionBox, setOptionBox] = useState(false);
 	const [radio, setRadio] = useState(1);
 	const [msgList, setMsgList] = useState([]);
 	const [fireList, setFireList] = useState([]);
+	const [itemInfo, setItemInfo] = useState({});
 	const [isLoading, setIsLoading] = useState(false);
-  const ref = firestore().collection('message');
-
+	
+	let roomName = route.params.roomName;
+	if(!roomName || roomName==''){
+		roomName = 'test';
+	}
+	const ref = firestore().collection(roomName);
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
@@ -52,6 +71,8 @@ const Room = (props) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 			getMsg();
+			getItemData();
+			getRoomData();
 		}
 
 		return () => isSubscribed = false;
@@ -74,29 +95,52 @@ const Room = (props) => {
 		 return splt2[0]+':'+splt2[1];
 	}
 
-	async function addTodo() {
+	async function addTodo() {		
+		console.log(ref._collectionPath._parts[0]);
     if(msgText == ""){
       ToastMessage("메세지를 입력해주세요.");
       return false;
     }
 
-    const currentTime = currentTimer();		
+		const currentTime = currentTimer();
     Keyboard.dismiss();
     await ref.add({
       content: msgText,
       userType: 1,
       complete: false,
       datetime: currentTime,
+			imgUrl: '',
     });
     setMsgText('');
   }
 
   useEffect(() => {
-    return ref.orderBy('datetime', 'asc').onSnapshot(querySnapshot => {
+    return ref.orderBy('datetime', 'asc').limit(1).onSnapshot(querySnapshot => {
       const list = [];
+			const arr1 = [];
       //console.log("querySnapshot : ",querySnapshot)
       querySnapshot.forEach((doc, index) => {
-        const {content, complete, userType, datetime} = doc.data();				
+        const {content, complete, userType, datetime} = doc.data();
+				
+				//console.log("doc : ",doc);
+				const dateSplit = datetime.split(' ')[0];	
+				//console.log(dateSplit);
+				
+				if(arr1.indexOf(dateSplit) !== -1){
+					console.log('a');					
+				}else{
+					console.log('b');
+					//arr1.push(dateSplit);
+				}
+
+				// arr1.dateSplit.push({
+        //   id: doc.id,
+        //   content,
+        //   complete,
+        //   userType,
+        //   datetime,
+        // });
+
         list.push({
           id: doc.id,
           content,
@@ -105,6 +149,7 @@ const Room = (props) => {
           datetime,
         });
       });
+			//console.log(arr1);
 			//console.log(list);
       setFireList(list);
         
@@ -114,6 +159,7 @@ const Room = (props) => {
     });
 	}, []);
 
+	//앨범
 	const chooseImage = () => {
     ImagePicker.openPicker({
       width: 300,
@@ -121,14 +167,16 @@ const Room = (props) => {
       cropping: true,
     })
 		.then(image => {
-			console.log(image.path);
-			//setUri(image.path);
+			//console.log(image.path);
+			setImg(image);
+			imageUpload();
 		})
 		.finally(()=>{
 			console.log('chooseImage finally');
 		});
   };
 
+	//카메라
   const openCamera = () => {
     ImagePicker.openCamera({
       width: 300,
@@ -136,14 +184,19 @@ const Room = (props) => {
       cropping: true,
     })
 		.then(image => {
-			console.log(image.path);
-			//setUri(image.path);
-			//props.onChange?.(image);
+			console.log(image);
+			setImg(image);
+			imageUpload();
 		})
 		.finally(()=>{
 			console.log('openCamera finally');
 		});
   };
+
+	//이미지 업로드
+	const imageUpload = async () => {
+    
+  }
 
 	const ModalOn = () => {
     setVisible(true);
@@ -165,6 +218,39 @@ const Room = (props) => {
 			}
 		}); 
   }
+
+	//판매 상품 정보
+	const getItemData = async () => {
+		await Api.send('GET', 'get_chat_room_product', {'is_api': 1, pd_idx:page_idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_chat_room_product : ",responseJson);
+				setItemInfo(responseJson);
+			}else{
+				//setItemList([]);				
+				//console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
+	}
+
+	//방 정보
+	const getRoomData = async () => {
+		await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:recv_idx, page_code:page_code, page_idx:page_idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("in_chat : ",responseJson);				
+			}else{
+				//setItemList([]);				
+				//console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
+	}
 
 	//차단하기
   function fnBlock(){
@@ -213,30 +299,40 @@ const Room = (props) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
-        headertitle={'상대방 닉네임'} 
+        headertitle={itemInfo.mb_nick} 
         ModalEvent={ModalOn} 
       />
 			<View	style={[styles.chatItemBox]}>    
 				<View style={styles.chatItemImg}>
-					<AutoHeightImage width={66} source={require("../../assets/img/sample1.jpg")} />
+					{itemInfo.image ? (
+						<AutoHeightImage width={66} source={{uri: itemInfo.image}} />
+					) : (
+						<AutoHeightImage width={66} source={require("../../assets/img/sample1.jpg")} />
+					)}
 				</View>
 				<View style={styles.listInfoBox}>
 					<View style={styles.listInfoCate}>
-						<Text style={styles.listInfoCateText}>중고거래</Text>
+						{page_code == "product" ? (
+							<Text	Text style={styles.listInfoCateText}>중고거래</Text>
+						) : (
+							<Text	Text style={styles.listInfoCateText}>매칭</Text>
+						)}
 					</View>
 					<View style={styles.listInfoTitle}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>[판매중] [스크랩] 급매합니다.</Text>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+							[{itemInfo.pd_status}] [{itemInfo.c1_name}] {itemInfo.pd_name}
+						</Text>
 					</View>
 					<View style={styles.listInfoDesc}>
 						<Text style={styles.listInfoDescText}>30,000원</Text>
 					</View>
-					<TouchableOpacity 
+					{/* <TouchableOpacity 
 						style={styles.listInfoState}
 						activeOpacity={opacityVal}
 						onPress={()=>{}}
 					>
 						<Text style={[styles.listInfoStateText]}>거래평가 작성</Text>
-					</TouchableOpacity>
+					</TouchableOpacity> */}
 				</View>          
 			</View>
 
@@ -372,10 +468,6 @@ const Room = (props) => {
 							<TextInput
 								value={msgText}
 								onChangeText={(v) => {setMsgText(v)}}
-								onContentSizeChange={(event) => {
-									console.log("event : ".event);
-									//this.setState({ height: event.nativeEvent.contentSize.height })
-								}}
 								multiline={true}
 								placeholder={"메세지를 입력해 주세요."}
 								//신고하거나 신고 받아서 채팅이 불가능합니다.
@@ -385,7 +477,7 @@ const Room = (props) => {
 							<TouchableOpacity 
 								style={styles.msgBtn}
 								activeOpacity={opacityVal}
-								onPress={()=>{addTodo()}}
+								onPress={()=>{addTodo();}}
 							>
 								<AutoHeightImage width={35} source={require("../../assets/img/icon_enter.png")} />
 							</TouchableOpacity>
@@ -451,8 +543,9 @@ const Room = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>차단하기</Text>
 						</TouchableOpacity>
+						
 						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.delete]}
+							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {
 								setVisible3(true);
@@ -460,6 +553,16 @@ const Room = (props) => {
 							}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>신고하기</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity 
+							style={[styles.modalCont2Btn, styles.delete]}
+							activeOpacity={opacityVal}
+							onPress={() => {
+								setVisible(false);
+							}}
+						>
+							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>나가기</Text>
 						</TouchableOpacity>
 					</View>
 					<TouchableOpacity 
@@ -693,7 +796,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
 	chatItemBox: {display:'flex',flexDirection:'row',alignItems:'center',padding:20,borderTopWidth:1,borderColor:'#E9EEF6'},	
 	chatItemImg: {width:66,height:66,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},
-	listInfoBox: {width:(innerWidth - 66),paddingLeft:15,paddingRight:90,position:'relative'},
+	listInfoBox: {width:(innerWidth - 66),paddingHorizontal:15,/*paddingRight:90,*/position:'relative'},
   listInfoCate: {},
   listInfoCateText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:17,color:'#000'},
 	listInfoTitle: {marginTop:5},
@@ -711,9 +814,9 @@ const styles = StyleSheet.create({
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
 	ChatDateBox: {marginTop:15,},
-	dateArea: {marginBottom:-20,},
+	dateArea: {marginBottom:0,},
 	dateAreaText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#727272'},
-	chatMsgArea: {marginTop:20,},
+	chatMsgArea: {},
 	myMessage: {flexDirection:'row',alignItems:'flex-end',justifyContent:'flex-end'},
 	myMessageTextDate: {marginRight:10,},
 	myMessageDate: {fontFamily:Font.NotoSansRegular,fontSize:10,lineHeight:12,color:'#727272'},
@@ -730,9 +833,9 @@ const styles = StyleSheet.create({
 
 	msgArea: {paddingHorizontal:15,borderTopWidth:1,borderColor:'#E1E1E1'},	
 	msgAreaTop: {flexDirection:'row',alignItems:'flex-end',justifyContent:'space-between',paddingVertical:15,},
-	msgPlusBtn: {width:30,height:50,alignItems:'center',justifyContent:'center',},
+	msgPlusBtn: {width:30,height:52,alignItems:'center',justifyContent:'center',},
 	msgInputArea: {width:widnowWidth-72,position:'relative'},
-	msgInput: {width:widnowWidth-72,maxHeight:80,backgroundColor:'#fff',borderWidth:1,borderColor:'#E1E1E1',borderRadius:20,paddingLeft:15,paddingRight:50,fontSize:14,},
+	msgInput: {width:widnowWidth-72,maxHeight:60,backgroundColor:'#fff',borderWidth:1,borderColor:'#E1E1E1',borderRadius:20,paddingLeft:15,paddingRight:50,fontSize:14,color:'#000'},
 	msgBtn: {position:'absolute',right:5,top:7,},
 	msgAreaBot: {flexDirection:'row',justifyContent:'center',paddingTop:10,paddingBottom:20,},
 	msgOptBtn: {width:'25%',alignItems:'center'},

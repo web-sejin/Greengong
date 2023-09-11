@@ -560,7 +560,7 @@ const Modify1 = ({navigation, route}) => {
 				console.log('성공 : ',responseJson);
 				navigation.navigate('Home', {isSubmit: true});
 			}else{
-				console.log('결과 출력 실패!', resultItem);
+				console.log('결과 출력 실패!', resultItem.result_text);
 				//ToastMessage(responseJson.result_text);
 			}
 		});
