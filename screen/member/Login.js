@@ -196,7 +196,7 @@ const Login = (props) => {
 					}					
 				}else{
 					console.log('결과 출력 실패!', resultItem);
-					ToastMessage(responseJson.result_text);
+					//ToastMessage(responseJson.result_text);
 				}
 			});
 			
@@ -240,6 +240,8 @@ const Login = (props) => {
 							placeholder={'이메일 입력'}
 							placeholderTextColor="#C5C5C6"
 							style={[styles.input]}
+							returnKyeType='done'
+							onSubmitEditing={_sendLogin}
 						/>
 					</View>
 					<View style={[styles.loginIptBox, styles.loginIptBox2]}>
@@ -251,6 +253,8 @@ const Login = (props) => {
 							placeholder={'비밀번호 입력'}
 							placeholderTextColor="#C5C5C6"
 							style={[styles.input]}
+							returnKyeType='done'
+							onSubmitEditing={_sendLogin}
 						/>
 					</View>
 					<View style={styles.loginBtnBox}>

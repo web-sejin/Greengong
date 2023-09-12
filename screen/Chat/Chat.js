@@ -105,7 +105,8 @@ const Chat = (props) => {
 			activeOpacity={opacityVal}
 			onPress={() => {
 				const roomName = 'product_'+item.cr_idx;
-        navigation.navigate('ChatRoom', {pd_idx:'', page_code:'product', recv_idx:item.recv_idx, roomName:roomName, cr_idx:item.cr_idx});
+				console.log(item.cr_idx);
+        navigation.navigate('ChatRoom', {pd_idx:item.page_idx, page_code:'product', recv_idx:item.recv_idx, roomName:roomName, cr_idx:item.cr_idx});
 			}}
 		>
 			<View style={styles.chatBoxLeft}>
@@ -143,13 +144,97 @@ const Chat = (props) => {
 						<AutoHeightImage width={47} source={{uri: item.pd_image}} />
 					) : null}
 				</View>
-			</View>
+			</View>			
 		</TouchableOpacity>
 	);
 
 	const getMatchList = async () => {
-
+		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('list_chat_match_room : ',responseJson);
+				setMatchList(responseJson.data);
+				setTotalPage2(responseJson.total_page);
+			}else{
+				setMatchList([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
 	}
+
+	const moreData2 = async () => {    
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_chat_match_room', {is_api: 1, page:nowPage2+1, keyword: inputText}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = matchList.concat(responseJson.data);				
+          setMatchList(addItem);			
+          setNowPage(nowPage2+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
+
+	const getList2 = ({item, index}) => (    
+    <TouchableOpacity
+			style={[styles.chatLi, index == 0 ? styles.chatLi2 : null]}
+			activeOpacity={opacityVal}
+			onPress={() => {
+				const roomName = 'match_'+item.cr_idx;
+				console.log(item.cr_idx);
+        navigation.navigate('ChatRoom', {pd_idx:item.page_idx, page_code:'match', recv_idx:item.recv_idx, roomName:roomName, cr_idx:item.cr_idx});
+			}}
+		>
+			<View style={styles.chatBoxLeft}>
+				<View style={styles.chatBoxProfile}>
+					<View style={styles.chatBoxProfileImg}>
+						{item.mb_img ? (
+							<AutoHeightImage width={69} source={{uri: item.mb_img}} />
+						) : (
+							<AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />
+						)}
+					</View>
+					<View style={styles.readCnt}>
+						<Text style={styles.readCntText}>{item.cr_unread}</Text>
+					</View>
+				</View>
+				<View style={styles.chatBoxInfo}>
+					<View style={styles.chatBoxName}>
+						<Text style={styles.chatBoxNameText}>{item.mb_nick}</Text>
+					</View>
+					<View style={styles.chatBoxLoc}>					
+						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+						<Text style={styles.chatBoxLocText}>{item.pd_dong}</Text>
+					</View>
+					<View style={styles.chatBoxCont}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.chatBoxContText}>{item.cr_last_msg}</Text>
+					</View>
+				</View>
+			</View>
+			<View style={styles.chatBoxRight}>
+				<View style={styles.chatBoxDate}>
+					<Text style={styles.chatBoxDateText}>{item.cr_lastdate}</Text>
+				</View>
+				<View style={styles.chatItemBox}>
+					{item.pd_image ? (
+						<AutoHeightImage width={47} source={{uri: item.pd_image}} />
+					) : null}
+				</View>
+			</View>			
+		</TouchableOpacity>
+	);
 	
 	const chatSch = async () => {
 		getProductList();
@@ -232,23 +317,44 @@ const Chat = (props) => {
 			</View>
 			
 			{tabState == 1 ? (
-			<FlatList
-				data={prdList}
-				renderItem={(getList)}
-				keyExtractor={(item, index) => index.toString()}	
-				onEndReachedThreshold={0.6}
-				onEndReached={moreData}
-				style={styles.flatList}
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-					</View>
-				}
-			/>
-			) : null }
+				<FlatList
+					data={prdList}
+					renderItem={(getList)}
+					keyExtractor={(item, index) => index.toString()}	
+					onEndReachedThreshold={0.6}
+					onEndReached={moreData}
+					style={styles.flatList}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+						</View>
+					}
+				/>
+			) : (
+				<FlatList
+					data={matchList}
+					renderItem={(getList2)}
+					keyExtractor={(item, index) => index.toString()}	
+					onEndReachedThreshold={0.6}
+					onEndReached={moreData2}
+					style={styles.flatList}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+						</View>
+					}
+				/>
+			)}
 	
 			<View style={{height:90}}></View>
+			
+			{/* {!isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null} */}
 		</SafeAreaView>
 	)
 }
@@ -289,8 +395,7 @@ const styles = StyleSheet.create({
 	chatBoxDateText: {fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#919191'},
 	chatItemBox: {width:47,height:47,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:4,},
 
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 });
 
 export default Chat

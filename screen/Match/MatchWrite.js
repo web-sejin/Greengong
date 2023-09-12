@@ -49,20 +49,6 @@ const MatchWrite = ({navigation, route}) => {
 		{'idx': 10, 'txt': '파일10', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
 	];
 
-	const dealMethod2Ary = [
-		{ label: '집게차 요청', value: '1' },
-		{ label: '지게차 요청', value: '2' },
-		{ label: '운반차량 요청', value: '3' },
-		{ label: '상담필요', value: '4' },
-	]
-
-	const payMethodAry = [
-		{ label: '계산서', value: '1' },
-		{ label: '계좌이체', value: '2' },
-		{ label: '현금', value: '3' },
-		{ label: '직접입력', value: '4' },
-	]
-
 	const contentMsg = '도면의 치수, 가공 용도, 상세 가공 요청을파트너에게 알려주세요. 요청 사항이 상세할수록, 업체로부터 정확한 답변을 받을 확률이 높아집니다.\n공차\n조립성\n도색\n표면처리\n도면의 치수\n가공용도\n상세 가공 요청';
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -99,6 +85,10 @@ const MatchWrite = ({navigation, route}) => {
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [matt1Ary, setMatt1Ary] = useState([]); //재료1 리스트
 	const [matt2Ary, setMatt2Ary] = useState([]); //재료2 리스트
+	const [list1, setList1] = useState([]); //도면보안설정 리스트
+	const [list2, setList2] = useState([]); //도면상담방식 리스트
+	const [list3, setList3] = useState([]); //제품용도 리스트
+	const [list4, setList4] = useState([]); //제품용도 세부 리스트
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -136,6 +126,9 @@ const MatchWrite = ({navigation, route}) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 			select1();
+			select5();
+			select6();
+			select7();			
 		}
 
 		return () => isSubscribed = false;
@@ -223,6 +216,7 @@ const MatchWrite = ({navigation, route}) => {
 		}
 	}
 
+	//재료2
 	const select4 = async () => {
 		await Api.send('GET', 'match_cate4', {is_api:1, cate3:matt1}, (args)=>{
 			let resultItem = args.resultItem;
@@ -236,6 +230,70 @@ const MatchWrite = ({navigation, route}) => {
 				//console.log("재료2 err : ",responseJson.result_text);
 			}
 		});
+	}
+
+	//도면보안설정
+	const select5 = async () => {
+		await Api.send('GET', 'match_doc_permit', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("도면보안설정 : ",responseJson);
+				setList1(responseJson.data);
+			}else{
+				//console.log("도면보안설정 err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//상담방식(견적서)
+	const select6 = async () => {
+		await Api.send('GET', 'match_chat_permit', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("상담방식(견적서) : ",responseJson);
+				setList2(responseJson.data);
+			}else{
+				//console.log("상담방식(견적서) err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//제품용도
+	const select7 = async () => {
+		await Api.send('GET', 'match_use_type', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("제품용도 : ",responseJson);
+				setList3(responseJson.data);
+			}else{
+				//console.log("상담방식(견적서) err : ",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//제품용도 세부
+	const select8 = async () => {
+		await Api.send('GET', 'match_use_type2', {is_api:1, user_type:useInfo}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("제품용도 세부 : ",responseJson);
+				setList4(responseJson.data);
+			}else{
+				//console.log("상담방식(견적서) err : ",responseJson.result_text);
+			}
+		}); 
 	}
 
 	function getFileCount(selectCon){
@@ -320,6 +378,14 @@ const MatchWrite = ({navigation, route}) => {
 		setCalendarVisible(false);
   }
 
+	//도면업로드 삭제
+	const floorfileDelete = () => {
+		setFloorFile('');
+		setFloorFileType('');
+		setFloorFileUri('');
+		console.log('?');
+	}
+
 	function writeUpdate(){
 		let img1Path = '';
 		let img2Path = '';
@@ -365,9 +431,18 @@ const MatchWrite = ({navigation, route}) => {
 
 		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
 
-		// if((sort!=7 && sort!=8) && (ingred!=32 && ingred!=33)){
-		// 	if(shape == ""){ ToastMessage('형태를 선택해 주세요.'); return false; }
-		// }
+		if(sort==40 || cate==6 || cate==7){
+		}else{
+			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
+		}
+
+		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83)){
+		}else{
+			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
+			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
+				if(matt2Direct==""){ ToastMessage('재료2를 직접 입력해 주세요.'); return false; }
+			}
+		}
 
 		if(cnt == ""){ ToastMessage('수량을 입력해 주세요.'); return false; }
 		
@@ -379,13 +454,11 @@ const MatchWrite = ({navigation, route}) => {
 
 		if(useInfo == ""){ ToastMessage('제품용도를 선택해 주세요.'); return false; }
 
-		if(indCate == ""){ ToastMessage('[산업] 카테고리를 선택해 주세요.'); return false; }
-		//직접입력 체크 = indCateDirect
+		if(indCate == ""){ ToastMessage('[산업] 카테고리를 선택해 주세요.'); return false; }		
+		if(useInfo==3 && indCate==1 && indCateDirect==""){ ToastMessage('[산업] 카테고리를 직접 입력해 주세요.'); return false; }
 
 		if(endDateMethod == ""){ ToastMessage('납기일방식을 선택해 주세요.'); return false; }
-		if(endDateMethod == 2 && endDate == ""){
-			ToastMessage('납기일을 선택해 주세요.'); return false;
-		}
+		if(endDateMethod == 2 && endDate == ""){ ToastMessage('납기일을 선택해 주세요.'); return false; }
 
 		if(content == ""){ ToastMessage('도면상세정보를 입력해 주세요.'); return false; }
 
@@ -410,6 +483,8 @@ const MatchWrite = ({navigation, route}) => {
 			c4_etc:matt2Direct,
 			mc_total:calcCnt,
 			mc_project_name:projectName,
+			mc_dwg_secure:security,
+			mc_chat_permit:advice,
 			mc_use_type:useInfo,
 			mc_use_type_etc:indCateDirect,
 			mc_use_type2:indCate,
@@ -431,7 +506,7 @@ const MatchWrite = ({navigation, route}) => {
 		if(img9Path != ''){ formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; }
 		if(img10Path != ''){ formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; }
 
-		//console.log("formData : ",formData);
+		console.log("formData : ",formData);
 
 		Api.send('POST', 'save_match', formData, (args)=>{
 			let resultItem = args.resultItem;
@@ -632,7 +707,6 @@ const MatchWrite = ({navigation, route}) => {
 									<RNPickerSelect
 										value={matt2}
 										onValueChange={(value) => {
-											console.log(value);
 											setMatt2(value);
 											if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
 												setMatt2Direct(''); 
@@ -666,7 +740,7 @@ const MatchWrite = ({navigation, route}) => {
 									<TextInput
 										value={matt2Direct}
 										onChangeText={(v) => {setMatt2Direct(v)}}
-										placeholder={'재료2 직접 입력을 입력해 주세요.'}
+										placeholder={'재료2를 직접 입력을 입력해 주세요.'}
 										placeholderTextColor="#8791A1"
 										style={[styles.input]}
 									/>
@@ -706,21 +780,31 @@ const MatchWrite = ({navigation, route}) => {
 									editable = {false}
 									placeholder={'도면을 업로드해 주세요.'}
 									placeholderTextColor="#8791A1"
-									style={[styles.input, styles.input2]}
+									style={[styles.input, styles.input2, floorFile!=""? styles.input4:null]}
 								/>
 								<TouchableOpacity 
-									style={styles.certChkBtn}
+									style={[styles.certChkBtn, floorFile!=""? styles.certChkBtn4:null]}
 									activeOpacity={opacityVal}
 									onPress={openPicker}
 								>
 									<Text style={styles.certChkBtnText}>업로드</Text>
 								</TouchableOpacity>
+								{floorFile != "" ? (
+									<TouchableOpacity 
+										style={[styles.certChkBtn4, styles.certChkBtnDelete]}
+										activeOpacity={opacityVal}
+										onPress={floorfileDelete}
+									>
+										<Text style={styles.certChkBtnText}>삭제</Text>
+									</TouchableOpacity>
+								) : null}
 							</View>
 							<View style={styles.inputAlert}>
 								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
 								<Text style={styles.inputAlertText}>도면이 없으면 자세한 견적을 받을 수 없습니다.</Text>
 							</View>
 							
+							{floorFile=="" ? (
 							<TouchableOpacity
 								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
 								activeOpacity={opacityVal}
@@ -735,6 +819,7 @@ const MatchWrite = ({navigation, route}) => {
 								<AutoHeightImage width={15} source={require("../../assets/img/icon_chk_on.png")} style={styles.floorBtnImg} />
 								<Text style={styles.floorBtnText}>설계요청</Text>
 							</TouchableOpacity>
+							) : null}
 						</View>
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
@@ -743,6 +828,7 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={security}
 									onValueChange={(value) => setSecurity(value)}
 									placeholder={{
 										label: '도면보안설정을 확인해 주세요.',
@@ -750,7 +836,10 @@ const MatchWrite = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1',
 									}}
-									items={dealMethod2Ary}
+									items={list1.map(item => ({
+										label: item.txt,
+										value: item.val,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -771,6 +860,7 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={advice}
 									onValueChange={(value) => setAdvice(value)}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
@@ -778,7 +868,10 @@ const MatchWrite = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1',
 									}}
-									items={payMethodAry}
+									items={list2.map(item => ({
+										label: item.txt,
+										value: item.val,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -816,14 +909,21 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setUseInfo(value)}
+									value={useInfo}
+									onValueChange={(value) => {
+										setUseInfo(value);
+										select8();
+									}}
 									placeholder={{
 										label: '제품용도를 선택해 주세요.',
 										inputLabel: '제품용도를 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}
-									items={payMethodAry}
+									items={list3.map(item => ({
+										label: item.txt,
+										value: item.val,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -844,11 +944,10 @@ const MatchWrite = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={indCate}
 									onValueChange={(value) => {
 										setIndCate(value);
-										if(value != '4'){
-											setIndCateDirect('');
-										}
+										setIndCateDirect('');
 									}}
 									placeholder={{
 										label: '카테고리를 선택해 주세요.',
@@ -856,7 +955,10 @@ const MatchWrite = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1',
 									}}
-									items={payMethodAry}
+									items={list4.map(item => ({
+										label: item.txt,
+										value: item.val,
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -869,7 +971,7 @@ const MatchWrite = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
-							{indCate == '4' ? (
+							{useInfo==3 && indCate==1 ? (
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TextInput
 									value={indCateDirect}
@@ -1073,6 +1175,7 @@ const styles = StyleSheet.create({
 	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
 	input2: {width:(innerWidth - 90),},
 	input3: {width:(innerWidth - 120),},
+	input4: {width:(innerWidth - 124),},
 	textarea: {height:275,borderRadius:8,textAlignVertical:"top",padding:12,},
 	inputContainer: {},
 	selectArr: {position:'absolute',top:25.5,right:20,},
@@ -1082,6 +1185,8 @@ const styles = StyleSheet.create({
 	certChkBtnText2: {fontFamily:Font.NotoSansBold,fontSize:16,color:'#fff'},
 	certChkBtn3: {width:110,height:58,backgroundColor:'#31B481',borderWidth:0,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	certChkBtnText3: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
+	certChkBtn4: {width:58,},
+	certChkBtnDelete: {height:58,backgroundColor:'#666',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	photoBox: {width:79,height:79,marginTop:10,marginRight:10,position:'relative'},
 	photoBtn: {width:79,height:79,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden',
 	display:'flex',alignItems:'center',justifyContent:'center',},

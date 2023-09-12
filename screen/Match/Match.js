@@ -25,6 +25,7 @@ const Match = (props) => {
 	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	const {params} = route;
 	const [searchVal, setSearchVal] = useState();
+	const [isLoading, setIsLoading] = useState(false);
 	const [scrollEvent, setScrollEvent] = useState(new Animated.Value(1))	
 	const [scrollEvent2, setScrollEvent2] = useState(new Animated.Value(0))
 	const [scrollEvent3, setScrollEvent3] = useState(new Animated.Value(98))
@@ -36,8 +37,16 @@ const Match = (props) => {
 	const [visible3, setVisible3] = useState(false);
 	const [filterList, setFilterList] = useState(filterListData); //개별선택
 	const [filterList2, setFilterList2] = useState(filterListData); //개별선택
+	const [filterAry, setFilterAry] = useState('');
 	const [filterLen, setFilterLen] = useState(0);
 	const [allFilter, setAllFilter] = useState(false); //모두 선택	
+	const [itemList, setItemList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
+	const [totalPage, setTotalPage] = useState(1);
+	const [myInfo, setMyInfo] = useState({});
+	const [myFac, setMyFac] = useState({});
+	const [myFacOn, setMyFacOn] = useState('');
+	const [initLoading, setInitLoading] = useState(false);
 
 	const DATA = [
 		{
@@ -118,44 +127,124 @@ const Match = (props) => {
 			category: 'CNC가공',
 		},
 	];
+
+	const isFocused = useIsFocused();
+	useEffect(()=>{
+		getMyInfo();
+		if(!initLoading){
+			getItemList();
+			setInitLoading(true);
+		}else if(params?.isSubmit){
+			setNowPage(1);
+			getItemList();
+			delete params?.isSubmit
+		}
+
+		// AsyncStorage.getItem('mainReload', (err, result) => {
+		// 	//console.log("result : ",result);
+		// 	if(result == 'on'){
+		// 		setNowPage(1);
+		// 		getItemList();
+		// 		delete params?.isSubmit;
+		// 		AsyncStorage.removeItem('mainReload');
+		// 	}
+		// });
+	},[isFocused]);
+
+	//회원 정보
+	const getMyInfo = async () => {		
+		await Api.send('GET', 'get_member_info', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log(responseJson);
+        setMyInfo(responseJson);
+				setMyFac(responseJson.fac_info);
+				
+				if(responseJson.fac_info[0].fc_use == 1){
+					setMyFacOn("공장1("+responseJson.fac_info[0].fc_dong+")");
+				}else if(responseJson.fac_info[1].fc_use == 1){
+					setMyFacOn("공장2("+responseJson.fac_info[0].fc_dong+")");
+				}
+				// const fcUse = (responseJson.fac_info).find(item=> item.fc_use==1);
+				// const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				// setMyFacOn(fcUseText);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		});  
+	}
+
+	//매칭 리스트
+	const getItemList = async () =>{
+		setIsLoading(false);
+		await Api.send('GET', 'list_match', {'is_api': 1, c1_idx:filterAry, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('list_match', responseJson);
+				setItemList(responseJson.data);
+				setTotalPage(responseJson.total_page);
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!');
+			}
+		});
+
+		setIsLoading(true);
+	}
+
+	useEffect(()=>{
+		if(initLoading){
+			setNowPage(1);
+			getItemList();			
+		}
+	}, [filterList2]);
 	
 	const getList = ({item, index}) => (
 		<TouchableOpacity 
 			style={[styles.listLi, index!=0 ? styles.listLiBorder : null ]}
 			activeOpacity={opacityVal}
-			onPress={() => {
-				navigation.navigate('MatchView', {category:item.category})
-			}}
+			onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
 		>
 			<>
-			<AutoHeightImage width={99} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
-			<View style={styles.listInfoBox}>
-				<View style={styles.listInfoTitle}>
-					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-						{item.title}
-					</Text>
+			{item.mc_image ? (
+				<View style={styles.pdImage}>
+					<AutoHeightImage width={99} source={{uri: item.mc_image}}  style={styles.listImg} />				
 				</View>
-				<View style={styles.listInfoDesc}>
-					<Text style={styles.listInfoDescText}>{item.desc}</Text>
-				</View>
-				<View style={styles.listInfoCate}>
-					<Text style={styles.listInfoCateText}>{item.cate}</Text>
-				</View>
-				<View style={styles.listInfoCnt}>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+			) : null}			
+				<View style={styles.listInfoBox}>
+					<View style={styles.listInfoTitle}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+							{item.mc_name}
+						</Text>
 					</View>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+					<View style={styles.listInfoDesc}>
+						<Text style={styles.listInfoDescText}>{item.mc_loc} · {item.mc_date}</Text>
 					</View>
-					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+					<View style={styles.listInfoCate}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.mc_summary}</Text>
+					</View>
+					<View style={styles.listInfoCnt}>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
+						</View>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
+						</View>
+						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+							<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+						</View>
 					</View>
 				</View>
-			</View>
 			</>
 		</TouchableOpacity>
 	);
@@ -250,14 +339,32 @@ const Match = (props) => {
 	const submitFilter = async () => {
 		selected = filterList.filter((item) => item.isChecked).map(item => item.idx);
 		setFilterLen(selected.length);
+
+		let commaAry = "";
 		
 		let selectCon = filterList.map((item) => {
 			if(item.isChecked === allFilter){
 				return {...item, isChecked: allFilter};
 			}else{
+				if(commaAry != ''){commaAry+=',';}
+				commaAry+=item.idx;
+				
+				setFilterAry(commaAry);
 				return {...item, isChecked: item.isChecked};
 			}
 		});
+
+		let cnt = 0;
+		filterList.map((item) => {
+			if(item.isChecked === allFilter){
+				
+			}else{
+				cnt = cnt+1;
+			}
+		});
+		if(cnt < 1){
+			setFilterAry('');
+		}
 		setFilterList2(selectCon);
 
 		//await listCenterInfoReceive(selected);
@@ -285,75 +392,74 @@ const Match = (props) => {
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
 			</View>
-			<FlatList
-				data={DATA}
-				renderItem={(getList)}
-				keyExtractor={item => item.id}
-				onScroll={onScroll}
-				ListHeaderComponent={
-					<>						
-					<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
-						<View style={styles.schIptBox}>
-							<TouchableOpacity
-							 style={styles.goToSch}
-							 activeOpacity={opacityVal}
-							 onPress={() => {navigation.navigate('SearchList', {backPage:'Match', tab:2})}}
-							>
-								<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
-							</TouchableOpacity>
-							{/* <TextInput
-								value={searchVal}
-								onChangeText={(v) => {setSearchVal(v)}}
-								placeholder={"무엇을 찾아드릴까요?"}
-								style={[styles.schInput]}
-								placeholderTextColor="#353636"
-							/>
-							<TouchableOpacity style={styles.schBtn}>
-								<AutoHeightImage width={16} source={require("../assets/img/icon_search.png")} />
-							</TouchableOpacity> */}
-						</View>
-						<View style={styles.schFilterBox}>
-							{filterLen > 0 ? (
-								<View style={styles.filterLabelBox}>
-									{filterList2.map((item, index) => {
-										if(item.isChecked){
-											return(
-											<View key={index} style={styles.filterLabel}>
-												<Text style={styles.filterLabelText}>{item.txt}</Text>
-											</View>
-											)
-										}
-									})}
-								</View>
-							) : (
+
+			{isLoading ? (
+				<FlatList
+					data={itemList}
+					renderItem={(getList)}
+					keyExtractor={(item, index) => index.toString()}
+					onScroll={onScroll}					
+					onEndReachedThreshold={0.8}
+					//onEndReached={moreData}
+					ListHeaderComponent={
+						<>						
+						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
+							<View style={styles.schIptBox}>
+								<TouchableOpacity
+								style={styles.goToSch}
+								activeOpacity={opacityVal}
+								onPress={() => {navigation.navigate('SearchList', {backPage:'Home', tab:1})}}
+								>
+									<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
+								</TouchableOpacity>
+							</View>
+							<View style={styles.schFilterBox}>
+								{filterLen > 0 ? (
+									<View style={styles.filterLabelBox}>
+										{filterList2.map((item, index) => {
+											if(item.isChecked){
+												return(
+												<View key={index} style={styles.filterLabel}>
+													<Text style={styles.filterLabelText}>{item.txt}</Text>
+												</View>
+												)
+											}
+										})}
+									</View>
+								) : (
+									<TouchableOpacity 
+										style={styles.schFilterBtn1} 
+										activeOpacity={opacityVal}
+										onPress={()=>{setVisible3(true)}}
+									>
+										<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									</TouchableOpacity>
+								)}
 								<TouchableOpacity 
-									style={styles.schFilterBtn1} 
+									style={styles.schFilterBtn2}
 									activeOpacity={opacityVal}
 									onPress={()=>{setVisible3(true)}}
 								>
-									<Text style={styles.schFilterBtnText}>필터를 선택해 주세요.</Text>
+									<Text style={styles.schFilterBtn2Text}>상세필터</Text>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_filter.png")} />
 								</TouchableOpacity>
-							)}
-							<TouchableOpacity 
-								style={styles.schFilterBtn2}
-								activeOpacity={opacityVal}
-								onPress={()=>{setVisible3(true)}}
-							>
-								<Text style={styles.schFilterBtn2Text}>상세필터</Text>
-								<AutoHeightImage width={17} source={require("../../assets/img/icon_filter.png")} />
-							</TouchableOpacity>
+							</View>
+						</KeyboardAvoidingView>
+						<View style={styles.borderTop}></View>
+						</>
+					}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>등록된 매칭이 없습니다.</Text>
 						</View>
-					</KeyboardAvoidingView>
-					<View style={styles.borderTop}></View>
-					</>
-				}
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 매칭이 없습니다.</Text>
-					</View>
-				}
-			/>
+					}
+				/>
+			) : (
+				<View style={[styles.indicator]}>
+					<ActivityIndicator size="large" />
+				</View>
+			)}
 
 			{!visible2 ? (
 			<Animated.View 
@@ -566,14 +672,15 @@ const styles = StyleSheet.create({
 	schBtn: {width:50,height:48,display:'flex',alignItems:'center',justifyContent:'center',position:'absolute',top:0,right:0,},
 	schFilterBox: {display:'flex',flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between',marginTop:5},
 	schFilterBtn1: {height:33,paddingLeft:20,paddingRight:20,backgroundColor:'#F5F5F5',borderRadius:13,display:'flex',alignItems:'center',justifyContent:'center',marginTop:10,},
-	schFilterBtnText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:35,color:'#888888'},
+	schFilterBtnText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#888888'},
 	schFilterBtn2: {width:85,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'flex-end',paddingTop:7,marginTop:10,},
-	schFilterBtn2Text: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#000',marginRight:5,},
+	schFilterBtn2Text: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#000',marginRight:5,},
 	filterLabelBox: {width:(innerWidth-85),display:'flex',flexWrap:'wrap',flexDirection:'row'},
 	filterLabel: {height:33,paddingLeft:12,paddingRight:12,backgroundColor:'#31B481',borderRadius:20,display:'flex',alignItems:'center',justifyContent:'center',marginRight:8,marginTop:10,},
 	filterLabelText: {fontSize:13,lineHeight:17,color:'#fff'},
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
+	pdImage: {width:99,height:99,borderRadius:8,overflow:'hidden'},
 	listImg: {borderRadius:8},
 	listInfoBox: {width:(innerWidth - 99),paddingLeft:15,},
 	listInfoTitle: {},
@@ -633,6 +740,7 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default Match

@@ -6,7 +6,7 @@ import { useFocusEffect, useIsFocused, useRoute } from '@react-navigation/native
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import {initializeApp} from "@react-native-firebase/app";
-import firestore from '@react-native-firebase/firestore';
+import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
 import {getStorage} from "@react-native-firebase/storage";
 
 import Font from "../../assets/common/Font";
@@ -143,8 +143,8 @@ const Room = (props) => {
 					if(responseJson.result === 'success'){
 						console.log('채팅 성공 : ',responseJson);
 						console.log('getRoomData!!!');
-						getRoomData();	
-						//navigation.navigate('Home', {isSubmit: true});
+						getRoomData();
+						fireRemove(doc.id);
 					}else{
 						console.log('결과 출력 실패!!!', resultItem.result_text);
 						//ToastMessage(responseJson.result_text);
@@ -183,6 +183,19 @@ const Room = (props) => {
       // }
     });
 	}, []);
+
+	//파이어스토어 데이터 삭제
+	const fireRemove = async (doc_id) => {
+		try {
+			console.log(doc_id);
+			await ref.doc(doc_id).delete();
+			//alert("삭제완료")                
+		} catch (error) {
+			console.log(error)
+			//alert("삭제실패")
+		}
+		//doc_id.ref.delete();
+	}
 
 	//앨범
 	const chooseImage = () => {
@@ -253,7 +266,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_chat_room_product : ",responseJson);
+				//console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -271,7 +284,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("in_chat : ",responseJson);				
+				//console.log("in_chat : ",responseJson);				
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;
@@ -833,8 +846,8 @@ const Room = (props) => {
             <Text style={styles.avatarTitleText}>전화걸기</Text>
           </View>
           <View style={styles.avatarDesc}>
-            <Text style={styles.avatarDescText}>거래 완료 할 회원에게 별점으로</Text>
-						<Text style={styles.avatarDescText}>거래를 완료를 하여 주세요.</Text>
+            <Text style={styles.avatarDescText}>상품에 대해서 자세한 문의는</Text>
+						<Text style={styles.avatarDescText}>전화를 통해서 하실수 있습니다.</Text>
 						<Text style={[styles.avatarDescText, styles.avatarDescText2, styles.avatarDescText3]}>{phone}</Text>
           </View>
           <View style={styles.avatarBtnBox}>

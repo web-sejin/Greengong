@@ -87,13 +87,13 @@ const UsedView = (props) => {
           setNaviPage('UsedModify3');
         }else if(responseJson.c1_idx == 4){
           setNaviPage('UsedModify4');
-        }
-        setIsLoading(true);
+        }        
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
 			}
 		});
+    setIsLoading(true);
   }
 
   const getMyData = async () => {
@@ -322,11 +322,17 @@ const UsedView = (props) => {
 
   //비딩체크
   function bidChk(){
-    if(itemInfo.is_bidding == 1){
-      setVisible2(true);
+    console.log("userInfo : ",userInfo);
+    console.log("itemInfo : ",itemInfo);
+    if(userInfo?.mb_idx == itemInfo.pd_mb_idx){
+      ToastMessage("자신의 게시물은 입찰할 수 없습니다.");
     }else{
-      navigation.navigate('Bid', {idx:idx});
-    }                  
+      if(itemInfo.is_bidding == 1){
+        setVisible2(true);
+      }else{
+        navigation.navigate('Bid', {idx:idx});
+      }     
+    }
   }
 
   function deleteBidding(){
@@ -746,7 +752,7 @@ const UsedView = (props) => {
 							activeOpacity={opacityVal}
 							onPress={() => {
                 setVisible(false)
-								navigation.navigate('SalesComplete');
+								navigation.navigate('SalesComplete', {idx:idx});
 						}}
 						>
 							<Text style={styles.modalCont2BtnText}>판매완료</Text>

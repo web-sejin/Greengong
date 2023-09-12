@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -9,18 +9,27 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const SalesComplete = ({navigation, route}) => {
+const SalesComplete = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const {params} = route;
+  const idx = params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [mbId, setMbId] = useState();
   const [score, setScore] = useState(3);
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
+  const [endList, setEndList] = useState([]);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -33,18 +42,66 @@ const SalesComplete = ({navigation, route}) => {
         setVisible2(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    console.log("idx : ",idx);
+    await Api.send('GET', 'insert_end_product', {'is_api': 1, pd_idx:idx, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("insert_end_product : ",responseJson);
+        setEndList(responseJson.data);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+    setIsLoading(true);
+  }
+
+  const getList = ({item, index}) => (
+		<TouchableOpacity 
+      style={[styles.compBtn]}
+      onPress={() => {
+        if(mbId && mbId==1){
+          setMbId();
+        }else{
+          setMbId(1);
+        }
+      }}
+    >
+      <View style={[styles.compWrap, styles.compWrapFst]}>
+        <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
+          <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
+        </View>
+        <View style={styles.compInfo}>
+          <View style={styles.compInfoDate}>
+            <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
+          </View>
+          <View style={styles.compInfoName}>
+            <Text style={styles.compInfoNameText}>{item.mb_nick}</Text>
+          </View>
+          <View style={styles.compInfoLoc}>
+            <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+            <Text style={styles.compInfoLocText}>{item.mb_loc}</Text>
+          </View>
+        </View>
+        <View style={styles.compThumb}>
+          <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
+        </View>
+      </View>
+    </TouchableOpacity>
+	);
 
   function fnSubmitBefore(){
     if(!mbId){
@@ -61,79 +118,31 @@ const SalesComplete = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'판매완료 업체선정'} />
-			<ScrollView>
-        <View style={[styles.salesAlert, styles.borderBot]}>
-          <View style={styles.alertBox}>
-            <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-            <Text style={styles.alertBoxText}>판매완료 업체를 선택할 수 있습니다.</Text>
-            <Text style={[styles.alertBoxText, styles.alertBoxText2]}>업체를 선택하지 않아도 판매완료가 가능합니다.</Text>
+      <FlatList
+        data={endList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}		
+        onEndReachedThreshold={0.6}
+        //onEndReached={moreData}
+        ListHeaderComponent={
+          <>						
+          <View style={[styles.salesAlert, styles.borderBot]}>
+            <View style={styles.alertBox}>
+              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+              <Text style={styles.alertBoxText}>판매완료 업체를 선택할 수 있습니다.</Text>
+              <Text style={[styles.alertBoxText, styles.alertBoxText2]}>업체를 선택하지 않아도 판매완료가 가능합니다.</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.borderTop}>
-          <TouchableOpacity 
-            style={[styles.compBtn]}
-            onPress={() => {
-              if(mbId && mbId==1){
-                setMbId();
-              }else{
-                setMbId(1);
-              }
-            }}
-          >
-            <View style={[styles.compWrap, styles.compWrapFst]}>
-              <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
-                <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-              </View>
-              <View style={styles.compInfo}>
-                <View style={styles.compInfoDate}>
-                  <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
-                </View>
-                <View style={styles.compInfoName}>
-                  <Text style={styles.compInfoNameText}>참좋은공장</Text>
-                </View>
-                <View style={styles.compInfoLoc}>
-                  <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                  <Text style={styles.compInfoLocText}>중3동</Text>
-                </View>
-              </View>
-              <View style={styles.compThumb}>
-                <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-              </View>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.compBtn]}
-            onPress={() => {
-              if(mbId && mbId==2){
-                setMbId();
-              }else{
-                setMbId(2);
-              }
-            }}
-          >
-            <View style={styles.compWrap}>
-              <View style={[styles.compRadio, mbId==2 ? styles.comRadioChk : null]}>
-                <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-              </View>
-              <View style={styles.compInfo}>
-                <View style={styles.compInfoDate}>
-                  <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
-                </View>
-                <View style={styles.compInfoName}>
-                  <Text style={styles.compInfoNameText}>참좋은공장</Text>
-                </View>
-                <View style={styles.compInfoLoc}>
-                  <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                  <Text style={styles.compInfoLocText}>중3동</Text>
-                </View>
-              </View>
-              <View style={styles.compThumb}>
-                <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          <View style={styles.borderTop}></View>
+          </>
+        }
+        ListEmptyComponent={
+          <View style={styles.notData}>
+            <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+            <Text style={styles.notDataText}>판매완료로 지정할 회원이 없습니다.</Text>
+          </View>
+        }
+      />
       <View style={styles.nextFix}>
 				<TouchableOpacity 
 					style={styles.nextBtn}
@@ -268,6 +277,10 @@ const SalesComplete = ({navigation, route}) => {
           </View>
 				</View>
       </Modal>
+
+      {/* <View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View> */}
 		</SafeAreaView>
 	)
 }
@@ -311,7 +324,17 @@ const styles = StyleSheet.create({
 	avatarBtn2: {backgroundColor:'#31B481'},
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
   starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
-  star: {marginHorizontal:4,}
+  star: {marginHorizontal:4,},
+
+  indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-export default SalesComplete
+//export default SalesComplete
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(SalesComplete);

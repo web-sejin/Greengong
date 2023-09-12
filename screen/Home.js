@@ -47,6 +47,29 @@ const Home = (props) => {
 	const [initLoading, setInitLoading] = useState(false);
 	
 	const isFocused = useIsFocused();
+	useEffect(()=>{
+		getMyInfo();
+		//console.log("initLoading : ",initLoading);
+		//console.log("isSubmit : ",params?.isSubmit);
+		if(!initLoading){
+			getItemList();
+			setInitLoading(true);
+		}else if(params?.isSubmit){
+			setNowPage(1);
+			getItemList();
+			delete params?.isSubmit
+		}
+
+		AsyncStorage.getItem('mainReload', (err, result) => {
+			//console.log("result : ",result);
+			if(result == 'on'){
+				setNowPage(1);
+				getItemList();
+				delete params?.isSubmit;
+				AsyncStorage.removeItem('mainReload');
+			}
+		});
+	},[isFocused]);
 
 	//회원 정보
 	const getMyInfo = async () => {		
@@ -83,9 +106,9 @@ const Home = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson.data);
+				//console.log(responseJson);
 				setItemList(responseJson.data);
-				//setTotalPage(responseJson);
+				setTotalPage(responseJson.total_page);
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -98,47 +121,25 @@ const Home = (props) => {
 
 	//중고 리스트 무한 스크롤
 	const moreData = async () => {
-		console.log("nowPage : ",nowPage);
-		await Api.send('GET', 'list_product', {is_api: 1, c1_idx:filterAry, page:nowPage+1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', args);
-			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson.data);				
-				const addItem = itemList.concat(responseJson.data);				
-				setItemList(addItem);			
-				setNowPage(nowPage+1);
-			}else{
-				console.log(responseJson);
-				console.log('결과 출력 실패!');
-			}
-		});
-	}
-
-	useEffect(()=>{
-		getMyInfo();
-		//console.log("initLoading : ",initLoading);
-		//console.log("isSubmit : ",params?.isSubmit);
-		if(!initLoading){
-			getItemList();
-			setInitLoading(true);
-		}else if(params?.isSubmit){
-			setNowPage(1);
-			getItemList();
-			delete params?.isSubmit
+		//console.log("nowPage : ",nowPage);
+		if(totalPage > nowPage){
+			await Api.send('GET', 'list_product', {is_api: 1, c1_idx:filterAry, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = itemList.concat(responseJson.data);				
+					setItemList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
 		}
-
-		AsyncStorage.getItem('mainReload', (err, result) => {
-			//console.log("result : ",result);
-			if(result == 'on'){
-				setNowPage(1);
-				getItemList();
-				delete params?.isSubmit;
-				AsyncStorage.removeItem('mainReload');
-			}
-		});
-	},[isFocused]);
+	}	
 
 	useEffect(()=>{
 		if(initLoading){
@@ -428,7 +429,7 @@ const Home = (props) => {
 					renderItem={(getList)}
 					keyExtractor={(item, index) => index.toString()}
 					onScroll={onScroll}					
-					onEndReachedThreshold={0.6}
+					onEndReachedThreshold={0.8}
 					onEndReached={moreData}
 					ListHeaderComponent={
 						<>						

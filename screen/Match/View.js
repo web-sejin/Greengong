@@ -11,12 +11,16 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MatchView = ({navigation, route}) => {
+const MatchView = (props) => {
   const scrollRef = useRef();
   const DATA = [
 		{
@@ -73,10 +77,8 @@ const MatchView = ({navigation, route}) => {
 		},
 	];
 
-  const title = route.params.category;
-  const naviPage = route.params.naviPage;
-  const stateVal = route.params.stateVal;
-
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [indicatorSt, setIndCatorSt] = useState(false);
@@ -89,6 +91,16 @@ const MatchView = ({navigation, route}) => {
   const [floorFile, setFloorFile] = useState(''); //도면 파일
 	const [floorFileType, setFloorFileType] = useState(''); //도면 파일
 	const [floorFileUri, setFloorFileUri] = useState(''); //도면 파일
+  const [toastModal, setToastModal] = useState(false);
+  const [toastText, setToastText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [itemInfo, setItemInfo] = useState({});
+  const [swp, setSwp] = useState({});
+  const [latest, setLatest] = useState({});
+  const [myInfo, setMyInfo] = useState({});
+  const [prdMbIdx, setPrdMbIdx] = useState();
+  const [radio, setRadio] = useState(1);
+  const [radioList, setRadioList] = useState([]);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -103,18 +115,58 @@ const MatchView = ({navigation, route}) => {
         setState('');
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
+      getMyData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'view_match', {'is_api': 1, mc_idx:idx, page_name:'view'}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("view_match : ",responseJson);
+				// setItemInfo(responseJson);
+        // setSwp(responseJson.pf_data);
+        // setLatest(responseJson.mb_latest);
+        // setZzim(responseJson.is_scrap);
+        // setPrdMbIdx(responseJson.pd_mb_idx);
+
+        // if(responseJson.is_product_like == 1){
+        //   setLike(1);
+        // }else{
+        //   setLike(0);
+        // }
+
+        setIsLoading(true);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+  }
+
+  const getMyData = async () => {
+    await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_member_info : ",responseJson);
+        setMyInfo(responseJson);
+			}else{
+				ToastMessage(responseJson.result_text);
+			}
+		});  
+  }
 
   function notBuy(){
     ToastMessage('판매완료된 상품은 가격협상이 불가합니다.');
@@ -179,7 +231,7 @@ const MatchView = ({navigation, route}) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
-        headertitle={title} 
+        headertitle={'title'} 
         ModalEvent={ModalOn} 
       />
 			<ScrollView ref={scrollRef}>
