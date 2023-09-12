@@ -15,8 +15,8 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const Chat = (props) => {
-	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
-	const {params} = route;
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;	
+	const {params} = route;	
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -28,30 +28,7 @@ const Chat = (props) => {
 	const [matchList, setMatchList] = useState([]);
 	const [nowPage2, setNowPage2] = useState(1);
   const [totalPage2, setTotalPage2] = useState(1);
-
-	const DATA = [
-		{
-			id: '1',
-			title: '상대방 닉네임',
-			desc: '주안1동',
-			cate: '삼거리 앞입니다.',
-			score: '14분 전',
-		},
-		{
-			id: '2',
-			title: '상대방 닉네임',
-			desc: '주안1동',
-			cate: '삼거리 앞입니다.',
-			score: '2023.09.03',
-		},
-		{
-			id: '3',
-			title: '상대방 닉네임',
-			desc: '주안1동',
-			cate: '삼거리 앞입니다.',
-			score: '2023.08.31',
-		},
-	];
+	const [initLoading, setInitLoading] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -59,15 +36,23 @@ const Chat = (props) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setIsLoading(false);
+				//setIsLoading(false);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			getProductList();
-			setNowPage(1);      
-			getMatchList();
-			setNowPage2(1);
+
+			if(!initLoading){
+				getProductList();
+				getMatchList();
+				setInitLoading(true);
+			}else if(params?.reload == 'on'){
+				getProductList();
+				setNowPage(1);      
+				getMatchList();
+				setNowPage2(1);
+				delete params?.reload
+			}
 		}
 
 		return () => isSubscribed = false;
@@ -75,7 +60,7 @@ const Chat = (props) => {
 
 	const getProductList = async () => {
 		setIsLoading(false);
-		await Api.send('GET', 'list_chat_product_room', {'is_api': 1, page: 1, keyword: inputText}, (args)=>{
+		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -93,13 +78,34 @@ const Chat = (props) => {
 		}); 
 		setIsLoading(true);
 	}
+	
+	const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_chat_product_room', {is_api: 1, page:nowPage+1, keyword: inputText}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = prdList.concat(responseJson.data);				
+          setPrdList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
 
 	const getList = ({item, index}) => (    
     <TouchableOpacity
 			style={[styles.chatLi, index == 0 ? styles.chatLi2 : null]}
 			activeOpacity={opacityVal}
 			onPress={() => {
-				navigation.navigate('ChatRoom', {});
+				const roomName = 'product_'+item.cr_idx;
+        navigation.navigate('ChatRoom', {pd_idx:'', page_code:'product', recv_idx:item.recv_idx, roomName:roomName, cr_idx:item.cr_idx});
 			}}
 		>
 			<View style={styles.chatBoxLeft}>
@@ -112,25 +118,25 @@ const Chat = (props) => {
 						)}
 					</View>
 					<View style={styles.readCnt}>
-						<Text style={styles.readCntText}>3</Text>
+						<Text style={styles.readCntText}>{item.cr_unread}</Text>
 					</View>
 				</View>
 				<View style={styles.chatBoxInfo}>
 					<View style={styles.chatBoxName}>
-						<Text style={styles.chatBoxNameText}>{item.title}</Text>
+						<Text style={styles.chatBoxNameText}>{item.mb_nick}</Text>
 					</View>
 					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-						<Text style={styles.chatBoxLocText}>{item.desc}</Text>
+						<Text style={styles.chatBoxLocText}>{item.pd_dong}</Text>
 					</View>
 					<View style={styles.chatBoxCont}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.chatBoxContText}>{item.cate}</Text>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.chatBoxContText}>{item.cr_last_msg}</Text>
 					</View>
 				</View>
 			</View>
 			<View style={styles.chatBoxRight}>
 				<View style={styles.chatBoxDate}>
-					<Text style={styles.chatBoxDateText}>{item.score}</Text>
+					<Text style={styles.chatBoxDateText}>{item.cr_lastdate}</Text>
 				</View>
 				<View style={styles.chatItemBox}>
 					{item.pd_image ? (
@@ -143,6 +149,13 @@ const Chat = (props) => {
 
 	const getMatchList = async () => {
 
+	}
+	
+	const chatSch = async () => {
+		getProductList();
+		setNowPage(1);      
+		getMatchList();
+		setNowPage2(1);
 	}
 
 	function fnTab(v){
@@ -165,84 +178,76 @@ const Chat = (props) => {
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
 			</View>
-			
-			{isLoading ? (
-			<>
-				<View style={styles.schBox}>
-					<View style={styles.faqListWrap}>					
-						<TextInput
-							value={inputText}
-							onChangeText={(v) => {setInputText(v)}}
-							placeholder={"검색어를 입력해 주세요."}
-							style={[styles.schInput]}
-							placeholderTextColor={"#C5C5C6"}
-						/>
-						<TouchableOpacity
-							style={styles.schBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {
-								
-							}}
-						>
-							<AutoHeightImage width={14} source={require("../../assets/img/icon_sch.png")} />
-						</TouchableOpacity>
-					</View>
-				</View>
-
-				<View style={styles.tabBox}>
+						
+			<View style={styles.schBox}>
+				<View style={styles.faqListWrap}>					
+					<TextInput
+						value={inputText}
+						onChangeText={(v) => {setInputText(v)}}
+						placeholder={"검색어를 입력해 주세요."}
+						style={[styles.schInput]}
+						placeholderTextColor={"#C5C5C6"}
+						returnKyeType='done'
+						onSubmitEditing={chatSch}
+					/>
 					<TouchableOpacity
-						style={styles.tabBtn}
+						style={styles.schBtn}
 						activeOpacity={opacityVal}
-						onPress={()=>{fnTab(1)}}
-					> 
-						{tabState == 1 ? (
-							<>
-							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
-							<View style={styles.tabLine}></View>
-							</>
-						) : (
-							<Text style={styles.tabBtnText}>중고거래</Text>  
-						)}
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.tabBtn}
-						activeOpacity={opacityVal}
-						onPress={()=>{fnTab(2)}}
+						onPress={() => {chatSch()}}
 					>
-						{tabState == 2 ? (
-							<>
-							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
-							<View style={styles.tabLine}></View>
-							</>
-						) : (
-							<Text style={styles.tabBtnText}>매칭</Text>  
-						)}
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_sch.png")} />
 					</TouchableOpacity>
 				</View>
-				
-				{tabState == 1 ? (
-				<FlatList
-					data={prdList}
-					renderItem={(getList)}
-					keyExtractor={(item, index) => index.toString()}	
-					// onEndReachedThreshold={0.6}
-					// onEndReached={moreData}
-					style={styles.flatList}
-					ListEmptyComponent={
-						<View style={styles.notData}>
-							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-						</View>
-					}
-				/>
-				) : null }
-			</>
-			) : (
-				<View style={[styles.indicator]}>
-          <ActivityIndicator size="large" />
-        </View>
-			)}
+			</View>
 
+			<View style={styles.tabBox}>
+				<TouchableOpacity
+					style={styles.tabBtn}
+					activeOpacity={opacityVal}
+					onPress={()=>{fnTab(1)}}
+				> 
+					{tabState == 1 ? (
+						<>
+						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
+						<View style={styles.tabLine}></View>
+						</>
+					) : (
+						<Text style={styles.tabBtnText}>중고거래</Text>  
+					)}
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.tabBtn}
+					activeOpacity={opacityVal}
+					onPress={()=>{fnTab(2)}}
+				>
+					{tabState == 2 ? (
+						<>
+						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
+						<View style={styles.tabLine}></View>
+						</>
+					) : (
+						<Text style={styles.tabBtnText}>매칭</Text>  
+					)}
+				</TouchableOpacity>
+			</View>
+			
+			{tabState == 1 ? (
+			<FlatList
+				data={prdList}
+				renderItem={(getList)}
+				keyExtractor={(item, index) => index.toString()}	
+				onEndReachedThreshold={0.6}
+				onEndReached={moreData}
+				style={styles.flatList}
+				ListEmptyComponent={
+					<View style={styles.notData}>
+						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+						<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+					</View>
+				}
+			/>
+			) : null }
+	
 			<View style={{height:90}}></View>
 		</SafeAreaView>
 	)

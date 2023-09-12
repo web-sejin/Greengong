@@ -172,7 +172,7 @@ const TabBarMenu = (props) => {
         activeOpacity={opacityVal}
         onPress={() => {
           navigation.navigate('TabNavigator', {
-            screen: 'Chat',
+            screen: 'Chat',            
           });
         }}
       >
@@ -230,7 +230,7 @@ const TabNavigator = ({ navigation }) => {
     >
       <Tab.Screen name="Home" component={Home} options={{}} />
       <Tab.Screen name="Match" component={Match} options={{}} />
-      <Tab.Screen name="Chat" component={Chat} options={{}} />
+      <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on'}} />
       <Tab.Screen name="Mypage" component={Mypage} options={{}} />
     </Tab.Navigator>
   );

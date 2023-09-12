@@ -44,7 +44,6 @@ const Home = (props) => {
 	const [myInfo, setMyInfo] = useState({});
 	const [myFac, setMyFac] = useState({});
 	const [myFacOn, setMyFacOn] = useState('');
-
 	const [initLoading, setInitLoading] = useState(false);
 	
 	const isFocused = useIsFocused();

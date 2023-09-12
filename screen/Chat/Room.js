@@ -141,7 +141,9 @@ const Room = (props) => {
 					let responseJson = args.responseJson;
 		
 					if(responseJson.result === 'success'){
-						//console.log('채팅 성공 : ',responseJson);				
+						console.log('채팅 성공 : ',responseJson);
+						console.log('getRoomData!!!');
+						getRoomData();	
 						//navigation.navigate('Home', {isSubmit: true});
 					}else{
 						console.log('결과 출력 실패!!!', resultItem.result_text);
@@ -175,7 +177,7 @@ const Room = (props) => {
 			}
 			//console.log("::::",TestArrayList[1].list);
       setFireList(list);
-			getRoomData();
+			
       // if (!loading) {
       //   setLoading(true);
       // }
@@ -263,7 +265,7 @@ const Room = (props) => {
 
 	//방 정보
 	const getRoomData = async () => {
-		await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:recv_idx, page_code:page_code, page_idx:page_idx}, (args)=>{
+		await Api.send('GET', 'in_chat', {is_api: 1, recv_idx:recv_idx, page_code:page_code, page_idx:page_idx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
