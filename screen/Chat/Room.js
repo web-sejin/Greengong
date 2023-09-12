@@ -420,7 +420,6 @@ const Room = (props) => {
 												prevContinue = styles.mgtop5;
 											}
 										}
-										
 										return(
 											item2.recv_idx==userInfo?.mb_idx ? (
 												<View 
@@ -441,8 +440,8 @@ const Room = (props) => {
 												>
 													<View style={styles.otMessageWrap}>
 														<View style={styles.otImg}>														
-															{item2.image ? (
-																<AutoHeightImage width={35} source={{uri: item2.image}} />
+															{item2.mb_image ? (
+																<AutoHeightImage width={35} source={{uri: item2.mb_image}} />
 															) : (
 																<AutoHeightImage width={35} source={require("../../assets/img/sample1.jpg")} />
 															)}

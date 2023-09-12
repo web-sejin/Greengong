@@ -23,6 +23,7 @@ const Mypage = (props) => {
   const [visible2, setVisible2] = useState(false);
 	const [memberData, setMemberData] = useState([]); //회원 정보	
 	const [profileImg, setProfileImg] = useState(userInfo?.mb_img1);
+	const [recentNotice, setRecentNotice] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -34,15 +35,9 @@ const Mypage = (props) => {
 				setVisible2(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-
+			member_info_handle();
 			if(userInfo){
 				if(userInfo.mb_img1){
 					setProfileImg(userInfo.mb_img1);
@@ -58,6 +53,9 @@ const Mypage = (props) => {
 		const payload = {'is_api': 1, 'id': userInfo?.mb_id}
 		const member_info_list = await member_info(payload);
 		//console.log('member_info_list >>', member_info_list);
+		if(member_info_list.recently_notice != ''){
+			setRecentNotice(member_info_list.recently_notice);
+		}
 	};
 
 	//로그아웃
@@ -116,10 +114,20 @@ const Mypage = (props) => {
 				</TouchableOpacity>
 			</View>
 			<ScrollView>
-				<View style={styles.notApproval}>
+				<TouchableOpacity 
+					style={styles.notApproval}
+					activeOpacity={opacityVal}
+					onPress={() => {
+						navigation.navigate('NoticeList');
+					}}
+				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alert4.png")} />
-					<Text style={styles.notApprovalText}>미승인된 공장이 있습니다.</Text>
-				</View>
+					{recentNotice != '' ? (
+						<Text style={styles.notApprovalText}>{recentNotice}</Text>
+					) : (
+						<Text style={styles.notApprovalText}>등록된 공지사항이 없습니다.</Text>
+					)}
+				</TouchableOpacity>
 				<View style={styles.mypageWrap}>
 					<View style={[styles.mypage1, styles.paddTop30, styles.paddBot30, styles.borderBot]}>
 						<View style={styles.mypage1InfoBox}>

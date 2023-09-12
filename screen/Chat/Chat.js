@@ -4,7 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
+
 import Api from '../../Api';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -19,6 +22,12 @@ const Chat = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputText, setInputText] = useState('');
 	const [tabState, setTabState] = useState(1);
+	const [prdList, setPrdList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+	const [matchList, setMatchList] = useState([]);
+	const [nowPage2, setNowPage2] = useState(1);
+  const [totalPage2, setTotalPage2] = useState(1);
 
 	const DATA = [
 		{
@@ -55,14 +64,35 @@ const Chat = (props) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getProductList();
+			setNowPage(1);      
+			getMatchList();
+			setNowPage2(1);
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-	function fnTab(v){
-    setTabState(v);
-  }
+	const getProductList = async () => {
+		setIsLoading(false);
+		await Api.send('GET', 'list_chat_product_room', {'is_api': 1, page: 1, keyword: inputText}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('list_chat_product_room : ',responseJson);
+				setPrdList(responseJson.data);
+				setTotalPage(responseJson.total_page);
+			}else{
+				setPrdList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+		setIsLoading(true);
+	}
 
 	const getList = ({item, index}) => (    
     <TouchableOpacity
@@ -75,7 +105,11 @@ const Chat = (props) => {
 			<View style={styles.chatBoxLeft}>
 				<View style={styles.chatBoxProfile}>
 					<View style={styles.chatBoxProfileImg}>
-						<AutoHeightImage width={69} source={require("../../assets/img/sample1.jpg")} />
+						{item.mb_img ? (
+							<AutoHeightImage width={69} source={{uri: item.mb_img}} />
+						) : (
+							<AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />
+						)}
 					</View>
 					<View style={styles.readCnt}>
 						<Text style={styles.readCntText}>3</Text>
@@ -85,7 +119,7 @@ const Chat = (props) => {
 					<View style={styles.chatBoxName}>
 						<Text style={styles.chatBoxNameText}>{item.title}</Text>
 					</View>
-					<View style={styles.chatBoxLoc}>
+					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
 						<Text style={styles.chatBoxLocText}>{item.desc}</Text>
 					</View>
@@ -99,11 +133,21 @@ const Chat = (props) => {
 					<Text style={styles.chatBoxDateText}>{item.score}</Text>
 				</View>
 				<View style={styles.chatItemBox}>
-					<AutoHeightImage width={47} source={require("../../assets/img/sample1.jpg")} />
+					{item.pd_image ? (
+						<AutoHeightImage width={47} source={{uri: item.pd_image}} />
+					) : null}
 				</View>
 			</View>
 		</TouchableOpacity>
 	);
+
+	const getMatchList = async () => {
+
+	}
+
+	function fnTab(v){
+    setTabState(v);
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -122,72 +166,82 @@ const Chat = (props) => {
 				</TouchableOpacity>
 			</View>
 			
-			<View style={styles.schBox}>
-				<View style={styles.faqListWrap}>					
-					<TextInput
-						value={inputText}
-						onChangeText={(v) => {setInputText(v)}}
-						placeholder={"검색어를 입력해 주세요."}
-						style={[styles.schInput]}
-						placeholderTextColor={"#C5C5C6"}
-					/>
+			{isLoading ? (
+			<>
+				<View style={styles.schBox}>
+					<View style={styles.faqListWrap}>					
+						<TextInput
+							value={inputText}
+							onChangeText={(v) => {setInputText(v)}}
+							placeholder={"검색어를 입력해 주세요."}
+							style={[styles.schInput]}
+							placeholderTextColor={"#C5C5C6"}
+						/>
+						<TouchableOpacity
+							style={styles.schBtn}
+							activeOpacity={opacityVal}
+							onPress={() => {
+								
+							}}
+						>
+							<AutoHeightImage width={14} source={require("../../assets/img/icon_sch.png")} />
+						</TouchableOpacity>
+					</View>
+				</View>
+
+				<View style={styles.tabBox}>
 					<TouchableOpacity
-						style={styles.schBtn}
+						style={styles.tabBtn}
 						activeOpacity={opacityVal}
-						onPress={() => {
-							
-						}}
+						onPress={()=>{fnTab(1)}}
+					> 
+						{tabState == 1 ? (
+							<>
+							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
+							<View style={styles.tabLine}></View>
+							</>
+						) : (
+							<Text style={styles.tabBtnText}>중고거래</Text>  
+						)}
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={styles.tabBtn}
+						activeOpacity={opacityVal}
+						onPress={()=>{fnTab(2)}}
 					>
-						<AutoHeightImage width={14} source={require("../../assets/img/icon_sch.png")} />
+						{tabState == 2 ? (
+							<>
+							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
+							<View style={styles.tabLine}></View>
+							</>
+						) : (
+							<Text style={styles.tabBtnText}>매칭</Text>  
+						)}
 					</TouchableOpacity>
 				</View>
-			</View>
-
-			<View style={styles.tabBox}>
-				<TouchableOpacity
-					style={styles.tabBtn}
-					activeOpacity={opacityVal}
-					onPress={()=>{fnTab(1)}}
-				> 
-					{tabState == 1 ? (
-						<>
-						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
-						<View style={styles.tabLine}></View>
-						</>
-					) : (
-						<Text style={styles.tabBtnText}>중고거래</Text>  
-					)}
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={styles.tabBtn}
-					activeOpacity={opacityVal}
-					onPress={()=>{fnTab(2)}}
-				>
-					{tabState == 2 ? (
-						<>
-						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
-						<View style={styles.tabLine}></View>
-						</>
-					) : (
-						<Text style={styles.tabBtnText}>매칭</Text>  
-					)}
-				</TouchableOpacity>
-			</View>
-
-			<FlatList
-				data={DATA}
-				renderItem={(getList)}
-				keyExtractor={(item, index) => index.toString()}	
-				// onEndReachedThreshold={0.6}
-				// onEndReached={moreData}
-				style={styles.flatList}
-				ListEmptyComponent={
-					<View style={styles.notData}>
-						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-					</View>
-				}
-			/>
+				
+				{tabState == 1 ? (
+				<FlatList
+					data={prdList}
+					renderItem={(getList)}
+					keyExtractor={(item, index) => index.toString()}	
+					// onEndReachedThreshold={0.6}
+					// onEndReached={moreData}
+					style={styles.flatList}
+					ListEmptyComponent={
+						<View style={styles.notData}>
+							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+						</View>
+					}
+				/>
+				) : null }
+			</>
+			) : (
+				<View style={[styles.indicator]}>
+          <ActivityIndicator size="large" />
+        </View>
+			)}
 
 			<View style={{height:90}}></View>
 		</SafeAreaView>
@@ -229,6 +283,9 @@ const styles = StyleSheet.create({
 	chatBoxRight: {width:75,alignItems:'flex-end'},
 	chatBoxDateText: {fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#919191'},
 	chatItemBox: {width:47,height:47,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:4,},
+
+	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
 });
 
 export default Chat

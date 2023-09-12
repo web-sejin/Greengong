@@ -66,7 +66,8 @@ export const actionCreators = {
 					'mb_idx': response.mb_idx,
 					'nick': response.mb_nick,
 					'result': response.result,
-					'result_text': response.result_text
+					'result_text': response.result_text,
+          'recently_notice': response.recently_notice
 				};
       } else {
         await dispatch({

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -18,6 +18,7 @@ const UsedChat = ({navigation, route}) => {
   const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [chatList, setChatList] = useState([]);
@@ -29,12 +30,13 @@ const UsedChat = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-        setNowPage(1);
-        setTotalPage(1);
+        //setNowPage(1);
+        //setTotalPage(1);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      setNowPage(1);
       getData();
 		}
 
@@ -42,6 +44,7 @@ const UsedChat = ({navigation, route}) => {
 	}, [isFocused]);
 
   const getData = async () => {
+    setIsLoading(false);
     await Api.send('GET', 'list_chat_product_user', {'is_api': 1, pd_idx: idx, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -53,9 +56,12 @@ const UsedChat = ({navigation, route}) => {
         setTotalPage(responseJson.total_page);
         setPdIdx(responseJson.pd_idx);
 			}else{
+        setNowPage(1);
+        setChatList([]);
 				ToastMessage(responseJson.result_text);
 			}
 		});  
+    setIsLoading(true);
   }
 
   const moreData = async () => {    
@@ -91,7 +97,7 @@ const UsedChat = ({navigation, route}) => {
           {item.image ? (
             <AutoHeightImage width={63} source={{uri: item.image}} />
           ) : (
-            <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
+            <AutoHeightImage width={63} source={require("../../assets/img/not_profile.png")} />
           )}
         </View>
         <View style={styles.chatBoxInfo}>
@@ -119,19 +125,25 @@ const UsedChat = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'채팅목록'} />
-        <FlatList
-          data={chatList}
-          renderItem={(getList)}
-          keyExtractor={(item, index) => index.toString()}
-          onEndReachedThreshold={0.6}
-          onEndReached={moreData}
-          ListEmptyComponent={
-            <View style={styles.notData}>
-              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-              <Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-            </View>
-          }
-        />
+        {isLoading ? (
+          <FlatList
+            data={chatList}
+            renderItem={(getList)}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReachedThreshold={0.6}
+            onEndReached={moreData}
+            ListEmptyComponent={
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+              </View>
+            }
+          />
+        ) : (
+          <View style={[styles.indicator]}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
 			{/* <ScrollView>
         <View style={styles.borderBot}></View>
         <View style={styles.borderTop}>          
@@ -219,6 +231,8 @@ const styles = StyleSheet.create({
   chatBoxLocText: {fontFamily:Font.NotoSansMedium,fontSize:13,lineHeight:15,color:'#000',marginLeft:5,},
   notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
+  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
 })
 
 export default UsedChat;

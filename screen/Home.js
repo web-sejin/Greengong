@@ -60,10 +60,15 @@ const Home = (props) => {
 				//console.log(responseJson);
         setMyInfo(responseJson);
 				setMyFac(responseJson.fac_info);
-
-				const fcUse = (responseJson.fac_info).find(item=> item.fc_use==1);
-				const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
-				setMyFacOn(fcUseText);
+				
+				if(responseJson.fac_info[0].fc_use == 1){
+					setMyFacOn("공장1("+responseJson.fac_info[0].fc_dong+")");
+				}else if(responseJson.fac_info[1].fc_use == 1){
+					setMyFacOn("공장2("+responseJson.fac_info[0].fc_dong+")");
+				}
+				// const fcUse = (responseJson.fac_info).find(item=> item.fc_use==1);
+				// const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				// setMyFacOn(fcUseText);
 			}else{
 				console.log(responseJson.result_text);
 			}

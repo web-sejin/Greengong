@@ -208,7 +208,6 @@ const UsedLike = ({navigation, route}) => {
 		}); 
     setIsLoading(false);
   }
-
   const moreData2 = async () => {
     if(totalPage2 > nowPage2){
       await Api.send('GET', 'list_scrap_seller', {is_api: 1, page:nowPage2+1}, (args)=>{
