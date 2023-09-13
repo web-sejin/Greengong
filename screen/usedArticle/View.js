@@ -519,6 +519,7 @@ const UsedView = (props) => {
               <View style={styles.viewSubInfo}>
                 <Text style={styles.viewSubInfoText}>조회 : {itemInfo.pd_view_cnt}</Text>
               </View>
+              {myInfo.mb_idx != itemInfo.pd_mb_idx ? (
               <TouchableOpacity
                 style={styles.likeBtn}
                 activeOpacity={opacityVal}
@@ -530,6 +531,7 @@ const UsedView = (props) => {
                   <AutoHeightImage width={20} source={require("../../assets/img/icon_heart_off.png")} />
                 )}
               </TouchableOpacity>
+              ) : null}
             </View>
           </View>
           
@@ -624,7 +626,7 @@ const UsedView = (props) => {
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
                           <Text style={styles.listInfoPriceStateText}>판매완료</Text>
                         </View>
-                        {item.is_free != 1 ? (
+                        {item2.is_free != 1 ? (
                         <View style={styles.listInfoPrice}>
                           <Text style={styles.listInfoPriceText}>{item2.pd_price}원</Text>
                         </View>
@@ -751,7 +753,8 @@ const UsedView = (props) => {
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {
-                setVisible(false)
+                setVisible(false);
+                //console.log(idx);              
 								navigation.navigate('SalesComplete', {idx:idx});
 						}}
 						>

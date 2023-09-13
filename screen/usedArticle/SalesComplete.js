@@ -72,21 +72,22 @@ const SalesComplete = (props) => {
   const getList = ({item, index}) => (
 		<TouchableOpacity 
       style={[styles.compBtn]}
+      activeOpacity={opacityVal}
       onPress={() => {
-        if(mbId && mbId==1){
+        if(mbId && mbId==item.mb_idx){
           setMbId();
         }else{
-          setMbId(1);
+          setMbId(item.mb_idx);
         }
       }}
     >
-      <View style={[styles.compWrap, styles.compWrapFst]}>
-        <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
+      <View style={[styles.compWrap, index==0 ? styles.compWrapFst : null]}>
+        <View style={[styles.compRadio, mbId==item.mb_idx ? styles.comRadioChk : null]}>
           <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
         </View>
         <View style={styles.compInfo}>
           <View style={styles.compInfoDate}>
-            <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
+            <Text style={styles.compInfoDateText}>{item.cr_lastdate}</Text>
           </View>
           <View style={styles.compInfoName}>
             <Text style={styles.compInfoNameText}>{item.mb_nick}</Text>
@@ -97,8 +98,19 @@ const SalesComplete = (props) => {
           </View>
         </View>
         <View style={styles.compThumb}>
-          <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
+          <AutoHeightImage width={79} source={{uri: item.image}} />
         </View>
+        {item.bd_price ? (
+        <View style={styles.bidPriceBox}>
+          <View style={styles.bidPriceLeft}>
+            <Text style={styles.bidPriceLeftText}>가격</Text>
+          </View>
+          <View style={styles.bidPriceRight}>
+            <Text style={styles.bidPriceRightUnit}>{item.bd_unit}</Text>
+            <Text style={styles.bidPriceRightPrice}>{item.bd_price}원</Text>
+          </View>
+        </View>
+        ) : null}
       </View>
     </TouchableOpacity>
 	);
@@ -111,8 +123,33 @@ const SalesComplete = (props) => {
     }
   }
 
-  function fnSubmit(){
-    console.log("fnSubmit");    
+  function submitEndProduct(v){    
+    const formData = {
+			is_api:1,				
+			pd_idx:idx
+		};
+
+    if(v == 2){
+      formData.recv_idx = mbId;
+    }else if(v == 3){
+      formData.recv_idx = mbId;
+      formData.so_score = score;
+    }
+
+    Api.send('POST', 'save_end_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible(false);
+        setVisible2(false);
+				navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -179,7 +216,7 @@ const SalesComplete = (props) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(1)}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -264,13 +301,13 @@ const SalesComplete = (props) => {
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
               style={styles.avatarBtn}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(2)}}
             >
               <Text style={styles.avatarBtnText}>평가 하지 않고 완료</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(3)}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -300,11 +337,11 @@ const styles = StyleSheet.create({
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
   compBtn: {paddingHorizontal:20,},
-  compWrap: {paddingVertical:30,borderTopWidth:1,borderColor:'#E9EEF6',display:'flex',flexDirection:'row',justifyContent:'space-between',position:'relative',paddingLeft:31},
+  compWrap: {paddingVertical:30,borderTopWidth:1,borderColor:'#E9EEF6',display:'flex',flexDirection:'row',justifyContent:'space-between',flexWrap:'wrap',position:'relative'},
   compWrapFst: {borderTopWidth:0,},
   compRadio: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,position:'absolute',top:30,left:0,display:'flex',alignItems:'center',justifyContent:'center'},
   comRadioChk: {backgroundColor:'#31B481',borderColor:'#31B481',},
-  compInfo: {width:(innerWidth-110)},
+  compInfo: {width:(innerWidth-79),paddingLeft:31},
   compInfoDate: {},
   compInfoDateText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:21,color:'#7E93A8'},
   compInfoName: {marginVertical:8},
@@ -312,6 +349,13 @@ const styles = StyleSheet.create({
   compInfoLoc: {display:'flex',flexDirection:'row',alignItems:'center',},
   compInfoLocText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:15,color:'#000',marginLeft:5,},
   compThumb: {width:79,height:79,borderRadius:50,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'},
+  bidPriceBox: {width:widnowWidth-40,flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:15,paddingTop:11,paddingBottom:10,paddingHorizontal:15,backgroundColor:'#F3FAF8',borderRadius:8},
+  bidPriceLeft: {},
+  bidPriceLeftText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#353636'},
+  bidPriceRight: {flexDirection:'row',alignItems:'center',},
+  bidPriceRightUnit: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#111',marginRight:3,},
+  bidPriceRightPrice: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#31B481'},
+
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
   modalCont2: {top:((widnowHeight/2)-166)},

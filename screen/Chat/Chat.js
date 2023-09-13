@@ -66,7 +66,7 @@ const Chat = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_chat_product_room : ',responseJson);
+				//console.log('list_chat_product_room : ',responseJson);
 				setPrdList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{
@@ -155,7 +155,7 @@ const Chat = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_chat_match_room : ',responseJson);
+				//console.log('list_chat_match_room : ',responseJson);
 				setMatchList(responseJson.data);
 				setTotalPage2(responseJson.total_page);
 			}else{
@@ -324,11 +324,17 @@ const Chat = (props) => {
 					onEndReachedThreshold={0.6}
 					onEndReached={moreData}
 					style={styles.flatList}
-					ListEmptyComponent={
-						<View style={styles.notData}>
-							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-						</View>
+					ListEmptyComponent={					
+						isLoading ? (
+							<View style={styles.notData}>
+								<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+								<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+							</View>
+						):(
+							<View style={[styles.indicator]}>
+								<ActivityIndicator size="large" />
+							</View>
+						)
 					}
 				/>
 			) : (
@@ -340,10 +346,16 @@ const Chat = (props) => {
 					onEndReached={moreData2}
 					style={styles.flatList}
 					ListEmptyComponent={
-						<View style={styles.notData}>
-							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-							<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
-						</View>
+						isLoading ? (
+							<View style={styles.notData}>
+								<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+								<Text style={styles.notDataText}>진행중인 채팅이 없습니다.</Text>
+							</View>
+						):(
+							<View style={[styles.indicator]}>
+								<ActivityIndicator size="large" />
+							</View>
+						)
 					}
 				/>
 			)}
@@ -395,7 +407,7 @@ const styles = StyleSheet.create({
 	chatBoxDateText: {fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#919191'},
 	chatItemBox: {width:47,height:47,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:4,},
 
-	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
+	indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
 });
 
 export default Chat

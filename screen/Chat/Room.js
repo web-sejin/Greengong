@@ -36,7 +36,8 @@ const Room = (props) => {
 	const [visible3, setVisible3] = useState(false);
 	const [visible4, setVisible4] = useState(false);
 	const [visible5, setVisible5] = useState(false);
-	const [img, setImg] = useState('');
+	const [visible6, setVisible6] = useState(false);
+	const [img, setImg] = useState({});
 	const [msgText, setMsgText] = useState('');
 	const [optionBox, setOptionBox] = useState(false);
 	const [radio, setRadio] = useState(1);
@@ -47,6 +48,7 @@ const Room = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [roomInfo, setRoomInfo] = useState({});
 	const [phone, setPhone] = useState();
+	const [popImg, setPopImg] = useState('');
 	
 	let roomName = route.params.roomName;
 	if(!roomName || roomName==''){
@@ -64,6 +66,7 @@ const Room = (props) => {
 				setVisible3(false);
 				setVisible4(false);
 				setVisible5(false);
+				setVisible6(false);
 				setRadio(1);
 			}
 		}else{
@@ -94,25 +97,35 @@ const Room = (props) => {
 		 return splt2[0]+':'+splt2[1];
 	}
 
-	async function addTodo() {		
+	async function addTodo(v) {		
 		//console.log(ref._collectionPath._parts[0]);
-    if(msgText == ""){
-      ToastMessage("메세지를 입력해주세요.");
-      return false;
-    }
-
 		const currentTime = currentTimer();
-    Keyboard.dismiss();
-		//console.log("ref ::::", ref);
-    await ref.add({
-      content: msgText,
-      userType: 1,
-      complete: false,
-      datetime: currentTime,
-			mb_idx:userInfo?.mb_idx,
-			imgUrl: '',
-    });
-    setMsgText('');
+
+		if(v == 'text'){
+			if(msgText == ""){
+				ToastMessage("메세지를 입력해주세요.");
+				return false;
+			}
+
+			Keyboard.dismiss();
+			await ref.add({
+				content: msgText,
+				complete: false,
+				datetime: currentTime,
+				mb_idx:userInfo?.mb_idx,
+				imgUrl: '',
+			});
+			setMsgText('');
+		}else{
+			await ref.add({
+				content: '',
+				complete: false,
+				datetime: currentTime,
+				mb_idx:userInfo?.mb_idx,				
+				imgUrl: v,
+			});
+			setOptionBox(false);
+		}    
   }
 
   useEffect(() => {
@@ -122,42 +135,44 @@ const Room = (props) => {
       const list = [];
       //console.log("querySnapshot : ",querySnapshot)
       querySnapshot.forEach((doc, index) => {
-        const {content, complete, userType, datetime, mb_idx} = doc.data();							
+        const {content, complete, datetime, mb_idx, imgUrl} = doc.data();							
 				const dateSplit = datetime.split(' ')[0];			
 				//console.log("doc id : ",doc.id);
 				//console.log(page_idx);
+
 				const formData = {
 					is_api:1,				
 					recv_idx:recv_idx,
 					page_code:page_code,
 					page_idx:page_idx,
-					ch_msg:content,
-					msg_key:doc.id,					
-					ch_file:'',
+					msg_key:doc.id,
 				};
+
+				if(content != ''){ formData.ch_msg =  content; console.log('a');}
+				if(imgUrl != ''){ formData.ch_file =  {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
 
 				Api.send('POST', 'send_chat', formData, (args)=>{
 					let resultItem = args.resultItem;
 					let responseJson = args.responseJson;
 		
 					if(responseJson.result === 'success'){
-						console.log('채팅 성공 : ',responseJson);
-						console.log('getRoomData!!!');
+						//console.log('send_chat : ',responseJson);
 						getRoomData();
 						fireRemove(doc.id);
+						setImg({});
 					}else{
 						console.log('결과 출력 실패!!!', resultItem.result_text);
 						//ToastMessage(responseJson.result_text);
 					}
-				});
+				});				
 
         list.push({
           id: doc.id,
           content,
           complete,
-          userType,
           datetime,
 					mb_idx,
+					imgUrl,
         });
       });
 
@@ -175,9 +190,8 @@ const Room = (props) => {
 					TestArrayList[j].list.push(list[i]);
 				}
 			}
-			//console.log("::::",TestArrayList[1].list);
+			//console.log("::::",TestArrayList[0].list);
       setFireList(list);
-			
       // if (!loading) {
       //   setLoading(true);
       // }
@@ -191,23 +205,23 @@ const Room = (props) => {
 			await ref.doc(doc_id).delete();
 			//alert("삭제완료")                
 		} catch (error) {
-			console.log(error)
+			console.log("error : ",error)
 			//alert("삭제실패")
 		}
-		//doc_id.ref.delete();
 	}
 
 	//앨범
 	const chooseImage = () => {
+		Keyboard.dismiss();
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
+      //width: widnowWidth,
+      //height: 400,
+      //cropping: true,
     })
 		.then(image => {
 			//console.log(image.path);
 			setImg(image);
-			imageUpload();
+			imageUpload(image.path);
 		})
 		.finally(()=>{
 			console.log('chooseImage finally');
@@ -216,15 +230,16 @@ const Room = (props) => {
 
 	//카메라
   const openCamera = () => {
+		Keyboard.dismiss();
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
+      //width: widnowWidth,
+      //height: 400,
+      //cropping: true,
     })
 		.then(image => {
 			console.log(image);
 			setImg(image);
-			imageUpload();
+			imageUpload(image.path);
 		})
 		.finally(()=>{
 			console.log('openCamera finally');
@@ -232,8 +247,8 @@ const Room = (props) => {
   };
 
 	//이미지 업로드
-	const imageUpload = async () => {
-    
+	const imageUpload = async (path) => {		
+    addTodo(path);
   }
 
 	const ModalOn = () => {
@@ -284,7 +299,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("in_chat : ",responseJson);				
+				//console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;
@@ -305,7 +320,7 @@ const Room = (props) => {
 				setDbList(TestDbList);
 			}else{
 				//setItemList([]);				
-				//console.log('결과 출력 실패! : ', resultItem.result_text);
+				console.log('결과 출력 실패! : ', resultItem.result_text);
 			}
 		});
 	}
@@ -357,6 +372,12 @@ const Room = (props) => {
     }
   }, []);
 
+	//이미지 팝업
+	function ImageCropPicker(url){		
+		//console.log(url);
+		setPopImg(url);
+		setVisible6(true);
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -370,7 +391,7 @@ const Room = (props) => {
 					{itemInfo.image ? (
 						<AutoHeightImage width={66} source={{uri: itemInfo.image}} />
 					) : (
-						<AutoHeightImage width={66} source={require("../../assets/img/sample1.jpg")} />
+						<AutoHeightImage width={66} source={require("../../assets/img/not_profile.png")} />
 					)}
 				</View>
 				<View style={styles.listInfoBox}>
@@ -444,10 +465,20 @@ const Room = (props) => {
 													<View style={styles.myMessageTextDate}>
 														<Text style={styles.myMessageDate}>{item2.ch_date}</Text>
 													</View>
+													{item2.ch_type==1 ? (
 													<View style={styles.myMessageTextBox}>
 														<Text style={styles.myMessageText}>{content}</Text>
 													</View>
-												</View>
+													) : (
+														<TouchableOpacity 
+															style={[styles.myMessageTextBox, styles.myMessageTextBoxImg]}
+															activeOpacity={opacityVal}
+															onPress={()=>{ImageCropPicker(item2.ch_file)}}
+														>
+															<AutoHeightImage width={112} source={{uri: item2.ch_file}} />
+														</TouchableOpacity>
+													)}																			
+												</View>			
 											) : (
 												<View 
 													key={item2.ch_idx}
@@ -458,12 +489,22 @@ const Room = (props) => {
 															{item2.mb_image ? (
 																<AutoHeightImage width={35} source={{uri: item2.mb_image}} />
 															) : (
-																<AutoHeightImage width={35} source={require("../../assets/img/sample1.jpg")} />
+																<AutoHeightImage width={35} source={require("../../assets/img/not_profile.png")} />
 															)}
-														</View>					
-														<View style={styles.otMessageTextBox}>
-															<Text style={styles.otMessageText}>{content}</Text>
 														</View>
+														{item2.ch_type==1 ? (	
+															<View style={styles.otMessageTextBox}>
+																<Text style={styles.otMessageText}>{content}</Text>
+															</View>
+														) : (
+															<TouchableOpacity 
+																style={[styles.otMessageTextBox, styles.myMessageTextBoxImg]}
+																activeOpacity={opacityVal}
+															onPress={()=>{ImageCropPicker(item2.ch_file)}}
+															>
+																<AutoHeightImage width={112} source={{uri: item2.ch_file}} />
+															</TouchableOpacity>
+														)}
 													</View>
 													<View style={styles.otMessageTextDate}>
 														<Text style={styles.myMessageDate}>{item2.ch_date}</Text>
@@ -475,100 +516,7 @@ const Room = (props) => {
 								</View>
 							</View>
 						)
-					})}
-
-					{/* <View style={styles.ChatDateBox}>
-						<View style={styles.dateArea}>
-							<Text style={styles.dateAreaText}>2023년 07월 03일</Text>
-						</View>
-						
-						<View style={styles.chatMsgArea}>
-							{fireList.map((item, index) => {
-								const content = item.content;
-								const datetime = item.datetime;
-								const onlyTIME = getTime(datetime);
-								
-								let prevContinue = styles.mgtop20;
-								if(index != 0){		
-									if(fireList[index-1].mb_idx == userInfo?.mb_idx){
-										prevContinue = styles.mgtop5;
-									}
-								}
-
-								return(
-									item.mb_idx==userInfo?.mb_idx ? (
-										<View 
-											key={item.id}
-											style={[styles.myMessage, prevContinue]}
-										>
-											<View style={styles.myMessageTextDate}>
-												<Text style={styles.myMessageDate}>
-													{onlyTIME}
-												</Text>
-											</View>
-											<View style={styles.myMessageTextBox}>
-												<Text style={styles.myMessageText}>{content}</Text>
-											</View>
-										</View>
-									) : (
-										<View 
-											key={item.id}
-											style={[styles.otMessage, prevContinue]}
-										>
-											<View style={styles.otMessageWrap}>
-												<View style={styles.otImg}>
-													<AutoHeightImage width={35} source={require("../../assets/img/sample1.jpg")} />
-												</View>					
-												<View style={styles.otMessageTextBox}>
-													<Text style={styles.otMessageText}>{content}</Text>
-												</View>
-											</View>
-											<View style={styles.otMessageTextDate}>
-												<Text style={styles.otMessageDate}>{onlyTIME}</Text>
-											</View>
-										</View>
-									)
-								)
-							})}
-						</View>
-					</View> */}
-
-					{/* <View style={[styles.ChatDateBox, styles.mgtop80]}>
-						<View style={styles.dateArea}>
-							<Text style={styles.dateAreaText}>2023년 07월 04일</Text>
-						</View>
-						<View style={styles.chatMsgArea}>
-							<View style={[styles.myMessage, styles.mgtop40, styles.mgtop0]}>
-								<View style={styles.myMessageTextDate}>
-									<Text style={styles.myMessageDate}>오후 05:05</Text>
-								</View>
-								<View style={styles.myMessageTextBox}>
-									<Text style={styles.myMessageText}>올리신 물건 보고 연락 드립니다.</Text>
-								</View>
-							</View>
-							<View style={[styles.otMessage, styles.mgtop40]}>
-								<View style={styles.otMessageWrap}>
-									<View style={styles.otImg}>
-										<AutoHeightImage width={35} source={require("../../assets/img/sample1.jpg")} />
-									</View>					
-									<View style={styles.otMessageTextBox}>
-										<Text style={styles.otMessageText}>네 안녕하세요</Text>
-									</View>
-								</View>
-								<View style={styles.otMessageTextDate}>
-									<Text style={styles.otMessageDate}>오후 05:10</Text>
-								</View>
-							</View>
-							<View style={[styles.myMessage, styles.mgtop40]}>
-								<View style={styles.myMessageTextDate}>
-									<Text style={styles.myMessageDate}>오후 05:12</Text>
-								</View>
-								<View style={[styles.myMessageTextBox, styles.myMessageTextBoxImg]}>
-									<AutoHeightImage width={112} source={require("../../assets/img/sample1.jpg")} />
-								</View>
-							</View>
-						</View>
-					</View> */}
+					})}					
 				</View>
 			</ScrollView>		
 				
@@ -602,7 +550,7 @@ const Room = (props) => {
 							<TouchableOpacity 
 								style={styles.msgBtn}
 								activeOpacity={opacityVal}
-								onPress={()=>{addTodo();}}
+								onPress={()=>{addTodo('text');}}
 							>
 								<AutoHeightImage width={35} source={require("../../assets/img/icon_enter.png")} />
 							</TouchableOpacity>
@@ -626,14 +574,16 @@ const Room = (props) => {
 							<AutoHeightImage width={50} source={require("../../assets/img/chat_btn2.png")} />
 							<Text style={styles.msgOptBtnText}>앨범</Text>
 						</TouchableOpacity>
+						{userInfo.mb_idx != itemInfo.pd_mb_idx ? (
 						<TouchableOpacity
 							style={styles.msgOptBtn}
 							activeOpacity={opacityVal}
 							onPress={()=>{setVisible4(true)}}
 						>
 							<AutoHeightImage width={50} source={require("../../assets/img/chat_btn3.png")} />
-							<Text style={styles.msgOptBtnText}>전화</Text>
+							<Text style={styles.msgOptBtnText}>전화{userInfo?.mb_idx }</Text>
 						</TouchableOpacity>
+						) : null}
 						<TouchableOpacity
 							style={styles.msgOptBtn}
 							activeOpacity={opacityVal}
@@ -913,6 +863,23 @@ const Room = (props) => {
 					)}
 				</View>
       </Modal>
+
+			<Modal
+        visible={visible6}
+				transparent={true}
+				onRequestClose={() => {setVisible6(false)}}
+      >				
+				<View style={styles.imgPopBox}>
+					<TouchableOpacity 
+						style={styles.modalX}
+						activeOpacity={opacityVal}
+						onPress={() => {setVisible6(false)}}
+					>
+						<AutoHeightImage width={35} source={require("../../assets/img/write_btn_off2.png")} />
+					</TouchableOpacity>
+					<AutoHeightImage width={widnowWidth-20} source={{uri: popImg}} />
+				</View>				
+			</Modal>
 		</SafeAreaView>
 	)
 }
@@ -1024,6 +991,9 @@ const styles = StyleSheet.create({
 
 	notMsgData: {paddingVertical:40,},
 	notMsgDataText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:17,color:'#999',textAlign:'center'},
+
+	imgPopBox: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(0,0,0,0.9)',overflow:'hidden',position:'absolute',left:0,top:0,alignItems:'center',justifyContent:'center'},
+	modalX: {position:'absolute',top:10,right:10,},
 })
 
 //export default Room

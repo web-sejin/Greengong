@@ -22,60 +22,6 @@ const opacityVal = 0.8;
 
 const MatchView = (props) => {
   const scrollRef = useRef();
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-      naviPage: 'UsedWrite1',
-      stateVal: '',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고자재',
-      naviPage: 'UsedWrite2',
-      stateVal: '나눔',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고기계/장비',
-      naviPage: 'UsedWrite3',
-      stateVal: '입찰',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '폐기물',
-      naviPage: 'UsedWrite4',
-      stateVal: '',
-		},
-	];
 
   const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
   const idx = route.params.idx;
@@ -96,9 +42,8 @@ const MatchView = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [itemInfo, setItemInfo] = useState({});
   const [swp, setSwp] = useState({});
-  const [latest, setLatest] = useState({});
   const [myInfo, setMyInfo] = useState({});
-  const [prdMbIdx, setPrdMbIdx] = useState();
+  const [mcMbIdx, setMcMbIdx] = useState();
   const [radio, setRadio] = useState(1);
   const [radioList, setRadioList] = useState([]);
 
@@ -133,11 +78,10 @@ const MatchView = (props) => {
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
 				console.log("view_match : ",responseJson);
-				// setItemInfo(responseJson);
-        // setSwp(responseJson.pf_data);
-        // setLatest(responseJson.mb_latest);
-        // setZzim(responseJson.is_scrap);
-        // setPrdMbIdx(responseJson.pd_mb_idx);
+				setItemInfo(responseJson);
+        setSwp(responseJson.mf_data);
+        setZzim(responseJson.is_scrap);
+        setMcMbIdx(responseJson.mc_mb_idx);
 
         // if(responseJson.is_product_like == 1){
         //   setLike(1);
@@ -174,6 +118,103 @@ const MatchView = (props) => {
 
   const ModalOn = () => {
     setVisible(true);
+  }
+
+  //관심요청자
+  function fnScrap(){
+    const formData = {
+			is_api:1,				
+			mb_idx:mcMbIdx,
+      sr_code:'match'
+		};
+
+    Api.send('POST', 'save_scrap', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);				
+        if(responseJson.scrap_type == 'save'){
+          setZzim(1);
+          ToastMessage('관심판매자에 추가되었습니다.');
+        }else{
+          setZzim(0);
+          ToastMessage('관심판매자에서 삭제되었습니다.');
+        }
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //좋아요
+  function fnLike(){
+    const formData = {
+			is_api:1,				
+			mc_idx:idx,
+		};
+
+    Api.send('POST', 'save_like_match', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        if(responseJson.is_like == 1){
+          setLike(1);
+        }else{
+          setLike(0);
+        }
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //신고하기
+  function fnSingo(){
+    const formData = {
+			is_api:1,				
+			reason_idx:radio,
+      page_code:'product',
+      article_idx:idx
+		};
+
+    Api.send('POST', 'save_report', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('신고 성공 : ',responseJson);
+        navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //차단하기
+  function fnBlock(){
+    const formData = {
+			is_api:1,				
+			recv_idx:prdMbIdx
+		};
+
+    Api.send('POST', 'save_block', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('차단 성공 : ',responseJson);
+        navigation.navigate('Home', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
   function fnSendEmail(){
@@ -231,10 +272,11 @@ const MatchView = (props) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
-        headertitle={'title'} 
+        headertitle={itemInfo.mc_name} 
         ModalEvent={ModalOn} 
       />
 			<ScrollView ref={scrollRef}>
+        {swp.length > 0 ? (
         <Swiper 
           style={styles.swiper} 
           showsButtons={true}
@@ -253,112 +295,95 @@ const MatchView = (props) => {
           dot={<View style={styles.swiperDot} />}
           activeDot={<View style={[styles.swiperDot, styles.swiperActiveDot]} />}
         >
-          <View style={styles.swiperSlider}>
-            {/* <AutoHeightImage width={79} source={{uri: item.path}} /> */}
+          {/* <View style={styles.swiperSlider}>            
             <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
-          </View>
-          <View style={styles.swiperSlider}>            
-            <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
-          </View>
-          <View style={styles.swiperSlider}>            
-            <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
-          </View>
+          </View> */}
+          {swp.map((item, index) => {
+            return(
+              <View key={index} style={styles.swiperSlider}>
+                <AutoHeightImage width={widnowWidth} source={{uri: item.mf_name}} />
+              </View>
+            )
+          })}
         </Swiper>
+        ) : null}
+
         <View style={[styles.viewBox1]}>
           <View style={styles.profileBox}>
             <TouchableOpacity
+              style={styles.otherProfile}
               activeOpacity={opacityVal}
               onPress={()=>{
-                navigation.navigate('Other', {});
+                navigation.navigate('Other', {idx:itemInfo.mc_mb_idx});
               }}
             >
-              <AutoHeightImage width={58} source={require("../../assets/img/profile_img.png")} />
+              {itemInfo.mb_img ? (
+                <AutoHeightImage width={58} source={{uri: itemInfo.mb_img}} />
+              ) : (
+                <AutoHeightImage width={58} source={require("../../assets/img/not_profile.png")} />	
+              )}
             </TouchableOpacity>
             <View style={styles.profileBoxInfo}>
               <View style={styles.profileName}>
-                <Text style={styles.profileNameText}>홍길동</Text>
+                <Text style={styles.profileNameText}>{itemInfo.mb_nick}</Text>
               </View>
               <View style={styles.profileLocal}>
                 <AutoHeightImage width={10} source={require("../../assets/img/icon_local2.png")} />
-                <Text style={styles.profileLocalText}>중동</Text>
+                <Text style={styles.profileLocalText}>{itemInfo.mc_loc}</Text>
               </View>
               <View style={styles.profileResult}>
-                <Text style={styles.profileResultText}>거래평가 : 4</Text>
+                <Text style={styles.profileResultText}>거래평가 : {itemInfo.mb_score}</Text>
               </View>
             </View>
+            {myInfo.mb_idx != itemInfo.mc_mb_idx ? (
             <TouchableOpacity
               style={[styles.profileZzim, zzim==1 ? styles.profileZzimOn : null]}
               activeOpacity={opacityVal}
               onPress={() => {
-                if(zzim == 0){
-                  setZzim(1);
-                }else{
-                  setZzim(0);
-                }                
+                fnScrap();                  
               }}
             >
               <Text style={[styles.profileZzimText, zzim==1 ? styles.profileZzimTextOn : null]}>관심요청자</Text>
             </TouchableOpacity>
+            ) : null}
           </View>
           <View style={styles.viewSubjectBox}>
             <View style={styles.viewSubject}>
               <View style={styles.viewState}>                
-                {state == '' || state == 1 ? (
-                <Text style={styles.viewStateText}>견적요청중</Text>
-                ) : null}
-
-                {state == 2 ? (
-                <Text style={styles.viewStateText}>발주완료</Text>
-                ) : null}
+                <Text style={styles.viewStateText}>{itemInfo.mc_status}</Text>
               </View>
               <View style={styles.viewSubjectPart}>
-                <Text style={styles.viewSubjectText}>
-                스크랩 싸게 급매로 팝니다. 이 재료로 우주선 만들 수 있습니다.
-                </Text>
+                <Text style={styles.viewSubjectText}>{itemInfo.mc_name}</Text>
               </View>
             </View>
             <View style={styles.viewOpt}>
               <View style={styles.viewOptLabel}>
-                <Text style={styles.viewOptLabelText}>3일 전 등록</Text>
+                <Text style={styles.viewOptLabelText}>{itemInfo.mc_date} 등록</Text>
               </View>
             </View>
           </View>
           <View style={styles.viewSumm}>
-            <Text  style={styles.viewSummText}>
-              밀링 / 플라스틱 / ABS / 도면 업로드 유 / 모든 파트너 도면 다운로드 가능 / 견적서를 제출한 경우에만 상담 가능
-            </Text>
+            <Text  style={styles.viewSummText}>{itemInfo.mc_summary}</Text>
           </View>
           <View style={styles.viewContent}>
-            <Text  style={styles.viewContentText}>
-              파이프 제작 공장입니다.
-              304파이프 202계 파이프 제작합니다.
-              길이는 4m 안쪽이고 1T에 100파이입니다.
-              304랑 200계 섞여있습니다.
-              사진 보시고 연락주세요.
-            </Text>
+            <Text  style={styles.viewContentText}>{itemInfo.mc_contents}</Text>
           </View>
           <View style={styles.viewSubInfoBox}>
             <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>채팅 : 10</Text>
+              <Text style={styles.viewSubInfoText}>채팅 : {itemInfo.mc_chat_cnt}</Text>
             </View>
             <View style={styles.viewSubInfoLine}></View>
             <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>찜 : 5</Text>
+              <Text style={styles.viewSubInfoText}>찜 : {itemInfo.mc_like_cnt}</Text>
             </View>
             <View style={styles.viewSubInfoLine}></View>
             <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>조회 : 100</Text>
+              <Text style={styles.viewSubInfoText}>조회 : {itemInfo.mc_view_cnt}</Text>
             </View>
             <TouchableOpacity
               style={styles.likeBtn}
               activeOpacity={opacityVal}
-					    onPress={() => {
-                if(like == 0){
-                  setLike(1);
-                }else{
-                  setLike(0);
-                }                
-              }}
+					    onPress={() => {fnLike()}}
             >
               {like == 1 ? (
                 <AutoHeightImage width={20} source={require("../../assets/img/icon_heart.png")} />
@@ -572,6 +597,7 @@ const styles = StyleSheet.create({
   swiperNavi: {marginTop:-5},
   viewBox1: {paddingHorizontal:20,},
   profileBox: {paddingTop:25,paddingBottom:30,borderBottomWidth:1,borderBottomColor:'#E9EEF6',display:'flex',flexDirection:'row',position:'relative',},
+  otherProfile: {width:58,height:58,borderRadius:50,overflow:'hidden'},
   profileBoxInfo: {width:(innerWidth-58),paddingLeft:10,},
   profileName: {},
   profileNameText: {fontFamily:Font.NotoSansBold,fontSize:18,lineHeight:22,color:'#000'},
