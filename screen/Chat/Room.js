@@ -37,6 +37,9 @@ const Room = (props) => {
 	const [visible4, setVisible4] = useState(false);
 	const [visible5, setVisible5] = useState(false);
 	const [visible6, setVisible6] = useState(false);
+	const [visible7, setVisible7] = useState(false);
+	const [toastModal, setToastModal] = useState(false);
+	const [toastText, setToastText] = useState('');
 	const [img, setImg] = useState({});
 	const [msgText, setMsgText] = useState('');
 	const [optionBox, setOptionBox] = useState(false);
@@ -49,6 +52,7 @@ const Room = (props) => {
 	const [roomInfo, setRoomInfo] = useState({});
 	const [phone, setPhone] = useState();
 	const [popImg, setPopImg] = useState('');
+	const [iptHolder, setIptHolder] = useState('');
 	
 	let roomName = route.params.roomName;
 	if(!roomName || roomName==''){
@@ -67,6 +71,9 @@ const Room = (props) => {
 				setVisible4(false);
 				setVisible5(false);
 				setVisible6(false);
+				setVisible7(false);
+				setToastModal(false);
+				setToastText('');
 				setRadio(1);
 			}
 		}else{
@@ -148,8 +155,8 @@ const Room = (props) => {
 					msg_key:doc.id,
 				};
 
-				if(content != ''){ formData.ch_msg =  content; console.log('a');}
-				if(imgUrl != ''){ formData.ch_file =  {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
+				if(content != ''){ formData.ch_msg = content; }
+				if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
 
 				Api.send('POST', 'send_chat', formData, (args)=>{
 					let resultItem = args.resultItem;
@@ -159,7 +166,7 @@ const Room = (props) => {
 						//console.log('send_chat : ',responseJson);
 						getRoomData();
 						fireRemove(doc.id);
-						setImg({});
+						setImg({});						
 					}else{
 						console.log('결과 출력 실패!!!', resultItem.result_text);
 						//ToastMessage(responseJson.result_text);
@@ -201,7 +208,7 @@ const Room = (props) => {
 	//파이어스토어 데이터 삭제
 	const fireRemove = async (doc_id) => {
 		try {
-			console.log(doc_id);
+			//console.log(doc_id);
 			await ref.doc(doc_id).delete();
 			//alert("삭제완료")                
 		} catch (error) {
@@ -318,34 +325,111 @@ const Room = (props) => {
 					}
 				}
 				setDbList(TestDbList);
+
+				if(responseJson.is_my_report == 1 || responseJson.is_you_report == 1){
+					setIptHolder('신고하거나 신고 받아서 채팅이 불가능합니다.');
+				}else if(responseJson.is_my_block == 1 || responseJson.is_you_block == 1){
+					setIptHolder('차단하거나 차단 받아서 채팅이 불가능합니다.');						
+				}else{
+					setIptHolder('');
+				}
 			}else{
 				//setItemList([]);				
-				console.log('결과 출력 실패! : ', resultItem.result_text);
+				//console.log('결과 출력 실패! : ', resultItem.result_text);
+				ToastMessage(resultItem.result_text);
 			}
 		});
 	}
 
+	function blockEvent(){
+		setVisible(false);
+		if(roomInfo.is_my_block == 0){
+			setVisible2(true);			
+		}else{
+			fnBlock();
+		}
+	}
+
 	//차단하기
-  function fnBlock(){
-		console.log('차단!');
-    // const formData = {
-		// 	is_api:1,				
-		// 	recv_idx:prdMbIdx
-		// };
+  const fnBlock = async () => {
+    const formData = {
+			is_api:1,				
+			recv_idx:recv_idx
+		};
 
     Api.send('POST', 'save_block', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('차단 성공 : ',responseJson);
-        navigation.navigate('Home', {isSubmit: true});
+				//console.log('차단 성공 : ',responseJson);				
 			}else{
+				//console.log('결과 출력 실패!', resultItem.result_text);
+			}
+		});
+
+		setVisible2(false);
+		getRoomData();
+  }
+
+	function reportEvent(){		
+		if(roomInfo.is_my_report == 0){
+			setVisible(false);
+			setVisible3(true);			
+		}else{
+			setToastText('이미 신고한 채팅입니다.');      
+      setToastModal(true);
+      setTimeout(()=>{ setToastModal(false) },2000);
+		}
+	}
+
+	//신고하기
+	const fnSingo = async () => {
+    const formData = {
+			is_api:1,				
+			reason_idx:radio,
+      page_code:'chat',
+      article_idx:route.params.cr_idx
+		};
+
+    Api.send('POST', 'save_report', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('신고 성공 : ',responseJson);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+
+		setVisible3(false);
+		getRoomData();
+  }
+
+	//나가기
+	const getOut = async () => {
+		const formData = {
+			is_api:1,				
+      cr_idx:route.params.cr_idx
+		};
+
+    Api.send('POST', 'out_chat', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('나가기 성공 : ',responseJson);
+				setVisible7(false);
+				navigation.navigate('Chat', {reload:'on'});
+			}else{
+				setVisible7(false);
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
 			}
-		});
-  } 
+		});		
+	}
 
 	//자주 쓰는 메세지 선택
 	function fnMsgSelect(v){
@@ -434,7 +518,7 @@ const Room = (props) => {
 						<Text style={styles.alertBoxText}>카카오톡이나 플랫폼 외의 거래는 피해가 발생할 확률이 높습니다.</Text>
 						<Text style={styles.alertBoxText}>본 플랫폼은 기능 범주를 벗어난 사기 피해를 책임지지 않습니다.</Text>
 					</View>
-
+					
 					{dbList.map((item, index) => {
 						const date = (item.date).split('-');						
 						const innerList = item.list;
@@ -523,38 +607,51 @@ const Room = (props) => {
 			<KeyboardAvoidingView>
 				<View style={styles.msgArea}>
 					<View style={styles.msgAreaTop}>
-						<TouchableOpacity
-							style={styles.msgPlusBtn}
-							activeOpacity={opacityVal}
-							onPress={()=>{
-								setOptionBox(!optionBox);
-								Keyboard.dismiss();
-							}}
-						>
-							{optionBox ? (
-								<AutoHeightImage width={17} source={require("../../assets/img/icon_close.png")} />
-							):(
-								<AutoHeightImage width={17} source={require("../../assets/img/icon_plus.png")} />
-							)}
-						</TouchableOpacity>
-						<View style={styles.msgInputArea}>
-							<TextInput
-								value={msgText}
-								onChangeText={(v) => {setMsgText(v)}}
-								multiline={true}
-								placeholder={"메세지를 입력해 주세요."}
-								//신고하거나 신고 받아서 채팅이 불가능합니다.
-								style={[styles.msgInput]}
-								placeholderTextColor="#8791A1"
-							/>
-							<TouchableOpacity 
-								style={styles.msgBtn}
+						{roomInfo.is_my_report == 0 && roomInfo.is_my_block == 0 && roomInfo.is_you_report == 0 && roomInfo.is_you_block == 0 ? (
+							<>
+							<TouchableOpacity
+								style={styles.msgPlusBtn}
 								activeOpacity={opacityVal}
-								onPress={()=>{addTodo('text');}}
+								onPress={()=>{
+									setOptionBox(!optionBox);
+									Keyboard.dismiss();
+								}}
 							>
-								<AutoHeightImage width={35} source={require("../../assets/img/icon_enter.png")} />
+								{optionBox ? (
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_close.png")} />
+								):(
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_plus.png")} />
+								)}
 							</TouchableOpacity>
-						</View>
+							<View style={styles.msgInputArea}>
+								<TextInput
+									value={msgText}
+									onChangeText={(v) => {setMsgText(v)}}
+									multiline={true}
+									placeholder={"메세지를 입력해 주세요."}
+									//신고하거나 신고 받아서 채팅이 불가능합니다.
+									style={[styles.msgInput]}
+									placeholderTextColor="#8791A1"
+								/>							
+								<TouchableOpacity 
+									style={styles.msgBtn}
+									activeOpacity={opacityVal}
+									onPress={()=>{addTodo('text');}}
+								>
+									<AutoHeightImage width={35} source={require("../../assets/img/icon_enter.png")} />
+								</TouchableOpacity>
+							</View>
+							</>
+						):(
+							<View style={[styles.msgInputArea, styles.msgInputArea2]}>
+								<TextInput
+									placeholder={iptHolder}
+									style={[styles.msgInput, styles.msgInput2]}
+									placeholderTextColor="#8791A1"
+									editable={false}
+								/>
+							</View>
+						)}
 					</View>
 					{optionBox ? (
 					<View style={styles.msgAreaBot}>
@@ -611,31 +708,27 @@ const Room = (props) => {
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								setVisible2(true);
-								setVisible(false);
-							}}
+							onPress={() => {blockEvent()}}
 						>
-							<Text style={styles.modalCont2BtnText}>차단하기</Text>
+							{roomInfo.is_my_block == 0 ? (
+								<Text style={styles.modalCont2BtnText}>차단하기</Text>
+							) : (
+								<Text style={styles.modalCont2BtnText}>차단해제</Text>
+							)}
 						</TouchableOpacity>
 						
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								setVisible3(true);
-								setVisible(false);
-							}}
+							onPress={() => {reportEvent()}}
 						>
-							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>신고하기</Text>
+							<Text style={[styles.modalCont2BtnText]}>신고하기</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.delete]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								setVisible(false);
-							}}
+							onPress={() => {setVisible7(true)}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>나가기</Text>
 						</TouchableOpacity>
@@ -773,9 +866,7 @@ const Room = (props) => {
 					<TouchableOpacity 
 						style={styles.nextBtn}
 						activeOpacity={opacityVal}
-						onPress={() => {
-												
-					}}
+						onPress={() => {fnSingo()}}
 					>
 						<Text style={styles.nextBtnText}>신고하기</Text>
 					</TouchableOpacity>
@@ -880,6 +971,72 @@ const Room = (props) => {
 					<AutoHeightImage width={widnowWidth-20} source={{uri: popImg}} />
 				</View>				
 			</Modal>
+
+			<Modal
+        visible={visible7}
+				transparent={true}
+				onRequestClose={() => {setVisible7(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVisible7(false)}}
+				></Pressable>
+				<View style={[styles.modalCont3]}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>채팅방 나가기</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>채팅방을 나가면 채팅 정보가</Text>
+						<Text style={styles.avatarDescText}>삭제되어 복구가 안됩니다.</Text>
+						<Text style={[styles.avatarDescText, styles.avatarDescText2]}>나가시겠습니까?</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {setVisible7(false)}}
+            >
+              <Text style={styles.avatarBtnText}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+              onPress={() => {getOut()}}
+            >
+              <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+				</View>
+      </Modal>
+
+			<Modal
+        visible={toastModal}
+				animationType={"slide"}
+				transparent={true}
+      >
+				<View style={styles.toastModal}>
+					<View
+						style={{
+							backgroundColor: '#000',
+							borderRadius: 10,
+							paddingVertical: 10,
+							paddingHorizontal: 20,
+							opacity: 0.7,
+						}}
+					>
+						<Text
+							style={{
+								textAlign: 'center',
+								color: '#FFFFFF',
+								fontSize: 15,
+								lineHeight: 22,
+								fontFamily: Font.NotoSansRegular,
+								letterSpacing: -0.38,
+							}}
+						>
+							{toastText}
+						</Text>
+					</View>
+				</View>
+			</Modal>
 		</SafeAreaView>
 	)
 }
@@ -928,6 +1085,8 @@ const styles = StyleSheet.create({
 	msgPlusBtn: {width:30,height:52,alignItems:'center',justifyContent:'center',},
 	msgInputArea: {width:widnowWidth-72,position:'relative'},
 	msgInput: {width:widnowWidth-72,maxHeight:60,backgroundColor:'#fff',borderWidth:1,borderColor:'#E1E1E1',borderRadius:20,paddingLeft:15,paddingRight:50,fontSize:14,color:'#000'},
+	msgInputArea2: {width:widnowWidth-30},
+	msgInput2: {width:widnowWidth-30,backgroundColor:'#fafafa'},
 	msgBtn: {position:'absolute',right:5,top:7,},
 	msgAreaBot: {flexDirection:'row',justifyContent:'center',paddingTop:10,paddingBottom:20,},
 	msgOptBtn: {width:'25%',alignItems:'center'},
