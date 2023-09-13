@@ -35,7 +35,7 @@ LocaleConfig.locales['kr'] = {
 LocaleConfig.defaultLocale = 'kr';
 
 //스크랩 글쓰기
-const MatchWrite = ({navigation, route}) => {
+const MatchModify = ({navigation, route}) => {
 	const fileListData = [
 		{'idx': 1, 'txt': '파일1', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
 		{'idx': 2, 'txt': '파일2', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
@@ -1224,4 +1224,4 @@ const styles = StyleSheet.create({
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-export default MatchWrite
+export default MatchModify

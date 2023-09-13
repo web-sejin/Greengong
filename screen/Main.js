@@ -57,6 +57,7 @@ import Bid from './usedArticle/Bid'; //입찰하기
 import SalesComplete from './usedArticle/SalesComplete'; //판매완료업체선정
 import UsedChat from './usedArticle/UsedChat'; //중고상품 채팅목록
 import MatchWrite from './Match/MatchWrite'; //매칭 글쓰기
+import MatchModify from './Match/MatchModify'; //매칭 글수정
 import MatchView from './Match/View'; //매칭 상세페이지
 import DownUsed from './Match/DownUsed'; //매칭 도면다운로드 허용
 import Estimate from './Match/Estimate'; //매칭 예상 견적서 등록
@@ -270,6 +271,7 @@ const StackNavigator = () => {
       <Stack.Screen name="UsedChat" component={UsedChat} />
       <Stack.Screen name="ChatRoom" component={ChatRoom} />
       <Stack.Screen name="MatchWrite" component={MatchWrite} />
+      <Stack.Screen name="MatchModify" component={MatchModify} />
       <Stack.Screen name="MatchView" component={MatchView} />
       <Stack.Screen name="MachChat" component={MachChat} />
       <Stack.Screen name="DownUsed" component={DownUsed} />

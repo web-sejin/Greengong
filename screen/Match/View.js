@@ -33,7 +33,9 @@ const MatchView = (props) => {
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [visible3, setVisible3] = useState(false);
-  const [state, setState] = useState('');
+  const [visible4, setVisible4] = useState(false);
+  const [visible5, setVisible5] = useState(false);
+  const [visible6, setVisible6] = useState(false);
   const [floorFile, setFloorFile] = useState(''); //도면 파일
 	const [floorFileType, setFloorFileType] = useState(''); //도면 파일
 	const [floorFileUri, setFloorFileUri] = useState(''); //도면 파일
@@ -57,7 +59,9 @@ const MatchView = (props) => {
 				setVisible(false);
         setVisible2(false);
         setVisible3(false);
-        setState('');
+        setVisible4(false);
+        setVisible5(false);
+        setVisible6(false);
 			}
 		}else{
 			setRouteLoad(true);
@@ -117,7 +121,11 @@ const MatchView = (props) => {
   }
 
   const ModalOn = () => {
-    setVisible(true);
+    if(myInfo.mb_idx == itemInfo.mc_mb_idx){
+      setVisible(true);
+    }else{
+      //setVisible3(true);
+    }
   }
 
   //관심요청자
@@ -268,6 +276,27 @@ const MatchView = (props) => {
 
   }
 
+  //견적요청중
+  function chgStateSell(){
+    const formData = {
+			is_api:1,
+      mc_idx:idx,
+		};
+
+    Api.send('POST', 'requesting_match', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setVisible(false);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -275,306 +304,339 @@ const MatchView = (props) => {
         headertitle={itemInfo.mc_name} 
         ModalEvent={ModalOn} 
       />
-			<ScrollView ref={scrollRef}>
-        {swp.length > 0 ? (
-        <Swiper 
-          style={styles.swiper} 
-          showsButtons={true}
-          nextButton={
-            <View style={[styles.swiperNavi, styles.swiperNext]}>
-              <AutoHeightImage width={35} source={require("../../assets/img/swipe_next.png")} />
-            </View>
-          }
-          prevButton={
-            <View style={[styles.swiperNavi, styles.swiperPrev]}>
-              <AutoHeightImage width={35} source={require("../../assets/img/swipe_prev.png")} />
-            </View>
-          }
-          showsPagination={true}
-          paginationStyle={styles.swiperDotBox}
-          dot={<View style={styles.swiperDot} />}
-          activeDot={<View style={[styles.swiperDot, styles.swiperActiveDot]} />}
-        >
-          {/* <View style={styles.swiperSlider}>            
-            <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
-          </View> */}
-          {swp.map((item, index) => {
-            return(
-              <View key={index} style={styles.swiperSlider}>
-                <AutoHeightImage width={widnowWidth} source={{uri: item.mf_name}} />
-              </View>
-            )
-          })}
-        </Swiper>
-        ) : null}
 
-        <View style={[styles.viewBox1]}>
-          <View style={styles.profileBox}>
-            <TouchableOpacity
-              style={styles.otherProfile}
-              activeOpacity={opacityVal}
-              onPress={()=>{
-                navigation.navigate('Other', {idx:itemInfo.mc_mb_idx});
-              }}
+      {isLoading ? (
+        <>
+          <ScrollView ref={scrollRef}>
+            {swp.length > 0 ? (
+            <Swiper 
+              style={styles.swiper} 
+              showsButtons={true}
+              nextButton={
+                <View style={[styles.swiperNavi, styles.swiperNext]}>
+                  <AutoHeightImage width={35} source={require("../../assets/img/swipe_next.png")} />
+                </View>
+              }
+              prevButton={
+                <View style={[styles.swiperNavi, styles.swiperPrev]}>
+                  <AutoHeightImage width={35} source={require("../../assets/img/swipe_prev.png")} />
+                </View>
+              }
+              showsPagination={true}
+              paginationStyle={styles.swiperDotBox}
+              dot={<View style={styles.swiperDot} />}
+              activeDot={<View style={[styles.swiperDot, styles.swiperActiveDot]} />}
             >
-              {itemInfo.mb_img ? (
-                <AutoHeightImage width={58} source={{uri: itemInfo.mb_img}} />
-              ) : (
-                <AutoHeightImage width={58} source={require("../../assets/img/not_profile.png")} />	
-              )}
-            </TouchableOpacity>
-            <View style={styles.profileBoxInfo}>
-              <View style={styles.profileName}>
-                <Text style={styles.profileNameText}>{itemInfo.mb_nick}</Text>
-              </View>
-              <View style={styles.profileLocal}>
-                <AutoHeightImage width={10} source={require("../../assets/img/icon_local2.png")} />
-                <Text style={styles.profileLocalText}>{itemInfo.mc_loc}</Text>
-              </View>
-              <View style={styles.profileResult}>
-                <Text style={styles.profileResultText}>거래평가 : {itemInfo.mb_score}</Text>
-              </View>
-            </View>
-            {myInfo.mb_idx != itemInfo.mc_mb_idx ? (
-            <TouchableOpacity
-              style={[styles.profileZzim, zzim==1 ? styles.profileZzimOn : null]}
-              activeOpacity={opacityVal}
-              onPress={() => {
-                fnScrap();                  
-              }}
-            >
-              <Text style={[styles.profileZzimText, zzim==1 ? styles.profileZzimTextOn : null]}>관심요청자</Text>
-            </TouchableOpacity>
+              {/* <View style={styles.swiperSlider}>            
+                <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
+              </View> */}
+              {swp.map((item, index) => {
+                return(
+                  <View key={index} style={styles.swiperSlider}>
+                    <AutoHeightImage width={widnowWidth} source={{uri: item.mf_name}} />
+                  </View>
+                )
+              })}
+            </Swiper>
             ) : null}
-          </View>
-          <View style={styles.viewSubjectBox}>
-            <View style={styles.viewSubject}>
-              <View style={styles.viewState}>                
-                <Text style={styles.viewStateText}>{itemInfo.mc_status}</Text>
+
+            <View style={[styles.viewBox1]}>
+              <View style={styles.profileBox}>
+                <TouchableOpacity
+                  style={styles.otherProfile}
+                  activeOpacity={opacityVal}
+                  onPress={()=>{
+                    navigation.navigate('Other', {idx:itemInfo.mc_mb_idx});
+                  }}
+                >
+                  {itemInfo.mb_img ? (
+                    <AutoHeightImage width={58} source={{uri: itemInfo.mb_img}} />
+                  ) : (
+                    <AutoHeightImage width={58} source={require("../../assets/img/not_profile.png")} />	
+                  )}
+                </TouchableOpacity>
+                <View style={styles.profileBoxInfo}>
+                  <View style={styles.profileName}>
+                    <Text style={styles.profileNameText}>{itemInfo.mb_nick}</Text>
+                  </View>
+                  <View style={styles.profileLocal}>
+                    <AutoHeightImage width={10} source={require("../../assets/img/icon_local2.png")} />
+                    <Text style={styles.profileLocalText}>{itemInfo.mc_loc}</Text>
+                  </View>
+                  <View style={styles.profileResult}>
+                    <Text style={styles.profileResultText}>거래평가 : {itemInfo.mb_score}</Text>
+                  </View>
+                </View>
+                {myInfo.mb_idx != itemInfo.mc_mb_idx ? (
+                <TouchableOpacity
+                  style={[styles.profileZzim, zzim==1 ? styles.profileZzimOn : null]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    fnScrap();                  
+                  }}
+                >
+                  <Text style={[styles.profileZzimText, zzim==1 ? styles.profileZzimTextOn : null]}>관심요청자</Text>
+                </TouchableOpacity>
+                ) : null}
               </View>
-              <View style={styles.viewSubjectPart}>
-                <Text style={styles.viewSubjectText}>{itemInfo.mc_name}</Text>
+              <View style={styles.viewSubjectBox}>
+                <View style={styles.viewSubject}>
+                  <View style={styles.viewState}>                
+                    <Text style={styles.viewStateText}>{itemInfo.mc_status}</Text>
+                  </View>
+                  <View style={styles.viewSubjectPart}>
+                    <Text style={styles.viewSubjectText}>{itemInfo.mc_name}</Text>
+                  </View>
+                </View>
+                <View style={styles.viewOpt}>
+                  <View style={styles.viewOptLabel}>
+                    <Text style={styles.viewOptLabelText}>{itemInfo.mc_date} 등록</Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.viewSumm}>
+                <Text  style={styles.viewSummText}>{itemInfo.mc_summary}</Text>
+              </View>
+              <View style={styles.viewContent}>
+                <View>
+                  <Text style={styles.viewContentText}>
+                    프로젝트명 : {itemInfo.mc_project_name}
+                  </Text>
+                  <Text style={styles.viewContentText}>
+                    제품 용도 : {itemInfo.mc_use_type}
+                  </Text>
+                  {itemInfo.mc_option2_org == 2 ? (
+                    <Text style={styles.viewContentText}>
+                      납기일 : {itemInfo.mc_end_date}
+                    </Text>
+                  ) : (
+                    <Text style={styles.viewContentText}>
+                      납기일 : {itemInfo.mc_option2}
+                    </Text>
+                  )}
+                  <Text style={styles.viewContentText}>
+                    추정예산 : {itemInfo.mc_price}
+                  </Text>
+                </View>
+                <View style={styles.mgTop20}>
+                  <Text style={styles.viewContentText}>{itemInfo.mc_contents}</Text>
+                </View>
+              </View>
+              <View style={styles.viewSubInfoBox}>
+                <View style={styles.viewSubInfo}>
+                  <Text style={styles.viewSubInfoText}>채팅 : {itemInfo.mc_chat_cnt}</Text>
+                </View>
+                <View style={styles.viewSubInfoLine}></View>
+                <View style={styles.viewSubInfo}>
+                  <Text style={styles.viewSubInfoText}>찜 : {itemInfo.mc_like_cnt}</Text>
+                </View>
+                <View style={styles.viewSubInfoLine}></View>
+                <View style={styles.viewSubInfo}>
+                  <Text style={styles.viewSubInfoText}>조회 : {itemInfo.mc_view_cnt}</Text>
+                </View>
+                {myInfo.mb_idx != itemInfo.mc_mb_idx ? (
+                <TouchableOpacity
+                  style={styles.likeBtn}
+                  activeOpacity={opacityVal}
+                  onPress={() => {fnLike()}}
+                >
+                  {like == 1 ? (
+                    <AutoHeightImage width={20} source={require("../../assets/img/icon_heart.png")} />
+                  ) : (
+                    <AutoHeightImage width={20} source={require("../../assets/img/icon_heart_off.png")} />
+                  )}
+                </TouchableOpacity>
+                ) : null }
               </View>
             </View>
-            <View style={styles.viewOpt}>
-              <View style={styles.viewOptLabel}>
-                <Text style={styles.viewOptLabelText}>{itemInfo.mc_date} 등록</Text>
-              </View>
+          </ScrollView>
+          <View style={[styles.nextFix]}>
+            <View style={styles.nextFixFlex}>
+              <TouchableOpacity 
+                style={[styles.nextBtn]}
+                activeOpacity={opacityVal}
+                onPress={() => {
+                  navigation.navigate('DownUsed', {}); //도면 다운로드 허용
+                  //setVisible2(true); //도면받기
+                }}
+              >
+                <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.nextBtn, styles.nextBtn2]}
+                activeOpacity={opacityVal}
+                onPress={() => {
+                  //navigation.navigate('MachChat', {}); //매칭 채팅리스트
+                  //setVisible3(true); //회사소개서 업로드 팝업
+                  navigation.navigate('Estimate', {}); //견적서 업로드 페이지
+                }}
+              >
+                <Text style={styles.nextBtnText}>채팅하기</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.viewSumm}>
-            <Text  style={styles.viewSummText}>{itemInfo.mc_summary}</Text>
-          </View>
-          <View style={styles.viewContent}>
-            <Text  style={styles.viewContentText}>{itemInfo.mc_contents}</Text>
-          </View>
-          <View style={styles.viewSubInfoBox}>
-            <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>채팅 : {itemInfo.mc_chat_cnt}</Text>
-            </View>
-            <View style={styles.viewSubInfoLine}></View>
-            <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>찜 : {itemInfo.mc_like_cnt}</Text>
-            </View>
-            <View style={styles.viewSubInfoLine}></View>
-            <View style={styles.viewSubInfo}>
-              <Text style={styles.viewSubInfoText}>조회 : {itemInfo.mc_view_cnt}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.likeBtn}
-              activeOpacity={opacityVal}
-					    onPress={() => {fnLike()}}
-            >
-              {like == 1 ? (
-                <AutoHeightImage width={20} source={require("../../assets/img/icon_heart.png")} />
-              ) : (
-                <AutoHeightImage width={20} source={require("../../assets/img/icon_heart_off.png")} />
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-      <View style={[styles.nextFix]}>
-        <View style={styles.nextFixFlex}>
-          <TouchableOpacity 
-            style={[styles.nextBtn]}
-            activeOpacity={opacityVal}
-            onPress={() => {
-              navigation.navigate('DownUsed', {}); //도면 다운로드 허용
-              //setVisible2(true); //도면받기
-            }}
+
+          <Modal
+            visible={visible}
+            transparent={true}
+            onRequestClose={() => {setVisible(false)}}
           >
-            <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.nextBtn, styles.nextBtn2]}
-            activeOpacity={opacityVal}
-            onPress={() => {
-              //navigation.navigate('MachChat', {}); //매칭 채팅리스트
-              //setVisible3(true); //회사소개서 업로드 팝업
-              navigation.navigate('Estimate', {}); //견적서 업로드 페이지
-            }}
+            <Pressable 
+              style={styles.modalBack}
+              onPress={() => {setVisible(false)}}
+            ></Pressable>
+            <View style={styles.modalCont2}>
+              <View style={styles.modalCont2Box}>
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.choice]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    navigation.navigate('MatchModify', {});
+                }}
+                >
+                  <Text style={styles.modalCont2BtnText}>수정하기</Text>
+                </TouchableOpacity>
+                
+                {itemInfo.mc_status_org == 2 ? (
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.modify]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {chgStateSell()}}
+                >
+                  <Text style={styles.modalCont2BtnText}>견적요청중</Text>
+                </TouchableOpacity>
+                ) : null}
+
+                {itemInfo.mc_status_org == 1 ? (
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.modify]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    setVisible(false);
+                    navigation.navigate('MatchCompelte', {idx:idx});
+                  }}
+                >
+                  <Text style={styles.modalCont2BtnText}>발주완료</Text>
+                </TouchableOpacity>
+                ) : null}
+
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.delete]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    setVisible(false)
+                  }}
+                >
+                  <Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity 
+                style={[styles.modalCont2Btn, styles.cancel]}
+                activeOpacity={opacityVal}
+                onPress={() => {
+                  setVisible(false)
+                }}
+              >
+                <Text style={styles.modalCont2BtnText}>취소</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={visible2}
+            transparent={true}
+            onRequestClose={() => {setVisible2(false)}}
           >
-            <Text style={styles.nextBtnText}>채팅하기</Text>
-          </TouchableOpacity>
-        </View>
-			</View>
-
-      <Modal
-				visible={visible}
-				transparent={true}
-				onRequestClose={() => {setVisible(false)}}
-      >
-				<Pressable 
-					style={styles.modalBack}
-					onPress={() => {setVisible(false)}}
-				></Pressable>
-				<View style={styles.modalCont2}>
-					<View style={styles.modalCont2Box}>
-						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.choice]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-								navigation.navigate('MatchWrite', {});
-						}}
-						>
-							<Text style={styles.modalCont2BtnText}>수정하기</Text>
-						</TouchableOpacity>
-
-            <TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-                setState(1);
-								setVisible(false)
-						}}
-						>
-							<Text style={styles.modalCont2BtnText}>견적요청중</Text>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-                setVisible(false);
-								navigation.navigate('MatchCompelte', {});
-							}}
-						>
-							<Text style={styles.modalCont2BtnText}>발주완료</Text>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.delete]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-                setState(2);
-								setVisible(false)
-							}}
-						>
-							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
-						</TouchableOpacity>
-					</View>
-					<TouchableOpacity 
-						style={[styles.modalCont2Btn, styles.cancel]}
-						activeOpacity={opacityVal}
-						onPress={() => {
-							setVisible(false)
-						}}
-					>
-						<Text style={styles.modalCont2BtnText}>취소</Text>
-					</TouchableOpacity>
-				</View>
-      </Modal>
-
-      <Modal
-        visible={visible2}
-				transparent={true}
-				onRequestClose={() => {setVisible2(false)}}
-      >
-				<Pressable 
-					style={styles.modalBack}
-					onPress={() => {setVisible2(false)}}
-				></Pressable>
-				<View style={styles.modalCont3}>
-					<View style={styles.avatarTitle}>
-            <Text style={styles.avatarTitleText}>도면받기</Text>
-          </View>
-          <View style={styles.avatarDesc}>
-            <Text style={styles.avatarDescText}>도면을 받아서 검토후 견적서를 발송하시겠습니까?</Text>
-            <Text style={styles.avatarDescText}>도면은 회원님의 메일로 발송이 됩니다.</Text>
-          </View>
-          <View style={styles.avatarBtnBox}>
-            <TouchableOpacity 
-              style={styles.avatarBtn}
+            <Pressable 
+              style={styles.modalBack}
               onPress={() => {setVisible2(false)}}
-            >
-              <Text style={styles.avatarBtnText}>취소</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSendEmail();}}
-            >
-              <Text style={styles.avatarBtnText}>확인</Text>
-            </TouchableOpacity>
-          </View>
-				</View>
-      </Modal>
+            ></Pressable>
+            <View style={styles.modalCont3}>
+              <View style={styles.avatarTitle}>
+                <Text style={styles.avatarTitleText}>도면받기</Text>
+              </View>
+              <View style={styles.avatarDesc}>
+                <Text style={styles.avatarDescText}>도면을 받아서 검토후 견적서를 발송하시겠습니까?</Text>
+                <Text style={styles.avatarDescText}>도면은 회원님의 메일로 발송이 됩니다.</Text>
+              </View>
+              <View style={styles.avatarBtnBox}>
+                <TouchableOpacity 
+                  style={styles.avatarBtn}
+                  onPress={() => {setVisible2(false)}}
+                >
+                  <Text style={styles.avatarBtnText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.avatarBtn, styles.avatarBtn2]}
+                  onPress={() => {fnSendEmail();}}
+                >
+                  <Text style={styles.avatarBtnText}>확인</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
 
-      <Modal
-        visible={visible3}
-				transparent={true}
-				onRequestClose={() => {setVisible3(false)}}
-      >
-				<Pressable 
-					style={styles.modalBack}
-					onPress={() => {setVisible3(false)}}
-				></Pressable>
-				<View style={[styles.modalCont3, styles.modalCont4]}>
-					<View style={styles.avatarTitle}>
-            <Text style={styles.avatarTitleText}>회사소개서 업로드</Text>
-          </View>
-          <View style={styles.avatarDesc}>
-            <Text style={styles.avatarDescText}>회사소개서를 업로드하시면 채팅이 가능합니다.</Text>
-            <Text style={styles.avatarDescText}>PDF, PPT, ZIP 파일을 업로드하여 주세요.</Text>
-          </View>
-          <View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={floorFile}
-									editable = {false}
-									placeholder={'파일을 업로드해 주세요.'}
-									placeholderTextColor="#8791A1"
-									style={[styles.input, styles.input2]}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={openPicker}
-								>
-									<Text style={styles.certChkBtnText}>업로드</Text>
-								</TouchableOpacity>
-							</View>
-          <View style={styles.avatarBtnBox}>
-            <TouchableOpacity 
-              style={styles.avatarBtn}
+          <Modal
+            visible={visible3}
+            transparent={true}
+            onRequestClose={() => {setVisible3(false)}}
+          >
+            <Pressable 
+              style={styles.modalBack}
               onPress={() => {setVisible3(false)}}
-            >
-              <Text style={styles.avatarBtnText}>취소</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnFileUpload();}}
-            >
-              <Text style={styles.avatarBtnText}>확인</Text>
-            </TouchableOpacity>
+            ></Pressable>
+            <View style={[styles.modalCont3, styles.modalCont4]}>
+              <View style={styles.avatarTitle}>
+                <Text style={styles.avatarTitleText}>회사소개서 업로드</Text>
+              </View>
+              <View style={styles.avatarDesc}>
+                <Text style={styles.avatarDescText}>회사소개서를 업로드하시면 채팅이 가능합니다.</Text>
+                <Text style={styles.avatarDescText}>PDF, PPT, ZIP 파일을 업로드하여 주세요.</Text>
+              </View>
+              <View style={[styles.typingInputBox, styles.typingFlexBox]}>
+                    <TextInput
+                      value={floorFile}
+                      editable = {false}
+                      placeholder={'파일을 업로드해 주세요.'}
+                      placeholderTextColor="#8791A1"
+                      style={[styles.input, styles.input2]}
+                    />
+                    <TouchableOpacity 
+                      style={styles.certChkBtn}
+                      activeOpacity={opacityVal}
+                      onPress={openPicker}
+                    >
+                      <Text style={styles.certChkBtnText}>업로드</Text>
+                    </TouchableOpacity>
+                  </View>
+              <View style={styles.avatarBtnBox}>
+                <TouchableOpacity 
+                  style={styles.avatarBtn}
+                  onPress={() => {setVisible3(false)}}
+                >
+                  <Text style={styles.avatarBtnText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.avatarBtn, styles.avatarBtn2]}
+                  onPress={() => {fnFileUpload();}}
+                >
+                  <Text style={styles.avatarBtnText}>확인</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          
+          {indicatorSt ? (
+          <View style={[styles.indicator, styles.indicator2]}>
+            <ActivityIndicator size="large" color="#fff" />
           </View>
-				</View>
-      </Modal>
-      
-      {indicatorSt ? (
-      <View style={[styles.indicator]}>
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
-      ) : null}
+          ) : null}
+        </>
+      ):(
+        <View style={[styles.indicator]}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
 		</SafeAreaView>
 	)
 }
@@ -680,7 +742,10 @@ const styles = StyleSheet.create({
 	input: {width:(innerWidth-130),height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
   certChkBtn: {width:80,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	certChkBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
-  indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10,backgroundColor:'rgba(0,0,0,0.5)'},
+  indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10},
+  indicator2: {backgroundColor:'rgba(0,0,0,0.5)'},
+
+  mgTop20: {marginTop:20},
 })
 
 export default MatchView

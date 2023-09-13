@@ -557,7 +557,12 @@ const UsedView = (props) => {
                   }}
                 >
                   <>
-                  <AutoHeightImage width={131} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+                  
+                  {item2.pd_image ? (
+                    <View style={styles.otherItemBox}>
+                      <AutoHeightImage width={131} source={{uri: item2.pd_image}} style={styles.listImg} />
+                    </View>
+                  ) : null }
                   <View style={styles.listInfoBox}>
                     <View style={styles.listInfoTitle}>
                       <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
@@ -741,6 +746,7 @@ const UsedView = (props) => {
 						</TouchableOpacity>
             )}
             
+            {itemInfo.pd_status_org == 2 || itemInfo.pd_status_org == 3 ? (
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
@@ -748,7 +754,9 @@ const UsedView = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>판매중</Text>
 						</TouchableOpacity>
-
+            ) : null }
+            
+            {itemInfo.pd_status_org != 3 ? (
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
@@ -760,6 +768,7 @@ const UsedView = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>판매완료</Text>
 						</TouchableOpacity>
+            ) : null }
 
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.delete]}
@@ -1045,6 +1054,7 @@ const styles = StyleSheet.create({
   otherItemList: {},
   listLi: {display:'flex',flexDirection:'row',paddingVertical:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
+  otherItemBox: {width:131,height:131,overflow:'hidden',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'},
 	listImg: {borderRadius:8},
 	listInfoBox: {width:(widnowWidth - 171),paddingLeft:15,},
 	listInfoTitle: {},
