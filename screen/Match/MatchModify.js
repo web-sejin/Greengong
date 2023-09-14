@@ -627,8 +627,8 @@ const MatchModify = ({navigation, route}) => {
 				console.log('성공 : ',responseJson);				
 				navigation.navigate('Match', {isSubmit: true});
 			}else{
-				console.log('결과 출력 실패!', resultItem);
-				ToastMessage(responseJson.result_text);
+				console.log('결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
 	}
@@ -696,7 +696,7 @@ const MatchModify = ({navigation, route}) => {
         setIsLoading(true);
 			}else{
 				//setItemList([]);				
-				console.log('결과 출력 실패!');
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
   }

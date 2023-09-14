@@ -474,7 +474,11 @@ const Modify3 = ({navigation, route}) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);				
-				navigation.navigate('Home', {isSubmit: true});
+				if(route.params.returnNavi){
+					navigation.navigate(route.params.returnNavi, {isSubmit: true});
+				}else{
+					navigation.navigate('Home', {isSubmit: true});
+				}
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);

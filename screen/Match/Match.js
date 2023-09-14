@@ -200,6 +200,26 @@ const Match = (props) => {
 		setIsLoading(true);
 	}
 
+	const moreData = async () => {
+		if(totalPage > nowPage){
+			await Api.send('GET', 'list_match', {is_api: 1, c1_idx:filterAry, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = itemList.concat(responseJson.data);				
+					setItemList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
+
 	useEffect(()=>{
 		if(initLoading){
 			setNowPage(1);
@@ -401,7 +421,7 @@ const Match = (props) => {
 					keyExtractor={(item, index) => index.toString()}
 					onScroll={onScroll}					
 					onEndReachedThreshold={0.8}
-					//onEndReached={moreData}
+					onEndReached={moreData}
 					ListHeaderComponent={
 						<>						
 						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>

@@ -26,14 +26,20 @@ const SaleList = ({navigation, route}) => {
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [tabState, setTabState] = useState(1);
-  const [idxVal, setIdxVal] = useState('');
   const [itemList, setItemList] = useState([]);
   const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [itemList2, setItemList2] = useState([]);
   const [nowPage2, setNowPage2] = useState(1);
   const [totalPage2, setTotalPage2] = useState(1);
-  const [initLoading, setInitLoading] = useState(false);  
+  const [initLoading, setInitLoading] = useState(false); 
+  
+  const [tab1Cnt, setTab1Cnt] = useState(0);
+  const [tab2Cnt, setTab2Cnt] = useState(0);
+
+  const [modiNav, setModiNav] = useState();
+  const [idxVal, setIdxVal] = useState();
+  const [itemState, setItemState] = useState();
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -43,14 +49,23 @@ const SaleList = ({navigation, route}) => {
 			if(!pageSt){
 				setIsLoading(false);
         setTabState(1);
-        setIdxVal('');
         setVisible(false);
-        setVisible2(false);
-        getProfileData();
+        setVisible2(false);        
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+
+      if(params?.isSubmit){
+        setModiNav();
+        setIdxVal();
+        setItemState();
+        setNowPage(1);
+        setNowPage2(1);
+        getData();
+        //getData2();
+        delete params?.isSubmit
+      }
 		}
 
 		return () => isSubscribed = false;
@@ -58,7 +73,7 @@ const SaleList = ({navigation, route}) => {
 
   useEffect(()=>{
     getData();
-    getData2();
+    //getData2();
   },[]);
 
   const getData = async () => {
@@ -69,25 +84,57 @@ const SaleList = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_sale : ",responseJson);
+				//console.log("list_sale : ",responseJson);
 				setItemList(responseJson.data);
         setTotalPage(responseJson.total_page);        
+        setTab1Cnt(responseJson.total_count);
+        setTab2Cnt(responseJson.end_total);
 			}else{
 				setItemList([]);
 				setNowPage(1);
+        setTab1Cnt(0);
 				console.log('결과 출력 실패!', responseJson.result_text);
         //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(true);
   }
+  const moreData = async () => {
+		if(totalPage > nowPage){
+			await Api.send('GET', 'list_sale', {is_api: 1, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = itemList.concat(responseJson.data);				
+					setItemList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
   const getList = ({item, index}) => (    
     <View style={styles.saleListBox}>
       <TouchableOpacity 
         style={styles.modalOpenBtn}
         activeOpacity={opacityVal}
         onPress={()=>{
-          setIdxVal(item.id);
+          if(item.c1_idx == 1){
+            setModiNav('UsedModify1');
+          }else if(item.c1_idx == 2){
+            setModiNav('UsedModify2');
+          }else if(item.c1_idx == 3){
+            setModiNav('UsedModify3');
+          }else if(item.c1_idx == 4){
+            setModiNav('UsedModify4');
+          }
+          setIdxVal(item.pd_idx);
+          setItemState(item.pd_status_org);
           setVisible(true);
         }}
       >
@@ -100,34 +147,36 @@ const SaleList = ({navigation, route}) => {
       </>
       ) : null}
       <View style={[styles.listInfoCate]}>
-        <Text style={styles.listInfoCateText}>{'['}{item.cate}{']'}</Text>
+        <Text style={styles.listInfoCateText}>{'['}{item.c1_name}{']'}</Text>
       </View>
       <View style={styles.listLi}>        
-        <View style={styles.listImgBox}>        
-          <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+        <View style={styles.listImgBox}>
+          {item.pd_image ? (
+          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />
+          ) : null}
         </View>			
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
+              {item.pd_name}
             </Text>
           </View>
           <View style={styles.listInfoDesc}>
-            <Text style={styles.listInfoDescText}>{item.loc}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_loc}</Text>
             <View style={styles.listInfoDescBar}></View>
-            <Text style={styles.listInfoDescText}>{item.period}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_date}</Text>
           </View>         
         </View>                 
       </View>
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
-            <Text style={styles.listInfoPriceState}>예약중</Text>
-            <Text style={styles.listInfoPriceText}>{item.price}원</Text>
+            <Text style={styles.listInfoPriceState}>{item.pd_status}</Text>
+            <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
           </View>
-          <View style={styles.listInfoDate}>
+          {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>
-          </View>
+          </View> */}
         </View>
       </View>
     </View>
@@ -143,24 +192,36 @@ const SaleList = ({navigation, route}) => {
 			if(responseJson.result === 'success' && responseJson){
 				console.log("list_end : ",responseJson);
 				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);        
+        setTotalPage2(responseJson.total_page);
+        setTab1Cnt(responseJson.ing_total);
+        setTab2Cnt(responseJson.total_count);
 			}else{
 				setItemList2([]);
 				setNowPage2(1);
+        setTab2Cnt(0);
 				console.log('결과 출력 실패!', responseJson.result_text);
         //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(true);
   }
-  const getList2 = ({item, index}) => (    
-    item.state == tabState ? (
-		<View style={styles.saleListBox}>
+  const getList2 = ({item, index}) => ( 
+    <View style={styles.saleListBox}>
       <TouchableOpacity 
         style={styles.modalOpenBtn}
         activeOpacity={opacityVal}
         onPress={()=>{
-          setIdxVal(item.id);
+          if(item.c1_idx == 1){
+            setModiNav('UsedModify1');
+          }else if(item.c1_idx == 2){
+            setModiNav('UsedModify2');
+          }else if(item.c1_idx == 3){
+            setModiNav('UsedModify3');
+          }else if(item.c1_idx == 4){
+            setModiNav('UsedModify4');
+          }
+          setIdxVal(item.pd_idx);
+          setItemState(item.pd_status_org);
           setVisible(true);
         }}
       >
@@ -173,63 +234,145 @@ const SaleList = ({navigation, route}) => {
       </>
       ) : null}
       <View style={[styles.listInfoCate]}>
-        <Text style={styles.listInfoCateText}>{'['}{item.cate}{']'}</Text>
+        <Text style={styles.listInfoCateText}>{'['}{item.c1_name}{']'}</Text>
       </View>
       <View style={styles.listLi}>        
         <View style={styles.listImgBox}>        
-          <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+          {item.pd_image ? (
+          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />
+          ) : null}
         </View>			
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
+              {item.pd_name}
             </Text>
           </View>
           <View style={styles.listInfoDesc}>
-            <Text style={styles.listInfoDescText}>{item.loc}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_loc}</Text>
             <View style={styles.listInfoDescBar}></View>
-            <Text style={styles.listInfoDescText}>{item.period}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_date}</Text>
 
-            {item.state == 2 ? (
             <View style={styles.listInfoCnt}>
               <View style={styles.listInfoCntBox}>
                 <AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-                <Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+                <Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
               </View>
               <View style={styles.listInfoCntBox}>
                 <AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-                <Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+                <Text style={styles.listInfoCntBoxText}>{item.pd_chat_cnt}</Text>
               </View>
               <View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
                 <AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-                <Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+                <Text style={styles.listInfoCntBoxText}>{item.pd_like_cnt}</Text>
               </View>
             </View>
-            ) : null}
           </View>         
         </View>                 
       </View>
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
-            <Text style={styles.listInfoPriceState}>예약중</Text>
-            <Text style={styles.listInfoPriceText}>{item.price}원</Text>
+            <Text style={styles.listInfoPriceState}>판매완료</Text>
+            <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
           </View>
-          <View style={styles.listInfoDate}>
+          {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>
-          </View>
+          </View> */}
         </View>
       </View>
-		</View>
-    ) : null
+    </View>
 	);
 
   function fnTab(v){
     setTabState(v);
+    setNowPage(1);
+    setNowPage2(1);
+    if(v == 1){
+      getData();
+    }else if(v == 2){
+      getData2();
+    }
   }
 
+  //삭제하기
   function fnDelete(){
-    console.log(idxVal);
+    const formData = {
+			is_api:1,				
+			pd_idx:idxVal,
+		};
+
+    Api.send('POST', 'del_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);				
+				setVisible(false);
+        setVisible2(false);
+        setModiNav();
+        setIdxVal();        
+        setItemState();
+        if(tabState==1){
+          getData();
+        }else{
+          getData2();
+        }
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //상태 변경 - 예약중
+  const chgStateRes = async () => {
+    const formData = {
+			is_api:1,
+      pd_idx:idxVal,
+		};
+
+    Api.send('POST', 'reserve_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible(false);
+        setModiNav();
+        setIdxVal();        
+        setItemState();
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //상태 변경 - 판매중
+  const chgStateSell = async () => {
+    const formData = {
+			is_api:1,
+      pd_idx:idxVal,
+		};
+
+    Api.send('POST', 'selling_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setVisible(false);
+        setModiNav();        
+        setIdxVal();
+        setItemState();
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -243,11 +386,11 @@ const SaleList = ({navigation, route}) => {
         > 
           {tabState == 1 ? (
             <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 ({itemList.length})</Text>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 ({tab1Cnt})</Text>
             <View style={styles.tabLine}></View>
             </>
           ) : (
-            <Text style={styles.tabBtnText}>판매중 ({itemList.length})</Text>  
+            <Text style={styles.tabBtnText}>판매중 ({tab1Cnt})</Text>  
           )}
         </TouchableOpacity>
         <TouchableOpacity
@@ -257,34 +400,58 @@ const SaleList = ({navigation, route}) => {
         >
           {tabState == 2 ? (
             <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>거래완료 ({itemList2.length})</Text>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>거래완료 ({tab2Cnt})</Text>
             <View style={styles.tabLine}></View>
             </>
           ) : (
-            <Text style={styles.tabBtnText}>거래완료 ({itemList2.length})</Text>  
+            <Text style={styles.tabBtnText}>거래완료 ({tab2Cnt})</Text>  
           )}
         </TouchableOpacity>
       </View>
-
-      {isLoading ? (
-        tabState == 1 ? (
+      {tabState == 1 ? (
         <FlatList
           data={itemList}
           renderItem={(getList)}
-          keyExtractor={item => item.id}		
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
           ListEmptyComponent={
-            <View style={styles.notData}>
-              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-              <Text style={styles.notDataText}>등록된 판매글이 없습니다.</Text>
-            </View>
+            isLoading ? (
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>판매중인 상품이 없습니다.</Text>
+              </View>
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
           }
         />
-        ) : null
       ) : (
-        <View style={[styles.indicator]}>
-          <ActivityIndicator size="large" />
-        </View>
-      )}			
+        <>        
+        <FlatList
+          data={itemList2}
+          renderItem={(getList2)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          //onEndReached={moreData2}
+          ListEmptyComponent={
+            isLoading ? (
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>거래완료된 상품이 없습니다.</Text>
+              </View>
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
+        />
+        <View><Text>456</Text></View>
+        </>
+      )}
 
       <Modal
 				visible={visible}
@@ -297,16 +464,38 @@ const SaleList = ({navigation, route}) => {
 				></Pressable>
 				<View style={styles.modalCont2}>
 					<View style={styles.modalCont2Box}>
-            <TouchableOpacity 
+          <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
 							onPress={() => {
-								setVisible(false)
-						}}
+                setVisible(false);
+                navigation.navigate(modiNav, {idx:idxVal, returnNavi:'UsedSaleList'});
+						  }}
+						>
+							<Text style={styles.modalCont2BtnText}>수정하기</Text>
+						</TouchableOpacity>
+            
+            {itemState == 1 ? (
+            <TouchableOpacity 
+							style={[styles.modalCont2Btn, styles.modify]}
+							activeOpacity={opacityVal}
+							onPress={() => {chgStateRes()}}
 						>
 							<Text style={styles.modalCont2BtnText}>예약중</Text>
 						</TouchableOpacity>
+            ) : null}
 
+            {itemState == 2 || itemState == 3 ? (
+						<TouchableOpacity 
+							style={[styles.modalCont2Btn, styles.modify]}
+							activeOpacity={opacityVal}
+							onPress={() => {chgStateSell()}}
+						>
+							<Text style={styles.modalCont2BtnText}>판매중</Text>
+						</TouchableOpacity>
+            ) : null }
+
+            {itemState == 1 || itemState == 2 ? (
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
@@ -315,35 +504,13 @@ const SaleList = ({navigation, route}) => {
 						}}
 						>
 							<Text style={styles.modalCont2BtnText}>거래완료</Text>
-						</TouchableOpacity>
-
-						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-                setVisible(false);
-								navigation.navigate('UsedWrite1', {});
-						}}
-						>
-							<Text style={styles.modalCont2BtnText}>상품 수정</Text>
-						</TouchableOpacity>            
-
-						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
-							activeOpacity={opacityVal}
-							onPress={() => {
-                setVisible(false);
-							}}
-						>
-							<Text style={styles.modalCont2BtnText}>판매중</Text>
-						</TouchableOpacity>
+						</TouchableOpacity>						        
+            ) : null }                        
 
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.delete]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-                setVisible2(true)
-							}}
+							onPress={() => {setVisible2(true)}}
 						>
 							<Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
 						</TouchableOpacity>
@@ -386,7 +553,7 @@ const SaleList = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnDelete();}}
+              onPress={() => {fnDelete()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -406,8 +573,7 @@ const styles = StyleSheet.create({
   tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
   tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
-  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+  indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
   saleListBox: {position:'relative'},
   modalOpenBtn: {display:'flex',alignItems:'center',justifyContent:'center',width:40,height:40,position:'absolute',top:16,right:5,},
   listInfoCate: {width:innerWidth,paddingHorizontal:20,paddingTop:30,marginBottom:10,},
@@ -415,7 +581,7 @@ const styles = StyleSheet.create({
   listLi: {display:'flex',flexDirection:'row',flexWrap:'wrap',alignItems:'center',paddingHorizontal:20,position:'relative'},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E1E8F0'},
   listLiBorder2: {width:innerWidth,height:5,backgroundColor:'red'},  
-  listImgBox: {width:63,},  
+  listImgBox: {width:63,height:63,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},  
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 63),paddingLeft:15,},
 	listInfoTitle: {},
@@ -423,7 +589,7 @@ const styles = StyleSheet.create({
 	listInfoDesc: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:8,position:'relative'},
 	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:15,color:'#737373'},	
   listInfoDescBar: {width:1,height:10,backgroundColor:'#737373',marginHorizontal:8,position:'relative',top:-1},
-  listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',position:'absolute',top:0,right:0,},
+  listInfoCnt: {display:'flex',flexDirection:'row',alignItems:'center',position:'absolute',top:-2,right:0,},
 	listInfoCntBox: {display:'flex',flexDirection:'row',alignItems:'center',marginRight:15,},
   listInfoCntBox2: {marginRight:0},
 	listInfoCntBoxText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#000',marginLeft:4,},

@@ -48,6 +48,7 @@ const MatchView = (props) => {
   const [mcMbIdx, setMcMbIdx] = useState();
   const [radio, setRadio] = useState(1);
   const [radioList, setRadioList] = useState([]);
+  const [dwgPmSt, setDwgPmSt] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -82,11 +83,12 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("view_match : ",responseJson);
+				console.log("view_match : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.mf_data);
         setZzim(responseJson.is_scrap);
         setMcMbIdx(responseJson.mc_mb_idx);
+        setDwgPmSt(responseJson.is_dwg_permit);
 
         // if(responseJson.is_product_like == 1){
         //   setLike(1);
@@ -124,16 +126,12 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("getRadioList : ",responseJson);
+				//console.log("getRadioList : ",responseJson);
         setRadioList(responseJson.data);
 			}else{
 				console.log(responseJson.result_text);
 			}
 		}); 
-  }
-
-  function notBuy(){
-    ToastMessage('판매완료된 상품은 가격협상이 불가합니다.');
   }
 
   const ModalOn = () => {
@@ -182,10 +180,10 @@ const MatchView = (props) => {
 				//console.log('성공 : ',responseJson);				
         if(responseJson.scrap_type == 'save'){
           setZzim(1);
-          ToastMessage('관심판매자에 추가되었습니다.');
+          ToastMessage('관심요청자에 추가되었습니다.');
         }else{
           setZzim(0);
-          ToastMessage('관심판매자에서 삭제되었습니다.');
+          ToastMessage('관심요청자에서 삭제되었습니다.');
         }
 			}else{
 				console.log('결과 출력 실패!', resultItem);
@@ -213,8 +211,8 @@ const MatchView = (props) => {
           setLike(0);
         }
 			}else{
-				console.log('결과 출력 실패!', resultItem);
-				ToastMessage(responseJson.result_text);
+				console.log('결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
   }
@@ -333,6 +331,26 @@ const MatchView = (props) => {
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //권한요청
+  function downPermitReq(){
+    const formData = {
+			is_api:1,
+      mc_idx:idx,
+		};
+
+    Api.send('POST', 'request_permit_dwg', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        ToastMessage('도면권한이 요청되었습니다.');
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+        ToastMessage('이미 요청한 상태입니다.');
 			}
 		});
   }
@@ -492,16 +510,35 @@ const MatchView = (props) => {
           </ScrollView>
           <View style={[styles.nextFix]}>
             <View style={styles.nextFixFlex}>
-              <TouchableOpacity 
-                style={[styles.nextBtn]}
-                activeOpacity={opacityVal}
-                onPress={() => {
-                  navigation.navigate('DownUsed', {}); //도면 다운로드 허용
-                  //setVisible2(true); //도면받기
-                }}
-              >
-                <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
-              </TouchableOpacity>
+              {myInfo.mb_idx == itemInfo.mc_mb_idx ? (
+                <TouchableOpacity 
+                  style={[styles.nextBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    navigation.navigate('DownUsed', {}); //도면 다운로드 허용
+                  }}
+                >
+                  <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
+                </TouchableOpacity>
+              ):(
+                <TouchableOpacity 
+                  style={[styles.nextBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    if(dwgPmSt == 0){
+                      downPermitReq(); //권한요청
+                    }else{
+                      setVisible2(true); //도면받기
+                    }
+                  }}
+                >
+                  {dwgPmSt == 0 ? (
+                    <Text style={styles.nextBtnText}>도면 권한 요청</Text>
+                  ) : (
+                    <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                  )}
+                </TouchableOpacity>
+              )}
               <TouchableOpacity 
                 style={[styles.nextBtn, styles.nextBtn2]}
                 activeOpacity={opacityVal}
@@ -595,7 +632,8 @@ const MatchView = (props) => {
                 <Text style={styles.avatarTitleText}>도면받기</Text>
               </View>
               <View style={styles.avatarDesc}>
-                <Text style={styles.avatarDescText}>도면을 받아서 검토후 견적서를 발송하시겠습니까?</Text>
+                <Text style={styles.avatarDescText}>도면을 받아서 검토후</Text>
+                <Text style={styles.avatarDescText}>견적서를 발송하시겠습니까?</Text>
                 <Text style={styles.avatarDescText}>도면은 회원님의 메일로 발송이 됩니다.</Text>
               </View>
               <View style={styles.avatarBtnBox}>

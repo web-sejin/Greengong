@@ -729,7 +729,7 @@ const UsedView = (props) => {
 							onPress={() => {
                 setVisible(false);
                 //console.log("naviPage : ",naviPage);
-                console.log(naviPage);
+                //console.log(naviPage);
 								navigation.navigate(naviPage, {idx:idx});
 						}}
 						>
