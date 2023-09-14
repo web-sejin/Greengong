@@ -68,6 +68,7 @@ const MatchView = (props) => {
 			setPageSt(!pageSt);
       getData();
       getMyData();
+      getRadioList();
 		}
 
 		return () => isSubscribed = false;
@@ -81,7 +82,7 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("view_match : ",responseJson);
+				//console.log("view_match : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.mf_data);
         setZzim(responseJson.is_scrap);
@@ -116,6 +117,21 @@ const MatchView = (props) => {
 		});  
   }
 
+  const getRadioList = async () => {
+    await Api.send('GET', 'insert_report', {is_api: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("getRadioList : ",responseJson);
+        setRadioList(responseJson.data);
+			}else{
+				console.log(responseJson.result_text);
+			}
+		}); 
+  }
+
   function notBuy(){
     ToastMessage('판매완료된 상품은 가격협상이 불가합니다.');
   }
@@ -124,8 +140,30 @@ const MatchView = (props) => {
     if(myInfo.mb_idx == itemInfo.mc_mb_idx){
       setVisible(true);
     }else{
-      //setVisible3(true);
+      setVisible5(true);
     }
+  }
+
+  //삭제
+  function deleteItem(){
+    //console.log(idx);
+    const formData = {
+			is_api:1,				
+			mc_idx:idx,
+		};
+
+    Api.send('POST', 'del_match', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);				
+				navigation.navigate('Match', {isSubmit: true});
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
   //관심요청자
@@ -186,7 +224,7 @@ const MatchView = (props) => {
     const formData = {
 			is_api:1,				
 			reason_idx:radio,
-      page_code:'product',
+      page_code:'match',
       article_idx:idx
 		};
 
@@ -195,8 +233,9 @@ const MatchView = (props) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				//console.log('신고 성공 : ',responseJson);
-        navigation.navigate('Home', {isSubmit: true});
+				console.log('신고 성공 : ',responseJson);
+        setVisible(false);
+        navigation.navigate('Match', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
@@ -208,7 +247,7 @@ const MatchView = (props) => {
   function fnBlock(){
     const formData = {
 			is_api:1,				
-			recv_idx:prdMbIdx
+			recv_idx:mcMbIdx
 		};
 
     Api.send('POST', 'save_block', formData, (args)=>{
@@ -217,7 +256,8 @@ const MatchView = (props) => {
 
 			if(responseJson.result === 'success'){
 				console.log('차단 성공 : ',responseJson);
-        navigation.navigate('Home', {isSubmit: true});
+        setVisible(false);
+        navigation.navigate('Match', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
@@ -491,7 +531,8 @@ const MatchView = (props) => {
                   style={[styles.modalCont2Btn, styles.choice]}
                   activeOpacity={opacityVal}
                   onPress={() => {
-                    navigation.navigate('MatchModify', {});
+                    setVisible(false);
+                    navigation.navigate('MatchModify', {idx:idx});
                 }}
                 >
                   <Text style={styles.modalCont2BtnText}>수정하기</Text>
@@ -523,9 +564,7 @@ const MatchView = (props) => {
                 <TouchableOpacity 
                   style={[styles.modalCont2Btn, styles.delete]}
                   activeOpacity={opacityVal}
-                  onPress={() => {
-                    setVisible(false)
-                  }}
+                  onPress={() => {setVisible4(true)}}
                 >
                   <Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>삭제하기</Text>
                 </TouchableOpacity>
@@ -625,6 +664,136 @@ const MatchView = (props) => {
               </View>
             </View>
           </Modal>
+
+          <Modal
+            visible={visible4}
+            transparent={true}
+            onRequestClose={() => {setVisible4(false)}}
+          >
+            <Pressable 
+              style={styles.modalBack}
+              onPress={() => {setVisible4(false)}}
+            ></Pressable>
+            <View style={styles.modalCont3}>
+              <View style={styles.avatarTitle}>
+                <Text style={styles.avatarTitleText}>삭제</Text>
+              </View>
+              <View style={styles.avatarDesc}>
+                <Text style={styles.avatarDescText}>삭제를 하면 다시 복구되지 않습니다.</Text>
+                <Text style={styles.avatarDescText}>채팅도 불가능하게 됩니다.</Text>
+              </View>
+              <View style={styles.avatarBtnBox}>
+                <TouchableOpacity 
+                  style={styles.avatarBtn}
+                  onPress={() => {setVisible4(false)}}
+                >
+                  <Text style={styles.avatarBtnText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.avatarBtn, styles.avatarBtn2]}
+                  onPress={() => {deleteItem();}}
+                >
+                  <Text style={styles.avatarBtnText}>확인</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={visible5}
+            transparent={true}
+            onRequestClose={() => {setVisible5(false)}}
+          >
+            <Pressable 
+              style={styles.modalBack}
+              onPress={() => {setVisible5(false)}}
+            ></Pressable>
+            <View style={styles.modalCont2}>
+              <View style={styles.modalCont2Box}>
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.choice]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {fnBlock()}}
+                >
+                  <Text style={styles.modalCont2BtnText}>차단하기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.modalCont2Btn, styles.delete]}
+                  activeOpacity={opacityVal}
+                  onPress={() => {
+                    setVisible5(false);
+                    setVisible6(true);
+                  }}
+                >
+                  <Text style={[styles.modalCont2BtnText, styles.modalCont2BtnText2]}>신고하기</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity 
+                style={[styles.modalCont2Btn, styles.cancel]}
+                activeOpacity={opacityVal}
+                onPress={() => {
+                  setVisible5(false)
+                }}
+              >
+                <Text style={styles.modalCont2BtnText}>취소</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={visible6}
+            animationType={"slide"}
+            onRequestClose={() => {setVisible6(false)}}
+          >
+            <View style={styles.header}>
+              <>
+              <TouchableOpacity
+                style={styles.headerCloseBtn}
+                activeOpacity={opacityVal}
+                onPress={() => {setVisible6(false)}} 						
+              >
+                <AutoHeightImage width={14} source={require("../../assets/img/icon_close.png")} />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>신고하기</Text>
+              </>
+            </View>
+            <ScrollView>
+              <View	View style={[styles.alertWrap]}>
+                <View style={styles.alertBox}>
+                  <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+                  <Text style={styles.alertBoxText}>비매너 메세지 건에 대해서 신고해 주세요.</Text>
+                </View>
+              </View>
+
+              <View style={styles.radioList}>
+                <View style={styles.borderTop2}></View>
+                {radioList.map((item, index) => {
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={[styles.radioBtn]}
+                      activeOpacity={opacityVal}
+                      onPress={()=>{setRadio(item.val)}}
+                    >
+                      <View style={[styles.circle, radio==item.val ? styles.circleOn : null]}>              
+                        <AutoHeightImage width={11} source={require("../../assets/img/icon_chk_on.png")} />
+                      </View>
+                      <Text style={styles.radioBtnText}>{item.txt}</Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </View>
+            </ScrollView>								
+            <View style={styles.nextFix}>
+              <TouchableOpacity 
+                style={[styles.nextBtn, styles.nextBtn3]}
+                activeOpacity={opacityVal}
+                onPress={() => {fnSingo()}}
+              >
+                <Text style={styles.nextBtnText}>신고하기</Text>
+              </TouchableOpacity>
+            </View>						
+          </Modal>
           
           {indicatorSt ? (
           <View style={[styles.indicator, styles.indicator2]}>
@@ -652,6 +821,7 @@ const styles = StyleSheet.create({
 	nextBtn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',
   justifyContent:'center',},
   nextBtn2: {backgroundColor:'#353636',},
+  nextBtn3: {width:innerWidth},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},
@@ -744,6 +914,25 @@ const styles = StyleSheet.create({
 	certChkBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
   indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10},
   indicator2: {backgroundColor:'rgba(0,0,0,0.5)'},
+
+  header: {height:50,backgroundColor:'#fff',position:'relative',display:'flex',justifyContent:'center',paddingLeft:20, paddingRight:20},
+	headerBackBtn: {width:30,height:50,position:'absolute',left:20,top:0,zIndex:10,display:'flex',justifyContent:'center'},
+  headerCloseBtn: {width:34,height:50,position:'absolute',right:10,top:0,zIndex:10,display:'flex',alignItems:'center',justifyContent:'center'},
+	headerTitle: {fontFamily:Font.NotoSansMedium,textAlign:'center',fontSize:17,lineHeight:50,color:'#000'},
+
+  alertWrap: {padding:20,},
+  alertBox: {width:innerWidth,padding:15,paddingLeft:45,backgroundColor:'#F3FAF8',borderRadius:12,position:'relative',},
+	icon_alert: {position:'absolute',left:15,top:15},
+	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
+	alertBoxText2: {marginTop:3,},
+
+  radioList: {paddingHorizontal:20,paddingBottom:30,},
+  radioBtn: {paddingVertical:20,flexDirection:'row',alignItems:'center'},  
+  radioBtnText: {width:(innerWidth-21),fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:21,color:'#000',paddingLeft:15},
+  circle: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,alignItems:'center',justifyContent:'center'},
+  circleOn: {backgroundColor:'#31B481',borderColor:'#31B481'},
+
+  borderTop2: {borderTopWidth:1,borderTopColor:'#E3E3E4'},
 
   mgTop20: {marginTop:20},
 })

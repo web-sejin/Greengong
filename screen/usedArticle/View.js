@@ -118,7 +118,7 @@ const UsedView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("getRadioList : ",responseJson);
+				console.log("getRadioList : ",responseJson);
         setRadioList(responseJson.data);
 			}else{
 				console.log(responseJson.result_text);
@@ -202,7 +202,7 @@ const UsedView = (props) => {
   }
 
   //삭제
-  function deleteItem(idx){
+  function deleteItem(){
     //console.log(idx);
     const formData = {
 			is_api:1,				
@@ -892,7 +892,7 @@ const UsedView = (props) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {deleteItem(idx);}}
+              onPress={() => {deleteItem();}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>

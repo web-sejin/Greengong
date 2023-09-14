@@ -326,9 +326,9 @@ const Room = (props) => {
 				}
 				setDbList(TestDbList);
 
-				if(responseJson.is_my_report == 1 || responseJson.is_you_report == 1){
+				if(responseJson.is_my_block == 1 || responseJson.is_you_block == 1){
 					setIptHolder('신고하거나 신고 받아서 채팅이 불가능합니다.');
-				}else if(responseJson.is_my_block == 1 || responseJson.is_you_block == 1){
+				}else if(responseJson.is_my_report == 1 || responseJson.is_you_report == 1){
 					setIptHolder('차단하거나 차단 받아서 채팅이 불가능합니다.');						
 				}else{
 					setIptHolder('');

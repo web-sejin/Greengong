@@ -5,6 +5,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
 import Api from '../../Api';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -140,15 +141,15 @@ const Match = (props) => {
 			delete params?.isSubmit
 		}
 
-		// AsyncStorage.getItem('mainReload', (err, result) => {
-		// 	//console.log("result : ",result);
-		// 	if(result == 'on'){
-		// 		setNowPage(1);
-		// 		getItemList();
-		// 		delete params?.isSubmit;
-		// 		AsyncStorage.removeItem('mainReload');
-		// 	}
-		// });
+		AsyncStorage.getItem('mainReload2', (err, result) => {
+			//console.log("result : ",result);
+			if(result == 'on'){
+				setNowPage(1);
+				getItemList();
+				delete params?.isSubmit;
+				AsyncStorage.removeItem('mainReload2');
+			}
+		});
 	},[isFocused]);
 
 	//회원 정보
@@ -186,7 +187,7 @@ const Match = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_match', responseJson);
+				//console.log('list_match', responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{

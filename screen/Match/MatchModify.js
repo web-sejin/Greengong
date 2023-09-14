@@ -17,6 +17,7 @@ const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
+
 let today = new Date();
 let year = today.getFullYear();
 let todayMonth = today.getMonth() + 1;
@@ -34,7 +35,7 @@ LocaleConfig.locales['kr'] = {
 };
 LocaleConfig.defaultLocale = 'kr';
 
-//스크랩 글쓰기
+//스크랩 글수정
 const MatchModify = ({navigation, route}) => {
 	const fileListData = [
 		{'idx': 1, 'txt': '파일1', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
@@ -49,7 +50,7 @@ const MatchModify = ({navigation, route}) => {
 		{'idx': 10, 'txt': '파일10', 'path': '', 'mf_idx':'', 'del':0, 'del_idx':''},
 	];
 
-	const contentMsg = '도면의 치수, 가공 용도, 상세 가공 요청을파트너에게 알려주세요. 요청 사항이 상세할수록, 업체로부터 정확한 답변을 받을 확률이 높아집니다.\n공차\n조립성\n도색\n표면처리\n도면의 치수\n가공용도\n상세 가공 요청';
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -78,7 +79,7 @@ const MatchModify = ({navigation, route}) => {
 	const [endDate, setEndDate] = useState(''); //납기일
 	const [endDateObj, setEndDateObj] = useState(); //납기일
 	const [price, setPrice] = useState(''); //추정예산범위(금액)
-	const [content, setContent] = useState(contentMsg); //도면상세정보
+	const [content, setContent] = useState(''); //도면상세정보
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [cateAry, setCateAry] = useState([]); //카테고리 리스트
@@ -98,37 +99,15 @@ const MatchModify = ({navigation, route}) => {
 			if(!pageSt){
 				setFileConfirm(false);
 				setFileList(fileListData);
-				setSubject('');
-				setCate('');
-				setSort('');
-				setMatt1('');
-				setMatt2('');
-				setMatt2Direct('');
-				setCnt('');
-				setFloorFile('');
-				setFloorFileType('');
-				setFloorFileUri('');
-				setCall(0);
-				setSecurity('');
-				setAdvice('');
-				setProjectName('');
-				setUseInfo('');				
-				setIndCate('');
-				setIndCateDirect('');
-				setEndDateMethod('');
-				setEndDate('');
-				setEndDateObj();
-				setPrice('');
-				setContent(contentMsg);
-				setIsLoading(false);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			select1();
-			select5();
-			select6();
-			select7();			
+      select1();
+      select5();
+      select6();
+      select7();
+			getData();
 		}
 
 		return () => isSubscribed = false;
@@ -152,7 +131,6 @@ const MatchModify = ({navigation, route}) => {
 
 	//분류
 	const select2 = async () => {
-		//console.log('cate : ',cate);
 		await Api.send('GET', 'match_cate2', {is_api:1, cate1:cate}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -169,13 +147,13 @@ const MatchModify = ({navigation, route}) => {
 
 	//분류 체크
 	const sortChk = async () => {
-		//console.log('sort : ',sort);
-		setMatt1('');
-		setMatt1Ary([]);		
+		//setMatt1('');
+		//setMatt1Ary([]);		
 		if(sort){
 			if(sort==40 || cate==6 || cate==7){
 				console.log('재료1 X');
-
+				setMatt1('');
+				setMatt1Ary([]);
 				setMatt2('');
 				setMatt2Ary([]);
 			}else{
@@ -185,9 +163,9 @@ const MatchModify = ({navigation, route}) => {
 	}
 
 	//재료1
-	const select3 = async () => {
-		setMatt2('');
-		setMatt2Ary([]);
+	const select3 = async () => {		
+		//setMatt2('');
+		//setMatt2Ary([]);
 		await Api.send('GET', 'match_cate3', {is_api:1, cate2:sort}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -204,9 +182,9 @@ const MatchModify = ({navigation, route}) => {
 
 	//재료1 체크
 	const matt1Chk = async () => {
-		console.log(cate+"//"+matt1);
+		//console.log("matt1Chk : ",cate+"//"+matt1);
 		if(matt1){
-			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83)){
+			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
 				console.log('재료2 X');
 				setMatt2('');
 				setMatt2Ary([]);
@@ -322,29 +300,21 @@ const MatchModify = ({navigation, route}) => {
   };
 
 	function deleteFile(v){
-		let selectCon = fileList.map((item) => {
-			if(item.idx === v){
-				return {...item, path: ''};
+		let selectCon = fileList.map((item) => {		
+			if(item.idx === v){				
+				return {...item, path: '', mf_idx:'', del:1, del_idx:item.mf_idx};
 			}else{
-				return {...item, path: item.path};
+				let val = ''
+				if(item.mf_idx != ''){
+					val = item.mf_idx;
+				}
+				return {...item, path: item.path, mf_idx:val, del:0, del_idx:item.mf_idx};
 			}
 		});
+		console.log("delete selectCon : ",selectCon);
 		setFileList(selectCon);
 		getFileCount(selectCon);
 	}
-
-	const handleChange = (idx) => {
-		let temp = chkMethod.map((item) => {
-			if(idx === item.idx){
-				//console.log('idx : ', idx, ' con idx : ', item.idx);
-				return { ...item, isChecked: !item.isChecked };
-			}
-
-			return item;
-		});
-
-		setChkMethod(temp);
-	};
 
 	const openPicker = async () => {
 		console.log(DocumentPicker.types)
@@ -397,31 +367,105 @@ const MatchModify = ({navigation, route}) => {
 		let img8Path = '';
 		let img9Path = '';
 		let img10Path = '';
+
+		let img1Idx = '';
+		let img2Idx = '';
+		let img3Idx = '';
+		let img4Idx = '';
+		let img5Idx = '';
+		let img6Idx = '';
+		let img7Idx = '';
+		let img8Idx = '';
+		let img9Idx = '';
+		let img10Idx = '';
 		
+		let del1 = 0;
+		let del2 = 0;
+		let del3 = 0;
+		let del4 = 0;
+		let del5 = 0;
+		let del6 = 0;
+		let del7 = 0;
+		let del8 = 0;
+		let del9 = 0;
+		let del10 = 0;
+
+		let del1Idx = '';
+		let del2Idx = '';
+		let del3Idx = '';
+		let del4Idx = '';
+		let del5Idx = '';
+		let del6Idx = '';
+		let del7Idx = '';
+		let del8Idx = '';
+		let del9Idx = '';
+		let del10Idx = '';		
 
 		fileList.map((item, index)=>{
 			if(item.idx == 1 && item.path != ''){ 
 				img1Path = item.path;
+				img1Idx = item.mf_idx;
 			}else if(item.idx == 2 && item.path != ''){ 
 				img2Path = item.path;
+				img2Idx = item.mf_idx;
 			}else if(item.idx == 3 && item.path != ''){ 
 				img3Path = item.path;
+				img3Idx = item.mf_idx;
 			}else if(item.idx == 4 && item.path != ''){ 
 				img4Path = item.path;
+				img4Idx = item.mf_idx;
 			}else if(item.idx == 5 && item.path != ''){ 
 				img5Path = item.path;
+				img5Idx = item.mf_idx;
 			}else if(item.idx == 6 && item.path != ''){ 
 				img6Path = item.path;
+				img6Idx = item.mf_idx;
 			}else if(item.idx == 7 && item.path != ''){ 
 				img7Path = item.path;
+				img7Idx = item.mf_idx;
 			}else if(item.idx == 8 && item.path != ''){ 
 				img8Path = item.path;
+				img8Idx = item.mf_idx;
 			}else if(item.idx == 9 && item.path != ''){ 
 				img9Path = item.path;
+				img9Idx = item.mf_idx;
 			}else if(item.idx == 10 && item.path != ''){ 
 				img10Path = item.path;
+				img10Idx = item.mf_idx;
 			}
-		})
+
+			if(item.idx == 1 && item.del == 1){
+				del1 = 1;
+				del1Idx = item.del_idx
+			}else if(item.idx == 2 && item.del == 1){
+				del2 = 1;
+				del2Idx = item.del_idx
+			}else if(item.idx == 3 && item.del == 1){
+				del3 = 1;
+				del3Idx = item.del_idx
+			}else if(item.idx == 4 && item.del == 1){
+				del4 = 1;
+				del4Idx = item.del_idx
+			}else if(item.idx == 5 && item.del == 1){
+				del5 = 1;
+				del5Idx = item.del_idx
+			}else if(item.idx == 6 && item.del == 1){
+				del6 = 1;
+				del6Idx = item.del_idx
+			}else if(item.idx == 7 && item.del == 1){
+				del7 = 1;
+				del7Idx = item.del_idx
+			}else if(item.idx == 8 && item.del == 1){
+				del8 = 1;
+				del8Idx = item.del_idx
+			}else if(item.idx == 9 && item.del == 1){
+				del9 = 1;
+				del9Idx = item.del_idx
+			}else if(item.idx == 10 && item.del == 1){
+				del10 = 1;
+				del10Idx = item.del_idx
+			}
+		});
 	
 		if(img1Path == ""){ ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); return false; }
 
@@ -436,7 +480,7 @@ const MatchModify = ({navigation, route}) => {
 			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
 		}
 
-		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83)){
+		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
 		}else{
 			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
 			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
@@ -467,13 +511,9 @@ const MatchModify = ({navigation, route}) => {
 			calcCnt = (cnt).split(',').join('');
 		}
 
-		// let calcPrice = 0;
-		// if(price != ''){
-		// 	calcPrice = (price).split(',').join('');
-		// }
-
 		const formData = {
 			is_api:1,				
+			mc_idx:idx,
 			mc_name:subject,
 			mc_contents:content,
 			c1_idx:cate,
@@ -495,20 +535,91 @@ const MatchModify = ({navigation, route}) => {
 		};
 
 		if(floorFile != ''){ formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; }
-		if(img1Path != ''){ formData.mf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'mf_img1.png'}; }
-		if(img2Path != ''){ formData.mf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'mf_img2.png'}; }
-		if(img3Path != ''){ formData.mf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'mf_img3.png'}; }
-		if(img4Path != ''){ formData.mf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'mf_img4.png'}; }
-		if(img5Path != ''){ formData.mf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'mf_img5.png'}; }
-		if(img6Path != ''){ formData.mf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'mf_img6.png'}; }
-		if(img7Path != ''){ formData.mf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'mf_img7.png'}; }
-		if(img8Path != ''){ formData.mf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'mf_img8.png'}; }
-		if(img9Path != ''){ formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; }
-		if(img10Path != ''){ formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; }
+		if(img1Path != ''){ 
+			formData.mf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'mf_img1.png'}; 
+			formData.mf_idx_0 = img1Idx;
+		}
+		if(img2Path != ''){ 
+			formData.mf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'mf_img2.png'}; 
+			formData.mf_idx_1 = img2Idx;
+		}
+		if(img3Path != ''){ 
+			formData.mf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'mf_img3.png'}; 
+			formData.mf_idx_2 = img3Idx;
+		}
+		if(img4Path != ''){ 
+			formData.mf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'mf_img4.png'}; 
+			formData.mf_idx_3 = img4Idx;
+		}
+		if(img5Path != ''){ 
+			formData.mf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'mf_img5.png'}; 
+			formData.mf_idx_4 = img5Idx;
+		}
+		if(img6Path != ''){ 
+			formData.mf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'mf_img6.png'}; 
+			formData.mf_idx_5 = img6Idx;
+		}
+		if(img7Path != ''){ 
+			formData.mf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'mf_img7.png'}; 
+			formData.mf_idx_6 = img7Idx;
+		}
+		if(img8Path != ''){ 
+			formData.mf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'mf_img8.png'}; 
+			formData.mf_idx_7 = img8Idx;
+		}
+		if(img9Path != ''){ 
+			formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; 
+			formData.mf_idx_8 = img9Idx;
+		}
+		if(img10Path != ''){ 
+			formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; 
+			formData.mf_idx_9 = img10Idx;
+		}
+
+		if(del1 == 1){ 
+			formData.mf_file_del_0 = del1;
+			formData.mf_file_del_0_idx = del1Idx;
+		}
+		if(del2 == 1){ 
+			formData.mf_file_del_1 = del2;
+			formData.mf_file_del_1_idx = del2Idx;
+		}
+		if(del3 == 1){ 
+			formData.mf_file_del_2 = del3;
+			formData.mf_file_del_2_idx = del3Idx;
+		}
+		if(del4 == 1){ 
+			formData.mf_file_del_3 = del4;
+			formData.mf_file_del_3_idx = del4Idx;
+		}
+		if(del5 == 1){ 
+			formData.mf_file_del_4 = del5;
+			formData.mf_file_del_4_idx = del5Idx;
+		}
+		if(del6 == 1){ 
+			formData.mf_file_del_5 = del6;
+			formData.mf_file_del_5_idx = del6Idx;
+		}
+		if(del7 == 1){ 
+			formData.mf_file_del_6 = del7;
+			formData.mf_file_del_6_idx = del7Idx;
+		}
+		if(del8 == 1){ 
+			formData.mf_file_del_7 = del8;
+			formData.mf_file_del_7_idx = del8Idx;
+		}
+		if(del9 == 1){ 
+			formData.mf_file_del_8 = del9;
+			formData.mf_file_del_8_idx = del9Idx;
+		}
+		if(del10 == 1){ 
+			formData.mf_file_del_9 = del10;
+			formData.mf_file_del_9_idx = del10Idx;
+		}
 
 		console.log("formData : ",formData);
 
-		Api.send('POST', 'save_match', formData, (args)=>{
+		Api.send('POST', 'modify_match', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
@@ -522,9 +633,77 @@ const MatchModify = ({navigation, route}) => {
 		});
 	}
 
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'view_match', {'is_api': 1, mc_idx:idx}, (args)=>{     
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("modify : ",responseJson);
+				const imgList = responseJson.mf_data;
+				if(imgList.length > 0){
+					let selectCon = fileList.map((item,index) => {					
+						if(imgList[index]){
+							return {...item, path: imgList[index].mf_name_org, mf_idx:imgList[index].mf_idx};
+						}else{
+							return {...item, path: item.path, mf_idx:''};
+						}
+					});
+					setFileList(selectCon);
+					getFileCount(selectCon);
+				}
+
+        setSubject(responseJson.mc_name);
+        
+        const apiCate = responseJson.c1_idx;
+				const apiSort = responseJson.c2_idx;
+				const apiMatt1 = responseJson.c3_idx;
+				const apiMatt2 = responseJson.c4_idx;
+				setMatt1('');
+				setMatt2('');
+				setCate(parseInt(apiCate));
+				setSort(apiSort.toString());			
+				setMatt1(apiMatt1.toString());
+				setMatt2(apiMatt2.toString());				
+				if(apiMatt2==12 || apiMatt2==22 || apiMatt2==32 || apiMatt2==40 || apiMatt2==47 || apiMatt2==59 || apiMatt2==62 || apiMatt2==65 || apiMatt2==70){
+					setMatt2Direct(responseJson.c4_etc);
+				}				        
+        
+				let totalComma = String(responseJson.mc_total).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+        setCnt(totalComma);
+        
+        if(responseJson.mc_file){
+          setFloorFile(responseJson.mc_file);
+        }
+
+        setCall(responseJson.mc_option1)
+        setSecurity(parseInt(responseJson.mc_dwg_secure_org));
+        setAdvice(parseInt(responseJson.mc_chat_permit));
+        setProjectName(responseJson.mc_project_name);        
+        setUseInfo(parseInt(responseJson.mc_use_type_org));
+        select8();
+        setIndCate(parseInt(responseJson.mc_use_type2_org))        
+        setEndDateMethod(responseJson.mc_option2_org);
+        if(responseJson.mc_option2_org == 2){
+          const endDate = (responseJson.mc_end_date).split('.').join('-');
+          setEndDate(endDate);
+        }
+        setPrice((responseJson.mc_price).toString());
+				setContent(responseJson.mc_contents);
+
+        setIsLoading(true);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!');
+			}
+		});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'매칭 글쓰기'} />
+			<Header navigation={navigation} headertitle={'매칭 글수정'} />
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>
 					<View style={[styles.registBox]}>
@@ -657,70 +836,30 @@ const MatchModify = ({navigation, route}) => {
 							</View>
 						</View>
 						
-						{(sort==40 || cate==6 || cate==7) ?
-							null 
-						: (
-						<View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>재료1</Text>
-							</View>
-							<View style={[styles.typingInputBox]}>
-								<RNPickerSelect
-									value={matt1}
-									onValueChange={(value) => {
-										setMatt1(value);
-										matt1Chk();
-									}}
-									placeholder={{
-										label: '재료1을 선택해 주세요.',
-										inputLabel: '재료1을 선택해 주세요.',
-										value: '',
-										color: '#8791A1',
-									}}
-									items={matt1Ary.map(item => ({
-										label: item.c3_name,
-										value: item.c3_idx,
-								 	}))}
-									fixAndroidTouchableBug={true}
-									useNativeAndroidPickerStyle={false}
-									style={{
-										placeholder: {color: '#8791A1'},
-										inputAndroid: styles.input,
-										inputAndroidContainer: styles.inputContainer,
-										inputIOS: styles.input,
-										inputIOSContainer: styles.inputContainer,
-									}}
-								/>
-								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
-							</View>
-						</View>
-						)}
-												
-						{matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==80) || (cate==3 && matt1==83) ? (
-							null
-						) : (
+						{cate!='' && sort!='' ? (
+							(sort==40 || cate==6 || cate==7) ?
+								null 
+							: (
 							<View style={[styles.typingBox, styles.mgTop35]}>
 								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>재료2</Text>
+									<Text style={styles.typingTitleText}>재료1{matt1}</Text>
 								</View>
-								<View style={[styles.typingInputBox]}>
+								<View style={[styles.typingInputBox]}>									
 									<RNPickerSelect
-										value={matt2}
+										value={matt1}
 										onValueChange={(value) => {
-											setMatt2(value);
-											if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
-												setMatt2Direct(''); 
-											}
+											setMatt1(value);
+											matt1Chk();
 										}}
 										placeholder={{
-											label: '재료2를 선택해 주세요.',
-											inputLabel: '재료2를 선택해 주세요.',
+											label: '재료1을 선택해 주세요.',
+											inputLabel: '재료1을 선택해 주세요.',
 											value: '',
 											color: '#8791A1',
 										}}
-										items={matt2Ary.map(item => ({
-											label: item.c4_name,
-											value: item.c4_idx,
+										items={matt1Ary.map(item => ({
+											label: item.c3_name,
+											value: item.c3_idx,
 										}))}
 										fixAndroidTouchableBug={true}
 										useNativeAndroidPickerStyle={false}
@@ -734,21 +873,67 @@ const MatchModify = ({navigation, route}) => {
 									/>
 									<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 								</View>
-
-								{matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70 ? (
-								<View style={[styles.typingInputBox]}>
-									<TextInput
-										value={matt2Direct}
-										onChangeText={(v) => {setMatt2Direct(v)}}
-										placeholder={'재료2를 직접 입력을 입력해 주세요.'}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-								</View>
-								) : null}
-
 							</View>
-						)}
+							)
+						) : null}
+
+						{cate!='' && matt1!='' ? (		
+							matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) ? (
+								null
+							) : (
+								<View style={[styles.typingBox, styles.mgTop35]}>
+									<View style={styles.typingTitle}>
+										<Text style={styles.typingTitleText}>재료2</Text>
+									</View>
+									<View style={[styles.typingInputBox]}>
+										<RNPickerSelect
+											value={matt2}
+											onValueChange={(value) => {
+												setMatt2(value);
+												if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
+													
+												}else{
+													setMatt2Direct(''); 
+												}
+											}}
+											placeholder={{
+												label: '재료2를 선택해 주세요.',
+												inputLabel: '재료2를 선택해 주세요.',
+												value: '',
+												color: '#8791A1',
+											}}
+											items={matt2Ary.map(item => ({
+												label: item.c4_name,
+												value: item.c4_idx,
+											}))}
+											fixAndroidTouchableBug={true}
+											useNativeAndroidPickerStyle={false}
+											style={{
+												placeholder: {color: '#8791A1'},
+												inputAndroid: styles.input,
+												inputAndroidContainer: styles.inputContainer,
+												inputIOS: styles.input,
+												inputIOSContainer: styles.inputContainer,
+											}}
+										/>
+										<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+									</View>
+
+									{matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70 ? (
+									<View style={[styles.typingInputBox]}>
+										<TextInput
+											value={matt2Direct}
+											onChangeText={(v) => {setMatt2Direct(v)}}
+											placeholder={'재료2를 직접 입력을 입력해 주세요.'}
+											placeholderTextColor="#8791A1"
+											style={[styles.input]}
+										/>
+									</View>
+									) : null}
+
+								</View>
+							)
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -1150,7 +1335,7 @@ const MatchModify = ({navigation, route}) => {
 				</View>
       </Modal>
 
-			{isLoading ? (
+			{!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>

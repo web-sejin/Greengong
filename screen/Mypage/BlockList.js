@@ -44,6 +44,7 @@ const BlockList = ({navigation, route}) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
+	//중고 전용
 	const setAsync = async () => {
 		try {
 			await AsyncStorage.setItem(
@@ -55,23 +56,36 @@ const BlockList = ({navigation, route}) => {
 		}
 	}
 
+	//매칭 전용
+	const setAsync2 = async () => {
+		try {
+			await AsyncStorage.setItem(
+				'mainReload2',
+				'on',
+			);
+		} catch (error) {
+			// Error saving data
+		}
+	}
+
 	const removeBlock = async (mb_idx) => {
+		console.log(mb_idx);
 		const formData = {
 			is_api:1,				
-			mb_idx:mb_idx,
-		};
-		
+			recv_idx:mb_idx,
+		};		
 
-    Api.send('POST', 'remove_block', formData, (args)=>{
+    Api.send('POST', 'save_block', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);				
 				setAsync();
+				setAsync2();
 				getData();
 			}else{
-				console.log('결과 출력 실패!', resultItem.result_text);
+				console.log('결과 출력 실패!', responseJson);
 				ToastMessage(responseJson.result_text);
 			}
 		});
@@ -86,11 +100,13 @@ const BlockList = ({navigation, route}) => {
 					navigation.navigate('Other', {idx:item.mb_idx});
 				}}
 			>
-				{item.image ? (
-					<AutoHeightImage width={50} source={{uri: item.image}} />
-				) : (
-					<AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} />	
-				)}
+				<View style={styles.listImgBox}>
+					{item.image ? (
+						<AutoHeightImage width={50} source={{uri: item.image}} />
+					) : (
+						<AutoHeightImage width={50} source={require("../../assets/img/not_profile.png")} />	
+					)}
+				</View>
 			</TouchableOpacity>
 			<View style={[styles.listInfoBox]}>
 				<View style={styles.listInfoTitle}>
@@ -188,6 +204,7 @@ const styles = StyleSheet.create({
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 	listLi: {display:'flex',flexDirection:'row',paddingHorizontal:20,},
   otherPeople: {paddingVertical:20,},
+	listImgBox: {width:50,height:50,borderRadius:50,overflow:'hidden'},
 	listImg: {borderRadius:50},
 	listInfoBox: {width:(innerWidth - 50),height:90,paddingLeft:15,paddingRight:65,display:'flex',justifyContent:'center',position:'relative'},
   listInfoTitle: {},
