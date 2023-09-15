@@ -90,11 +90,11 @@ const MatchView = (props) => {
         setMcMbIdx(responseJson.mc_mb_idx);
         setDwgPmSt(responseJson.is_dwg_permit);
 
-        // if(responseJson.is_product_like == 1){
-        //   setLike(1);
-        // }else{
-        //   setLike(0);
-        // }        
+        if(responseJson.is_product_like == 1){
+          setLike(1);
+        }else{
+          setLike(0);
+        }
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!', responseJson);
@@ -373,6 +373,32 @@ const MatchView = (props) => {
 		});
   }
 
+  function chatCheck(){    
+    if(myInfo.mb_idx == itemInfo.mc_mb_idx){
+      navigation.navigate('MachChat', {idx:idx});
+    }else{
+      chatDeal();
+    }
+  }
+
+  const chatDeal = async () => {
+    //
+    // await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:prdMbIdx, page_code:'match', page_idx:idx}, (args)=>{
+		// 	let resultItem = args.resultItem;
+		// 	let responseJson = args.responseJson;
+		// 	let arrItems = args.arrItems;
+		// 	//console.log('args ', responseJson);
+		// 	if(responseJson.result === 'success' && responseJson){
+		// 		//console.log("in_chat : ",responseJson);				
+    //     const roomName = 'match_'+responseJson.cr_idx;
+    //     //navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'product', recv_idx:prdMbIdx, roomName:roomName});
+		// 	}else{
+		// 		//setItemList([]);				
+		// 		//console.log('결과 출력 실패! : ', resultItem.result_text);
+		// 	}
+		// });
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -574,12 +600,18 @@ const MatchView = (props) => {
                 style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3]}
                 activeOpacity={opacityVal}
                 onPress={() => {
-                  //navigation.navigate('MachChat', {}); //매칭 채팅리스트
-                  //setVisible3(true); //회사소개서 업로드 팝업
-                  navigation.navigate('Estimate', {}); //견적서 업로드 페이지
+                  if(itemInfo.mc_chat_permit == 1){
+                    navigation.navigate('Estimate', {idx:idx}); //견적서 업로드 페이지
+                  }else if(itemInfo.mc_chat_permit == 2){
+                    setVisible3(true); //회사소개서 업로드 팝업
+                  }else if(itemInfo.mc_chat_permit == 3){
+                    navigation.navigate('Estimate', {idx:idx}); //견적서 업로드 페이지
+                  }else if(itemInfo.mc_chat_permit == 4){
+                    chatCheck();
+                  }
                 }}
               >
-                <Text style={styles.nextBtnText}>채팅하기</Text>
+                <Text style={styles.nextBtnText}>채팅하기{itemInfo.mc_chat_permit}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -698,7 +730,8 @@ const MatchView = (props) => {
                 <Text style={styles.avatarTitleText}>회사소개서 업로드</Text>
               </View>
               <View style={styles.avatarDesc}>
-                <Text style={styles.avatarDescText}>회사소개서를 업로드하시면 채팅이 가능합니다.</Text>
+                <Text style={styles.avatarDescText}>회사소개서를 업로드하시면</Text>
+                <Text style={styles.avatarDescText}>채팅이 가능합니다.</Text>
                 <Text style={styles.avatarDescText}>PDF, PPT, ZIP 파일을 업로드하여 주세요.</Text>
               </View>
               <View style={[styles.typingInputBox, styles.typingFlexBox]}>

@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
 	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden'},
 	listImg: {borderRadius:12,},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
-	listInfoBox2 : {width:innerWidth,paddingLeft:0,},
+	listInfoBox2: {width:innerWidth,paddingLeft:0,},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
 	listInfoDesc: {marginTop:5},

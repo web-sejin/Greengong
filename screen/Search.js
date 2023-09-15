@@ -32,303 +32,7 @@ const SearchList = ({navigation, route}) => {
 	const [nowPage, setNowPage] = useState(1);
 	const [totalPage, setTotalPage] = useState(1);
 	const [itemList, setItemList] = useState([]);
-
-	const DATA = [
-		// {
-		// 	id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-		// 	title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '스크랩',
-		// 	naviPage: 'UsedWrite1',
-		// 	stateVal: '',
-		// },
-		// {
-		// 	id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '중고자재',
-		// 	naviPage: 'UsedWrite2',
-		// 	stateVal: '나눔',
-		// },
-		// {
-		// 	id: '58694a0f-3da1-471f-bd96-145571e29d72',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '중고기계/장비',
-		// 	naviPage: 'UsedWrite3',
-		// 	stateVal: '입찰',
-		// },
-		// {
-		// 	id: '68694a0f-3da1-471f-bd96-145571e29d72',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '폐기물',
-		// 	naviPage: 'UsedWrite4',
-		// 	stateVal: '',
-		// },
-		// {
-		// 	id: '78694a0f-3da1-471f-bd96-145571e29d72',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '스크랩',
-		// 	naviPage: 'UsedWrite1',
-		// 	stateVal: '',
-		// },
-		// {
-		// 	id: '88694a0f-3da1-471f-bd96-145571e29d72',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '스크랩',
-		// 	naviPage: 'UsedWrite1',
-		// 	stateVal: '',
-		// },
-		// {
-		// 	id: '98694a0f-3da1-471f-bd96-145571e29d72',
-		// 	title: '거의 사용하지 않은 스크랩',
-		// 	desc: '김포시 고촌읍 · 3일전',
-		// 	cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-		// 	score: 2,
-		// 	review: 8,
-		// 	like: 5,
-		// 	price: '20,000',
-		// 	category: '스크랩',
-		// 	naviPage: 'UsedWrite1',
-		// 	stateVal: '',
-		// },
-	];
-	
-	const getList = ({item, index}) => (
-		<TouchableOpacity 
-			style={[styles.listLi]}
-			activeOpacity={opacityVal}
-			onPress={() => {
-				navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
-			}}
-		>
-			<>
-			<View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
-				<AutoHeightImage width={131} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
-				<View style={styles.listInfoBox}>
-					<View style={styles.listInfoTitle}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-							{item.title}
-						</Text>
-					</View>
-					<View style={styles.listInfoDesc}>
-						<Text style={styles.listInfoDescText}>{item.desc}</Text>
-					</View>
-					<View style={styles.listInfoCate}>
-						<Text style={styles.listInfoCateText}>{item.cate}</Text>
-					</View>
-					<View style={styles.listInfoCnt}>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={15} source={require("../assets/img/icon_star.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.score}</Text>
-						</View>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={14} source={require("../assets/img/icon_review.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.review}</Text>
-						</View>
-						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-							<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.like}</Text>
-						</View>
-					</View>
-					<View style={styles.listInfoPriceBox}>
-						{index == 0 ? (
-						<View style={[styles.listInfoPriceArea]}>
-							<View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
-								<Text style={styles.listInfoPriceStateText}>예약중</Text>
-							</View>
-							<View style={styles.listInfoPrice}>
-								<Text style={styles.listInfoPriceText}>200,000,000원</Text>
-							</View>
-						</View>
-						)
-						:
-						null
-						}
-
-						{index == 1 ? (
-						<View style={[styles.listInfoPriceArea]}>
-							<View style={[styles.listInfoPriceState, styles.listInfoPriceState2]}>
-								<Text style={styles.listInfoPriceStateText}>나눔</Text>
-							</View>
-						</View>
-						)
-						:
-						null
-						}
-
-						{index >= 2 ? (
-						<View style={[styles.listInfoPriceArea]}>
-							<View style={styles.listInfoPrice}>
-								<Text style={styles.listInfoPriceText}>200,000,000원</Text>
-							</View>
-						</View>
-						)
-						:
-						null
-						}
-					</View>
-				</View>
-			</View>
-			</>
-		</TouchableOpacity>
-	);
-
-	const DATA2 = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '78694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '88694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '98694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-	];
-	
-	const getList2 = ({item, index}) => (
-		<TouchableOpacity 
-			style={[styles.listLi]}
-			activeOpacity={opacityVal}
-			onPress={() => {
-				navigation.navigate('MatchView', {category:item.category})
-			}}
-		>
-			<>
-			<View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
-				<AutoHeightImage width={99} source={require("../assets/img/sample1.jpg")} style={styles.listImg} />
-				<View style={[styles.listInfoBox, styles.listInfoBox2]}>
-					<View style={styles.listInfoTitle}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-							{item.title}
-						</Text>
-					</View>
-					<View style={styles.listInfoDesc}>
-						<Text style={styles.listInfoDescText}>{item.desc}</Text>
-					</View>
-					<View style={styles.listInfoCate}>
-						<Text style={styles.listInfoCateText}>{item.cate}</Text>
-					</View>
-					<View style={styles.listInfoCnt}>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={15} source={require("../assets/img/icon_star.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.score}</Text>
-						</View>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={14} source={require("../assets/img/icon_review.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.review}</Text>
-						</View>
-						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-							<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.like}</Text>
-						</View>
-					</View>
-				</View>
-			</View>
-			</>
-		</TouchableOpacity>
-	);
+	const [itemChk, setItemChk] = useState(false);	
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -368,13 +72,22 @@ const SearchList = ({navigation, route}) => {
 	}
 
 	//검색 결과
-	const getData = async (sch) => {
+	const getData = async (sch, tab) => {
 		setIsLoading(false);
 		let apiName = '';
-		if(tabState == 1){
-			apiName = 'list_search_product';
+		
+		if(tab){
+			if(tab == 1){
+				apiName = 'list_search_product';
+			}else{
+				apiName = 'list_search_match';
+			}
 		}else{
-			apiName = 'list_search_match';
+			if(tabState == 1){
+				apiName = 'list_search_product';
+			}else{
+				apiName = 'list_search_match';
+			}
 		}
 
 		let keyTxt = schText;
@@ -387,18 +100,156 @@ const SearchList = ({navigation, route}) => {
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
-			console.log('args ', args);
+			//console.log('args ', arrItems);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(apiName+' : '+responseJson);
-				//setItemList();
+				console.log(responseJson);
+				setItemList(responseJson.data);
 			}else{
-				setItemList([]);				
+				setItemList([]);
 				console.log('결과 출력 실패!', responseJson);
 			}
 		});
-
+		setItemChk(true);
 		setIsLoading(true);
 	}
+
+	const getList = ({item, index}) => (
+		<TouchableOpacity 
+			style={[styles.listLi]}
+			activeOpacity={opacityVal}
+			onPress={() => {
+				navigation.navigate('UsedView', {})
+			}}
+		>
+			<>
+			<View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
+				{item.pd_image ? (
+				<View style={styles.pdImage}>
+					<AutoHeightImage width={131} source={{uri: item.pd_image}}  style={styles.listImg} />
+				</View>
+				):null}
+
+				<View style={[styles.listInfoBox, item.pd_image ? null : styles.listInfoBox3]}>
+					<View style={styles.listInfoTitle}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.pd_name}</Text>
+					</View>
+					<View style={styles.listInfoDesc}>
+						<Text style={styles.listInfoDescText}>{item.pd_loc} · {item.pd_date}</Text>
+					</View>
+					<View style={styles.listInfoCate}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.pd_summary}</Text>
+					</View>
+					<View style={styles.listInfoCnt}>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={15} source={require("../assets/img/icon_star.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
+						</View>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={14} source={require("../assets/img/icon_review.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.pd_chat_cnt}</Text>
+						</View>
+						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+							<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.pd_like_cnt}</Text>
+						</View>
+					</View>
+					<View style={styles.listInfoPriceBox}>
+						{item.is_free != 1 && item.pd_status_org == 1 ? (
+						<View style={[styles.listInfoPriceArea]}>
+							<View style={styles.listInfoPrice}>
+								<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+							</View>
+						</View>
+						)
+						:
+						null
+						}
+
+						{item.is_free == 1 && item.pd_status_org == 1 ? (
+						<View style={[styles.listInfoPriceArea]}>
+							<View style={[styles.listInfoPriceState, styles.listInfoPriceState2]}>
+								<Text style={styles.listInfoPriceStateText}>나눔</Text>
+							</View>
+						</View>
+						)
+						: null}
+
+						{item.pd_status_org == 2 ? (
+						<View style={[styles.listInfoPriceArea]}>
+							<View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
+								<Text style={styles.listInfoPriceStateText}>예약중</Text>
+							</View>
+							{item.is_free != 1 ? (
+							<View style={styles.listInfoPrice}>
+								<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+							</View>
+							) : null }
+						</View>
+						)
+						: null}
+
+						{item.pd_status_org == 3 ? (
+						<View style={[styles.listInfoPriceArea]}>
+							<View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
+								<Text style={styles.listInfoPriceStateText}>판매완료</Text>
+							</View>
+							{item.is_free != 1 ? (
+							<View style={styles.listInfoPrice}>
+								<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+							</View>
+							) : null }
+						</View>
+						)
+						: null}
+					</View>
+				</View>
+			</View>
+			</>
+		</TouchableOpacity>
+	);
+	
+	const getList2 = ({item, index}) => (
+		<TouchableOpacity 
+			style={[styles.listLi]}
+			activeOpacity={opacityVal}
+			onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
+		>
+			<>
+			<View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
+				{item.mc_image ? (
+				<View style={[styles.pdImage, styles.pdImage2]}>
+					<AutoHeightImage width={131} source={{uri: item.mc_image}}  style={styles.listImg} />
+				</View>
+				):null}
+				<View style={[styles.listInfoBox, styles.listInfoBox2]}>
+					<View style={styles.listInfoTitle}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.mc_name}</Text>
+					</View>
+					<View style={styles.listInfoDesc}>
+						<Text style={styles.listInfoDescText}>{item.mc_loc} · {item.mc_date}</Text>
+					</View>
+					<View style={styles.listInfoCate}>
+						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.mc_summary}</Text>
+					</View>
+					<View style={styles.listInfoCnt}>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={15} source={require("../assets/img/icon_star.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
+						</View>
+						<View style={styles.listInfoCntBox}>
+							<AutoHeightImage width={14} source={require("../assets/img/icon_review.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
+						</View>
+						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+							<AutoHeightImage width={16} source={require("../assets/img/icon_heart.png")}/>
+							<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+						</View>
+					</View>
+				</View>
+			</View>
+			</>
+		</TouchableOpacity>
+	);
 
   function _submit(){
 		if(schText == ''){
@@ -410,7 +261,12 @@ const SearchList = ({navigation, route}) => {
   }
 
   function fnTab(v){
-    setTabState(v);
+		setTabState(v);
+		if(schText != ''){
+			getData(schText, v);
+		}else{
+			setItemChk(false);
+		}
   }
 
 	//키워드 전체 삭제
@@ -420,7 +276,7 @@ const SearchList = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);
+				//console.log('성공 : ',responseJson);
 				getRecKeyword();
 			}else{
 				console.log('결과 출력 실패!', resultItem);
@@ -440,7 +296,7 @@ const SearchList = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);
+				//console.log('성공 : ',responseJson);
 				getRecKeyword();
 			}else{
 				console.log('결과 출력 실패!', resultItem);
@@ -513,7 +369,7 @@ const SearchList = ({navigation, route}) => {
 				</TouchableOpacity>
 			</View>
 			
-			{itemList.length < 1 && recKeyCnt>0 ? (
+			{!itemChk && recKeyCnt>0 ? (
 			<ScrollView>
 				<View style={styles.recentBox}>
 					<View style={styles.recentTit}>
@@ -530,13 +386,16 @@ const SearchList = ({navigation, route}) => {
 					<View style={styles.recentList}>
 						{keyList.map((item, index) => {
 							return(
-							<View key={item.rc_idx} style={styles.recentLi}>
+							<View 
+								key={item.rc_idx} 
+								style={[styles.recentLi, index!=0 ? styles.recentLi2 : null]}
+							>
 								<TouchableOpacity
 									style={styles.recentSchBtn}
 									activeOpacity={opacityVal}
 									onPress={()=>{
 										setSchText(item.rc_keyword);
-										getData(item.rc_keyword);
+										getData(item.rc_keyword, '');
 									}}
 								>
 									<Text style={styles.recentSchBtnText}>{item.rc_keyword}</Text>
@@ -551,58 +410,25 @@ const SearchList = ({navigation, route}) => {
 							</View>
 							)
 						})}
-
-						{/* <View style={[styles.recentLi, styles.recentLi2]}>
-							<TouchableOpacity
-								style={styles.recentSchBtn}
-								activeOpacity={opacityVal}
-								onPress={()=>{setSchText('우주선')}}
-							>
-								<Text style={styles.recentSchBtnText}>우주선</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.recentSchDel}
-								activeOpacity={opacityVal}
-								onPress={()=>{}}
-							>
-								<AutoHeightImage width={11} source={require("../assets/img/icon_close.png")} />
-							</TouchableOpacity>
-						</View>
-
-						<View style={[styles.recentLi, styles.recentLi2]}>
-							<TouchableOpacity
-								style={styles.recentSchBtn}
-								activeOpacity={opacityVal}
-								onPress={()=>{setSchText('자동차')}}
-							>
-								<Text style={styles.recentSchBtnText}>자동차</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.recentSchDel}
-								activeOpacity={opacityVal}
-								onPress={()=>{}}
-							>
-								<AutoHeightImage width={11} source={require("../assets/img/icon_close.png")} />
-							</TouchableOpacity>
-						</View> */}
 					</View>
 				</View>
 			</ScrollView>
 			) : null}
 			
-			{itemList.length < 1 && recKeyCnt<1 ? (
+			{!itemChk && recKeyCnt<1 ? (
 			<View style={styles.notData}>
 				<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
 				<Text style={styles.notDataText}>최근에 검색한 내용이 없습니다.</Text>
 			</View>
 			) : null}
-						  
-			{/* {isLoading ? (
-				tabState == 1 ? (
+
+			{isLoading ? (
+				itemChk ? (
+					tabState == 1 ? (
 					<FlatList
-						data={DATA}
+						data={itemList}
 						renderItem={(getList)}
-						keyExtractor={item => item.id}
+						keyExtractor={(item, index) => index.toString()}
 						ListEmptyComponent={
 							<View style={styles.notData}>
 								<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
@@ -610,24 +436,25 @@ const SearchList = ({navigation, route}) => {
 							</View>
 						}
 					/>
-				) : (
-					<FlatList
-						data={DATA2}
-						renderItem={(getList2)}
-						keyExtractor={item => item.id}
-						ListEmptyComponent={
-							<View style={styles.notData}>
-								<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
-								<Text style={styles.notDataText}>검색어와 일치하는 매칭이 없습니다.</Text>
-							</View>
-						}
-					/>
-				)
-			) : (
-        <View style={[styles.indicator]}>
+					) : (
+						<FlatList
+							data={itemList}
+							renderItem={(getList2)}
+							keyExtractor={(item, index) => index.toString()}
+							ListEmptyComponent={
+								<View style={styles.notData}>
+									<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
+									<Text style={styles.notDataText}>검색어와 일치하는 매칭이 없습니다.</Text>
+								</View>
+							}
+						/>
+					)
+				) : null
+			):(
+				<View style={[styles.indicator]}>
           <ActivityIndicator size="large" />
         </View>
-      )} */}
+			)}						  			
 		</SafeAreaView>
 	)
 }
@@ -654,9 +481,12 @@ const styles = StyleSheet.create({
 	listLi: {paddingHorizontal:20,},
 	listLiBorder: {flexDirection:'row',paddingVertical:20,borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	listLiBorderNot: {borderTopWidth:0,},
+	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden'},
+	pdImage2: {width:99,height:99},
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoBox2: {width:(innerWidth - 99)},
+	listInfoBox3 : {width:innerWidth,paddingLeft:0,},
 	listInfoTitle: {},
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
 	listInfoDesc: {marginTop:5},
@@ -672,6 +502,7 @@ const styles = StyleSheet.create({
 	listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,borderRadius:12,marginRight:8,},
 	listInfoPriceState1: {backgroundColor:'#31B481'},
 	listInfoPriceState2: {backgroundColor:'#F58C40'},
+	listInfoPriceState3: {width:64,backgroundColor:'#353636'},
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},

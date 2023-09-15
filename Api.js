@@ -94,7 +94,6 @@ class Api {
 					let resultCode = responseJson.result_code;
 					let total = responseJson.total;
 					let arrItems = responseJson.data;
-					let top3 = responseJson.top3;
 					// console.log('responseJson', responseJson);
 					let returnJson = {
 						resultItem: {
@@ -102,8 +101,7 @@ class Api {
 						},
 						total: total === undefined ? 0 : total,
 						arrItems: arrItems,
-						responseJson: responseJson,
-						top3: top3
+						responseJson: responseJson,						
 					};
 					// this.state.isLoading = false;
 					// this.state.dataSource = arrItems;
