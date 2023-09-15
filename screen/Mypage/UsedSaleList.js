@@ -404,7 +404,7 @@ const SaleList = ({navigation, route}) => {
         setModiNav();        
         setIdxVal();
         setItemState();
-        getData();
+        getData2();
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);

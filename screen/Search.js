@@ -9,6 +9,10 @@ import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
 import Header from '../components/Header';
 
+import Api from '../Api';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../redux/module/action/UserAction';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -23,6 +27,11 @@ const SearchList = ({navigation, route}) => {
 	const [isLoading, setIsLoading] = useState(false);
   const [schText, setSchText] = useState('');	
 	const [tabState, setTabState] = useState(tabNumber);
+	const [recKeyCnt, setRecKeyCnt] = useState(0);
+	const [keyList, setKeyList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
+	const [totalPage, setTotalPage] = useState(1);
+	const [itemList, setItemList] = useState([]);
 
 	const DATA = [
 		// {
@@ -330,36 +339,114 @@ const SearchList = ({navigation, route}) => {
         //setIsLoading(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getRecKeyword();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  function _submit(){
-    console.log("search!");
-  }
+	//최근검색어
+	const getRecKeyword = async () => {
+		setIsLoading(false);
+		await Api.send('GET', 'list_recently_keyword', {'is_api': 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log('list_recently_keyword', responseJson);
+				setKeyList(responseJson.data);
+				setRecKeyCnt(responseJson.total_count);
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
 
-	useEffect(() => {
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
-  }, []);
+		setIsLoading(true);
+	}
+
+	//검색 결과
+	const getData = async (sch) => {
+		setIsLoading(false);
+		let apiName = '';
+		if(tabState == 1){
+			apiName = 'list_search_product';
+		}else{
+			apiName = 'list_search_match';
+		}
+
+		let keyTxt = schText;
+		if(sch){
+			keyTxt = sch;
+		}
+
+		setNowPage(1);
+		await Api.send('GET', apiName, {is_api:1, keyword:keyTxt, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log(apiName+' : '+responseJson);
+				//setItemList();
+			}else{
+				setItemList([]);				
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+
+		setIsLoading(true);
+	}
+
+  function _submit(){
+		if(schText == ''){
+			ToastMessage('검색어를 입력해 주세요.');
+			return false;
+		}else{
+			getData();
+		}
+  }
 
   function fnTab(v){
-    setIsLoading(false);
     setTabState(v);
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
   }
+
+	//키워드 전체 삭제
+	const deleteAll = async () => {
+		Api.send('POST', 'alldel_recently_keyword', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				getRecKeyword();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+			}
+		});
+	}
+
+	//키워드 단일 삭제
+	const deleteOne = async (rc_idx) => {
+		const formData = {
+			is_api:1,				
+			rc_idx:rc_idx,
+		};
+
+		Api.send('POST', 'del_recently_keyword', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				getRecKeyword();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+			}
+		});
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -370,16 +457,16 @@ const SearchList = ({navigation, route}) => {
 						<TextInput
 							value={schText}
 							onChangeText={(v) => {setSchText(v)}}
-							//placeholder={''}
+							placeholder={'상품명 또는 내용을 검색해 주세요.'}
 							placeholderTextColor="#8791A1"
 							style={[styles.input]}
+							returnKyeType='done'
+							onSubmitEditing={_submit}
 						/>
 						<TouchableOpacity 
 							style={styles.faqSchBtn}
 							activeOpacity={opacityVal}
-							onPress={() => {
-								_submit();
-							}}
+							onPress={() => {_submit()}}
 						>                
 							<AutoHeightImage width={16} source={require("../assets/img/icon_search.png")} />
 						</TouchableOpacity>
@@ -426,6 +513,7 @@ const SearchList = ({navigation, route}) => {
 				</TouchableOpacity>
 			</View>
 			
+			{itemList.length < 1 && recKeyCnt>0 ? (
 			<ScrollView>
 				<View style={styles.recentBox}>
 					<View style={styles.recentTit}>
@@ -433,31 +521,38 @@ const SearchList = ({navigation, route}) => {
 						<TouchableOpacity
 							style={styles.recentTitReset}
 							activeOpacity={opacityVal}
-							onPress={()=>{}}
+							onPress={()=>{deleteAll()}}
 						>
 							<Text style={styles.recentTitResetText}>전체삭제</Text>
 						</TouchableOpacity>
 					</View>
 
 					<View style={styles.recentList}>
-						<View style={styles.recentLi}>
-							<TouchableOpacity
-								style={styles.recentSchBtn}
-								activeOpacity={opacityVal}
-								onPress={()=>{setSchText('익선동')}}
-							>
-								<Text style={styles.recentSchBtnText}>익선동</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.recentSchDel}
-								activeOpacity={opacityVal}
-								onPress={()=>{}}
-							>
-								<AutoHeightImage width={11} source={require("../assets/img/icon_close.png")} />
-							</TouchableOpacity>
-						</View>
+						{keyList.map((item, index) => {
+							return(
+							<View key={item.rc_idx} style={styles.recentLi}>
+								<TouchableOpacity
+									style={styles.recentSchBtn}
+									activeOpacity={opacityVal}
+									onPress={()=>{
+										setSchText(item.rc_keyword);
+										getData(item.rc_keyword);
+									}}
+								>
+									<Text style={styles.recentSchBtnText}>{item.rc_keyword}</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={styles.recentSchDel}
+									activeOpacity={opacityVal}
+									onPress={()=>{deleteOne(item.rc_idx)}}
+								>
+									<AutoHeightImage width={11} source={require("../assets/img/icon_close.png")} />
+								</TouchableOpacity>
+							</View>
+							)
+						})}
 
-						<View style={[styles.recentLi, styles.recentLi2]}>
+						{/* <View style={[styles.recentLi, styles.recentLi2]}>
 							<TouchableOpacity
 								style={styles.recentSchBtn}
 								activeOpacity={opacityVal}
@@ -489,16 +584,18 @@ const SearchList = ({navigation, route}) => {
 							>
 								<AutoHeightImage width={11} source={require("../assets/img/icon_close.png")} />
 							</TouchableOpacity>
-						</View>
+						</View> */}
 					</View>
 				</View>
 			</ScrollView>
-
-			{/* <View style={styles.notData}>
+			) : null}
+			
+			{itemList.length < 1 && recKeyCnt<1 ? (
+			<View style={styles.notData}>
 				<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
 				<Text style={styles.notDataText}>최근에 검색한 내용이 없습니다.</Text>
-			</View> */}
-
+			</View>
+			) : null}
 						  
 			{/* {isLoading ? (
 				tabState == 1 ? (

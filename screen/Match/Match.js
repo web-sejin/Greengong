@@ -391,6 +391,35 @@ const Match = (props) => {
 		//await listCenterInfoReceive(selected);
 		await setVisible3(false);
 	}
+
+	//공장 변경
+	const changeFac = async (idx) => {
+		let formData = {
+			is_api:1,				
+			fc_idx:idx,
+		};
+
+		Api.send('POST', 'choice_fac', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+				setItemList([]);
+				setNowPage(1);
+				setVisible(false);
+				setMyFac(responseJson.data);
+
+				const fcUse = (responseJson.data).find(item=> item.fc_use==1);
+				const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				setMyFacOn(fcUseText);				
+
+				getItemList();				
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+			}
+		});
+	}
 	
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -400,7 +429,7 @@ const Match = (props) => {
 					activeOpacity={opacityVal}
 					onPress={() => {setVisible(true)}}
 				>
-					<Text style={styles.headerBtn1Text}>공장1(신중동1)</Text>
+					<Text style={styles.headerBtn1Text}>{myFacOn}</Text>
 					<AutoHeightImage width={18} source={require("../../assets/img/icon_arrow.png")} />
 				</TouchableOpacity>
 				<TouchableOpacity 
@@ -429,7 +458,7 @@ const Match = (props) => {
 								<TouchableOpacity
 								style={styles.goToSch}
 								activeOpacity={opacityVal}
-								onPress={() => {navigation.navigate('SearchList', {backPage:'Home', tab:1})}}
+								onPress={() => {navigation.navigate('SearchList', {backPage:'Match', tab:2})}}
 								>
 									<Text style={styles.goToSchText}>무엇을 찾아드릴까요?</Text>
 								</TouchableOpacity>
@@ -529,21 +558,28 @@ const Match = (props) => {
 					onPress={() => {setVisible(false)}}
 				></Pressable>
 				<View style={styles.modalCont}>
-					<TouchableOpacity 
-						style={styles.myfactoryBtn}
-						activeOpacity={opacityVal}
-					>
-						<Text style={[styles.myfactoryBtnText, styles.myfactoryBtnTextOn]}>공장1(신중동1)</Text>
-					</TouchableOpacity>
+					{myFac.length > 0 ? (
+						myFac.map((item, index)=>{
+							return(
+								<TouchableOpacity
+									key = {index}
+									style={styles.myfactoryBtn}
+									activeOpacity={opacityVal}
+									onPress={()=>{changeFac(item.fc_idx)}}
+								>
+									<Text style={[styles.myfactoryBtnText, item.fc_use == 1 ? styles.myfactoryBtnTextOn : null]}>
+											{item.fc_name}({item.fc_dong})
+									</Text>
+								</TouchableOpacity>
+							)
+						})
+					) : null}
 					<TouchableOpacity 
 						style={[styles.myfactoryBtn, styles.myfactoryBtn2]}
 						activeOpacity={opacityVal}
-					>
-						<Text style={styles.myfactoryBtnText}>공장2(상동)</Text>
-					</TouchableOpacity>
-					<TouchableOpacity 
-						style={[styles.myfactoryBtn, styles.myfactoryBtn2]}
-						activeOpacity={opacityVal}
+						onPress={()=>{
+							navigation.navigate('MyCompany');
+						}}
 					>
 						<Text style={styles.myfactoryBtnText}>공장 관리하기</Text>
 					</TouchableOpacity>
