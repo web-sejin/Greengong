@@ -94,14 +94,16 @@ const MatchView = (props) => {
         //   setLike(1);
         // }else{
         //   setLike(0);
-        // }
-
-        setIsLoading(true);
+        // }        
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!', responseJson);
 			}
 		});
+
+    setTimeout(function(){
+      setIsLoading(true);
+    }, 100);
   }
 
   const getMyData = async () => {
@@ -266,10 +268,26 @@ const MatchView = (props) => {
   function fnSendEmail(){
     setVisible2(false);
     setIndCatorSt(true);
-    setTimeout(function(){
-      setIndCatorSt(false);
-      ToastMessage('도면이 메일로 전송되었습니다.');
-    }, 3000)
+
+    const formData = {
+			is_api:1,				
+			mc_idx:idx,
+		};
+
+    Api.send('POST', 'down_dwg', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setIndCatorSt(false);        
+        ToastMessage('도면이 메일로 전송되었습니다.');
+			}else{
+				console.log('메일 결과 출력 실패!!!', responseJson);
+        setIndCatorSt(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
   const openPicker = async () => {
@@ -510,37 +528,50 @@ const MatchView = (props) => {
           </ScrollView>
           <View style={[styles.nextFix]}>
             <View style={styles.nextFixFlex}>
-              {myInfo.mb_idx == itemInfo.mc_mb_idx ? (
-                <TouchableOpacity 
-                  style={[styles.nextBtn]}
-                  activeOpacity={opacityVal}
-                  onPress={() => {
-                    navigation.navigate('DownUsed', {}); //도면 다운로드 허용
-                  }}
-                >
-                  <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
-                </TouchableOpacity>
-              ):(
-                <TouchableOpacity 
-                  style={[styles.nextBtn]}
-                  activeOpacity={opacityVal}
-                  onPress={() => {
-                    if(dwgPmSt == 0){
-                      downPermitReq(); //권한요청
-                    }else{
-                      setVisible2(true); //도면받기
-                    }
-                  }}
-                >
-                  {dwgPmSt == 0 ? (
-                    <Text style={styles.nextBtnText}>도면 권한 요청</Text>
-                  ) : (
-                    <Text style={styles.nextBtnText}>도면 다운로드</Text>
-                  )}
-                </TouchableOpacity>
-              )}
+              {itemInfo.mc_file ? (
+
+                myInfo.mb_idx == itemInfo.mc_mb_idx ? (
+                  <TouchableOpacity 
+                    style={[styles.nextBtn]}
+                    activeOpacity={opacityVal}
+                    onPress={() => {
+                      navigation.navigate('DownUsed', {idx:idx}); //도면 다운로드 허용
+                    }}
+                  >
+                    <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
+                  </TouchableOpacity>
+                ):(
+                  <TouchableOpacity 
+                    style={[styles.nextBtn]}
+                    activeOpacity={opacityVal}
+                    onPress={() => {
+                      if(itemInfo.mc_dwg_secure_org == 1){
+                        setVisible2(true); //도면받기
+                      }else{
+                        if(dwgPmSt == 0){
+                          downPermitReq(); //권한요청
+                        }else{
+                          setVisible2(true); //도면받기
+                        }
+                      }
+                    }}
+                  >
+                    {itemInfo.mc_dwg_secure_org == 1 ? (
+                      <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                    ) : (
+                      dwgPmSt == 0 ? (
+                        <Text style={styles.nextBtnText}>도면 권한 요청</Text>
+                      ) : (
+                        <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                      )
+                    )}
+                  </TouchableOpacity>
+                )
+                
+              ) : null}
+
               <TouchableOpacity 
-                style={[styles.nextBtn, styles.nextBtn2]}
+                style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3]}
                 activeOpacity={opacityVal}
                 onPress={() => {
                   //navigation.navigate('MachChat', {}); //매칭 채팅리스트
@@ -645,7 +676,7 @@ const MatchView = (props) => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.avatarBtn, styles.avatarBtn2]}
-                  onPress={() => {fnSendEmail();}}
+                  onPress={() => {fnSendEmail()}}
                 >
                   <Text style={styles.avatarBtnText}>확인</Text>
                 </TouchableOpacity>

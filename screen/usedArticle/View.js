@@ -93,7 +93,10 @@ const UsedView = (props) => {
 				console.log('결과 출력 실패!');
 			}
 		});
-    setIsLoading(true);
+    
+    setTimeout(function(){
+      setIsLoading(true);
+    }, 100);
   }
 
   const getMyData = async () => {

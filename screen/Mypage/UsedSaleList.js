@@ -149,12 +149,18 @@ const SaleList = ({navigation, route}) => {
       <View style={[styles.listInfoCate]}>
         <Text style={styles.listInfoCateText}>{'['}{item.c1_name}{']'}</Text>
       </View>
-      <View style={styles.listLi}>        
-        <View style={styles.listImgBox}>
-          {item.pd_image ? (
-          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />
-          ) : null}
-        </View>			
+      <View style={styles.listLi}>
+      {item.pd_image ? (    
+        <TouchableOpacity 
+          style={styles.listImgBox}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedView', {idx:item.pd_idx})
+          }}
+        >          
+          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />          
+        </TouchableOpacity>			
+        ) : null}
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
@@ -237,11 +243,17 @@ const SaleList = ({navigation, route}) => {
         <Text style={styles.listInfoCateText}>{'['}{item.c1_name}{']'}</Text>
       </View>
       <View style={styles.listLi}>        
-        <View style={styles.listImgBox}>        
-          {item.pd_image ? (
-          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />
-          ) : null}
-        </View>			
+        {item.pd_image ? (
+        <TouchableOpacity 
+          style={styles.listImgBox}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedView', {idx:item.pd_idx})
+          }}
+        >                  
+          <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />          
+        </TouchableOpacity>			
+        ) : null}
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
@@ -283,6 +295,25 @@ const SaleList = ({navigation, route}) => {
       </View>
     </View>
 	);
+  const moreData2 = async () => {
+		if(totalPage2 > nowPage2){
+			await Api.send('GET', 'list_end', {is_api: 1, page:nowPage2+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = itemList2.concat(responseJson.data);				
+					setItemList2(addItem);			
+					setNowPage2(nowPage2+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
 
   function fnTab(v){
     setTabState(v);
@@ -290,8 +321,14 @@ const SaleList = ({navigation, route}) => {
     setNowPage2(1);
     if(v == 1){
       getData();
+      setTimeout(function(){
+        setItemList2([]);
+      },200);
     }else if(v == 2){
       getData2();
+      setTimeout(function(){
+        setItemList([]);
+      },200);
     }
   }
 
@@ -344,8 +381,8 @@ const SaleList = ({navigation, route}) => {
         setItemState();
         getData();
 			}else{
-				console.log('결과 출력 실패!', resultItem);
-				ToastMessage(responseJson.result_text);
+				console.log('결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
   }
@@ -375,6 +412,12 @@ const SaleList = ({navigation, route}) => {
 		});
   }
 
+  //판매완료
+  const dealEnd = async () => {
+    setVisible(false);
+    navigation.navigate('SalesComplete', {idx:idxVal, returnNavi:'UsedSaleList'});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'판매내역'} />
@@ -400,11 +443,11 @@ const SaleList = ({navigation, route}) => {
         >
           {tabState == 2 ? (
             <>
-            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>거래완료 ({tab2Cnt})</Text>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매완료 ({tab2Cnt})</Text>
             <View style={styles.tabLine}></View>
             </>
           ) : (
-            <Text style={styles.tabBtnText}>거래완료 ({tab2Cnt})</Text>  
+            <Text style={styles.tabBtnText}>판매완료 ({tab2Cnt})</Text>  
           )}
         </TouchableOpacity>
       </View>
@@ -435,12 +478,12 @@ const SaleList = ({navigation, route}) => {
           renderItem={(getList2)}
           keyExtractor={(item, index) => index.toString()}
           onEndReachedThreshold={0.6}
-          //onEndReached={moreData2}
+          onEndReached={moreData2}
           ListEmptyComponent={
             isLoading ? (
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-                <Text style={styles.notDataText}>거래완료된 상품이 없습니다.</Text>
+                <Text style={styles.notDataText}>판매완료된 상품이 없습니다.</Text>
               </View>
             ):(
               <View style={[styles.indicator]}>
@@ -449,7 +492,6 @@ const SaleList = ({navigation, route}) => {
             )
           }
         />
-        <View><Text>456</Text></View>
         </>
       )}
 
@@ -499,11 +541,9 @@ const SaleList = ({navigation, route}) => {
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}
-							onPress={() => {
-                setVisible(false);
-						}}
+							onPress={() => {dealEnd()}}
 						>
-							<Text style={styles.modalCont2BtnText}>거래완료</Text>
+							<Text style={styles.modalCont2BtnText}>판매완료</Text>
 						</TouchableOpacity>						        
             ) : null }                        
 

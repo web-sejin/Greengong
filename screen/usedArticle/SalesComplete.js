@@ -144,7 +144,11 @@ const SalesComplete = (props) => {
 				console.log('성공 : ',responseJson);
         setVisible(false);
         setVisible2(false);
-				navigation.navigate('Home', {isSubmit: true});
+        if(route.params.returnNavi){
+					navigation.navigate(route.params.returnNavi, {isSubmit : true});
+				}else{
+					navigation.navigate('Home', {isSubmit: true});
+				}
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				//ToastMessage(responseJson.result_text);

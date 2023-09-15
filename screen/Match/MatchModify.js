@@ -534,7 +534,7 @@ const MatchModify = ({navigation, route}) => {
 			mc_price:price
 		};
 
-		if(floorFile != ''){ formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; }
+		if(floorFile != ''){ formData.mc_file =  {'uri': floorFileUri, 'type': 'image/png', 'name': 'floorFile.png'}; }
 		if(img1Path != ''){ 
 			formData.mf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'mf_img1.png'}; 
 			formData.mf_idx_0 = img1Idx;
