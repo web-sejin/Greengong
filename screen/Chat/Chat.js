@@ -44,12 +44,12 @@ const Chat = (props) => {
 
 			if(!initLoading){
 				getProductList();
-				getMatchList();
+				//getMatchList();
 				setInitLoading(true);
 			}else if(params?.reload == 'on'){
 				getProductList();
 				setNowPage(1);      
-				getMatchList();
+				//getMatchList();
 				setNowPage2(1);
 				delete params?.reload
 			}
@@ -128,7 +128,7 @@ const Chat = (props) => {
 					</View>
 					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-						<Text style={styles.chatBoxLocText}>{item.pd_dong}</Text>
+						<Text style={styles.chatBoxLocText}>{item.pd_loc}</Text>
 					</View>
 					<View style={styles.chatBoxCont}>
 						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.chatBoxContText}>{item.cr_last_msg}</Text>
@@ -149,13 +149,14 @@ const Chat = (props) => {
 	);
 
 	const getMatchList = async () => {
+		setIsLoading(false);
 		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log('list_chat_match_room : ',responseJson);
+				console.log('list_chat_match_room : ',responseJson);
 				setMatchList(responseJson.data);
 				setTotalPage2(responseJson.total_page);
 			}else{
@@ -164,7 +165,8 @@ const Chat = (props) => {
 				console.log('결과 출력 실패!', responseJson.result_text);
         //ToastMessage(responseJson.result_text);
 			}
-		}); 
+		});
+		setIsLoading(true);
 	}
 
 	const moreData2 = async () => {    
@@ -216,7 +218,7 @@ const Chat = (props) => {
 					</View>
 					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-						<Text style={styles.chatBoxLocText}>{item.pd_dong}</Text>
+						<Text style={styles.chatBoxLocText}>{item.mc_loc}</Text>
 					</View>
 					<View style={styles.chatBoxCont}>
 						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.chatBoxContText}>{item.cr_last_msg}</Text>
@@ -228,23 +230,39 @@ const Chat = (props) => {
 					<Text style={styles.chatBoxDateText}>{item.cr_lastdate}</Text>
 				</View>
 				<View style={styles.chatItemBox}>
-					{item.pd_image ? (
-						<AutoHeightImage width={47} source={{uri: item.pd_image}} />
+					{item.mf_image ? (
+						<AutoHeightImage width={47} source={{uri: item.mf_image}} />
 					) : null}
 				</View>
-			</View>			
+			</View>
 		</TouchableOpacity>
 	);
 	
 	const chatSch = async () => {
-		getProductList();
-		setNowPage(1);      
-		getMatchList();
-		setNowPage2(1);
+		if(tabState == 1){
+			getProductList();
+			setNowPage(1);    
+		}else{
+			getMatchList();
+			setNowPage2(1);
+		}
 	}
 
 	function fnTab(v){
-    setTabState(v);
+		setTabState(v);
+    setNowPage(1);
+    setNowPage2(1);
+    if(v == 1){
+      getProductList();
+      setTimeout(function(){
+        getMatchList([]);
+      },200);
+    }else if(v == 2){
+      getMatchList();
+      setTimeout(function(){
+        getProductList([]);
+      },200);
+    }
   }
 
 	return (

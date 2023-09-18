@@ -48,7 +48,7 @@ const Room = (props) => {
 	const [dbList, setDbList] = useState([]);
 	const [fireList, setFireList] = useState([]);
 	const [itemInfo, setItemInfo] = useState({});
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const [roomInfo, setRoomInfo] = useState({});
 	const [phone, setPhone] = useState();
 	const [popImg, setPopImg] = useState('');
@@ -80,7 +80,11 @@ const Room = (props) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);			
 			getMsg();
-			getItemData();
+			if(page_code == 'product'){
+				getItemData();
+			}else{
+				getItemData2();
+			}
 			getRoomData();
 		}
 
@@ -124,6 +128,7 @@ const Room = (props) => {
 			});
 			setMsgText('');
 		}else{
+			setIsLoading(false);
 			await ref.add({
 				content: '',
 				complete: false,
@@ -181,6 +186,7 @@ const Room = (props) => {
 					mb_idx,
 					imgUrl,
         });
+				setIsLoading(true);
       });
 
 			//console.log("list : ",list);
@@ -254,7 +260,7 @@ const Room = (props) => {
   };
 
 	//이미지 업로드
-	const imageUpload = async (path) => {		
+	const imageUpload = async (path) => {			
     addTodo(path);
   }
 
@@ -297,6 +303,22 @@ const Room = (props) => {
 			}
 		});
 	}
+	const getItemData2 = async () => {
+		await Api.send('GET', 'get_chat_room_match', {'is_api': 1, mc_idx:page_idx, cr_idx:route.params.cr_idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("get_chat_room_match : ",responseJson);
+				setItemInfo(responseJson);
+				setPhone(responseJson.mb_hp050);
+			}else{
+				//setItemList([]);				
+				//console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
+	}
 
 	//방 정보
 	const getRoomData = async () => {
@@ -306,7 +328,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("in_chat : ",responseJson);
+				console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;
@@ -327,16 +349,16 @@ const Room = (props) => {
 				setDbList(TestDbList);
 
 				if(responseJson.is_my_block == 1 || responseJson.is_you_block == 1){
-					setIptHolder('신고하거나 신고 받아서 채팅이 불가능합니다.');
+					setIptHolder('차단하거나 차단 받아서 채팅이 불가능합니다.');
 				}else if(responseJson.is_my_report == 1 || responseJson.is_you_report == 1){
-					setIptHolder('차단하거나 차단 받아서 채팅이 불가능합니다.');						
+					setIptHolder('신고하거나 신고 받아서 채팅이 불가능합니다.');											
 				}else{
 					setIptHolder('');
 				}
 			}else{
 				//setItemList([]);				
-				//console.log('결과 출력 실패! : ', resultItem.result_text);
-				ToastMessage(resultItem.result_text);
+				console.log('결과 출력 실패! : ', responseJson.result_text);
+				ToastMessage(responseJson.result_text);
 			}
 		});
 	}
@@ -487,13 +509,21 @@ const Room = (props) => {
 						)}
 					</View>
 					<View style={styles.listInfoTitle}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-							[{itemInfo.pd_status}] [{itemInfo.c1_name}] {itemInfo.pd_name}
-						</Text>
+						{page_code == "product" ? (
+							<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+								[{itemInfo.pd_status}] [{itemInfo.c1_name}] {itemInfo.pd_name}
+							</Text>
+						) : (
+							<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+								[{itemInfo.mc_status}] [{itemInfo.c1_name}] {itemInfo.mc_name}
+							</Text>
+						)}
 					</View>
+					{page_code == "product" ? (
 					<View style={styles.listInfoDesc}>
 						<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>
 					</View>
+					) : null}
 					{/* <TouchableOpacity 
 						style={styles.listInfoState}
 						activeOpacity={opacityVal}
@@ -1037,6 +1067,12 @@ const Room = (props) => {
 					</View>
 				</View>
 			</Modal>
+							
+			{!isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -1120,8 +1156,7 @@ const styles = StyleSheet.create({
 	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	avatarBtn2: {backgroundColor:'#31B481'},
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
-  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
-  indicator2: {marginTop:62},
+  
   toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
 	modalCont4: {width:widnowWidth,backgroundColor:'#fff',position:'absolute',left:0,bottom:0,borderTopLeftRadius:12,borderTopRightRadius:12,},
 	modalCont4Top: {alignItems:'center',paddingTop:16,},
@@ -1153,6 +1188,8 @@ const styles = StyleSheet.create({
 
 	imgPopBox: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(0,0,0,0.9)',overflow:'hidden',position:'absolute',left:0,top:0,alignItems:'center',justifyContent:'center'},
 	modalX: {position:'absolute',top:10,right:10,},
+
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 //export default Room

@@ -46,6 +46,7 @@ const MatchView = (props) => {
   const [swp, setSwp] = useState({});
   const [myInfo, setMyInfo] = useState({});
   const [mcMbIdx, setMcMbIdx] = useState();
+  const [crIdx, setCrIdx] = useState();
   const [radio, setRadio] = useState(1);
   const [radioList, setRadioList] = useState([]);
   const [dwgPmSt, setDwgPmSt] = useState(0);
@@ -66,14 +67,17 @@ const MatchView = (props) => {
 			}
 		}else{
 			setRouteLoad(true);
-			setPageSt(!pageSt);
-      getData();
-      getMyData();
-      getRadioList();
+			setPageSt(!pageSt);      
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  useEffect(()=>{
+    getData();
+    getMyData();
+    getRadioList();
+  },[])
 
   const getData = async () => {
     setIsLoading(false);
@@ -90,7 +94,7 @@ const MatchView = (props) => {
         setMcMbIdx(responseJson.mc_mb_idx);
         setDwgPmSt(responseJson.is_dwg_permit);
 
-        if(responseJson.is_product_like == 1){
+        if(responseJson.is_match_like == 1){
           setLike(1);
         }else{
           setLike(0);
@@ -329,7 +333,33 @@ const MatchView = (props) => {
 	}
 
   function fnFileUpload(){
+    console.log(floorFile);
+    if(floorFile == ''){
+      setToastText('파일을 업로드 해주세요.');      
+      setToastModal(true);
+      setTimeout(()=>{ setToastModal(false) },2000);
+      return false;
+    }
 
+    const formData = {
+			is_api:1,
+      mc_idx:idx,
+      md_file: {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}
+		};
+
+    Api.send('POST', 'upload_doc', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible3(false);
+        chatDeal();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
   //견적요청중
@@ -381,22 +411,21 @@ const MatchView = (props) => {
     }
   }
 
-  const chatDeal = async () => {
-    //
-    // await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:prdMbIdx, page_code:'match', page_idx:idx}, (args)=>{
-		// 	let resultItem = args.resultItem;
-		// 	let responseJson = args.responseJson;
-		// 	let arrItems = args.arrItems;
-		// 	//console.log('args ', responseJson);
-		// 	if(responseJson.result === 'success' && responseJson){
-		// 		//console.log("in_chat : ",responseJson);				
-    //     const roomName = 'match_'+responseJson.cr_idx;
-    //     //navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'product', recv_idx:prdMbIdx, roomName:roomName});
-		// 	}else{
-		// 		//setItemList([]);				
-		// 		//console.log('결과 출력 실패! : ', resultItem.result_text);
-		// 	}
-		// });
+  const chatDeal = async () => {    
+    await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:mcMbIdx, page_code:'match', page_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("in_chat : ",responseJson);        
+        const roomName = 'match_'+responseJson.cr_idx;
+        navigation.navigate('ChatRoom', {pd_idx:idx, page_code:'match', recv_idx:mcMbIdx, roomName:roomName});
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
   }
 
 	return (
@@ -600,18 +629,34 @@ const MatchView = (props) => {
                 style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3]}
                 activeOpacity={opacityVal}
                 onPress={() => {
-                  if(itemInfo.mc_chat_permit == 1){
-                    navigation.navigate('Estimate', {idx:idx}); //견적서 업로드 페이지
-                  }else if(itemInfo.mc_chat_permit == 2){
-                    setVisible3(true); //회사소개서 업로드 팝업
-                  }else if(itemInfo.mc_chat_permit == 3){
-                    navigation.navigate('Estimate', {idx:idx}); //견적서 업로드 페이지
-                  }else if(itemInfo.mc_chat_permit == 4){
-                    chatCheck();
+                  if(myInfo.mb_idx == itemInfo.mc_mb_idx){
+                    navigation.navigate('MachChat', {idx:idx});
+                  }else{
+                    if(itemInfo.mc_chat_permit == 1){
+                      if(itemInfo.is_estimate == 0){
+                        navigation.navigate('Estimate', {idx:idx, mcMbIdx:mcMbIdx}); //견적서만 업로드 페이지
+                      }else{
+                        chatCheck();
+                      }                    
+                    }else if(itemInfo.mc_chat_permit == 2){
+                      if(itemInfo.is_doc == 0){
+                        setVisible3(true); //회사소개서만 업로드 팝업
+                      }else{
+                        chatCheck();
+                      }
+                    }else if(itemInfo.mc_chat_permit == 3){
+                      if(itemInfo.is_doc == 0 || itemInfo.is_estimate == 0){
+                        navigation.navigate('Estimate', {idx:idx, mcMbIdx:mcMbIdx}); //회사소개서 && 견적서 업로드 페이지
+                      }else{
+                        chatCheck();
+                      }                    
+                    }else if(itemInfo.mc_chat_permit == 4){
+                      chatCheck();
+                    }
                   }
                 }}
               >
-                <Text style={styles.nextBtnText}>채팅하기{itemInfo.mc_chat_permit}</Text>
+                <Text style={styles.nextBtnText}>채팅하기</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -732,7 +777,7 @@ const MatchView = (props) => {
               <View style={styles.avatarDesc}>
                 <Text style={styles.avatarDescText}>회사소개서를 업로드하시면</Text>
                 <Text style={styles.avatarDescText}>채팅이 가능합니다.</Text>
-                <Text style={styles.avatarDescText}>PDF, PPT, ZIP 파일을 업로드하여 주세요.</Text>
+                <Text style={styles.avatarDescText}>PDF, PPT, ZIP 파일을 업로드해 주세요.</Text>
               </View>
               <View style={[styles.typingInputBox, styles.typingFlexBox]}>
                     <TextInput
@@ -753,7 +798,12 @@ const MatchView = (props) => {
               <View style={styles.avatarBtnBox}>
                 <TouchableOpacity 
                   style={styles.avatarBtn}
-                  onPress={() => {setVisible3(false)}}
+                  onPress={() => {
+                    setVisible3(false);
+                    setFloorFile('');
+                    setFloorFileType('');
+                    setFloorFileUri('');
+                  }}
                 >
                   <Text style={styles.avatarBtnText}>취소</Text>
                 </TouchableOpacity>
@@ -908,6 +958,37 @@ const MatchView = (props) => {
           <ActivityIndicator size="large" />
         </View>
       )}
+
+      <Modal
+        visible={toastModal}
+				animationType={"slide"}
+				transparent={true}
+      >
+				<View style={styles.toastModal}>
+					<View
+						style={{
+							backgroundColor: '#000',
+							borderRadius: 10,
+							paddingVertical: 10,
+							paddingHorizontal: 20,
+							opacity: 0.7,
+						}}
+					>
+						<Text
+							style={{
+								textAlign: 'center',
+								color: '#FFFFFF',
+								fontSize: 15,
+								lineHeight: 22,
+								fontFamily: Font.NotoSansRegular,
+								letterSpacing: -0.38,
+							}}
+						>
+							{toastText}
+						</Text>
+					</View>
+				</View>
+			</Modal>
 		</SafeAreaView>
 	)
 }
@@ -1016,6 +1097,7 @@ const styles = StyleSheet.create({
 	certChkBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
   indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10},
   indicator2: {backgroundColor:'rgba(0,0,0,0.5)'},
+  toastModal: {width:widnowWidth,height:(widnowHeight - 125),display:'flex',alignItems:'center',justifyContent:'flex-end'},
 
   header: {height:50,backgroundColor:'#fff',position:'relative',display:'flex',justifyContent:'center',paddingLeft:20, paddingRight:20},
 	headerBackBtn: {width:30,height:50,position:'absolute',left:20,top:0,zIndex:10,display:'flex',justifyContent:'center'},

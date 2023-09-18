@@ -51,7 +51,7 @@ const UsedChat = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_chat : ",responseJson);
+				//console.log("list_chat : ",responseJson);
         setChatList(responseJson.data);
         setTotalPage(responseJson.total_page);
         setPdIdx(responseJson.pd_idx);
@@ -72,7 +72,7 @@ const UsedChat = ({navigation, route}) => {
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
-          console.log('list_chat more : ',responseJson.data);				
+          //console.log('list_chat more : ',responseJson.data);				
           const addItem = alimList.concat(responseJson.data);				
           setChatList(addItem);			
           setNowPage(nowPage+1);
@@ -219,12 +219,12 @@ const styles = StyleSheet.create({
   chatBoxFst: {borderTop:0},
   chatBoxLeft: {width:(innerWidth-90),display:'flex',flexDirection:'row',},
   chatBoxProfile: {width:63,height:63,borderRadius:50,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',},
-  chatBoxInfo: {width:(innerWidth-153),paddingLeft:20,},
+  chatBoxInfo: {width:(innerWidth-153),paddingLeft:20,paddingTop:5,},
   chatBoxName: {},
   chatBoxNameText: {fontFamily:Font.NotoSansBold,fontSize:17,lineHeight:25,color:'#353636'},
   chatBoxCont: {marginTop:5,},
   chatBoxContText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:20,color:'#191919'},
-  chatBoxRight: {width:80,display:'flex',alignItems:'flex-end',},
+  chatBoxRight: {width:80,display:'flex',alignItems:'flex-end',paddingTop:10,},
   chatBoxDate: {},
   chatBoxDateText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#919191'},
   chatBoxLoc: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'flex-end',marginTop:7,},

@@ -10,6 +10,9 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import Api from '../../Api';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -17,26 +20,29 @@ const opacityVal = 0.8;
 
 const Estimate = ({navigation, route}) => {
 	const itemData = [
-		{'idx': 1, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 2, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 3, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 4, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 5, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 6, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 7, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 8, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 9, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
-		{'idx': 10, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
+		{'idx': 1, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 2, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 3, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 4, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 5, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 6, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 7, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 8, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 9, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+		{'idx': 10, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
 	];
 
 	const itemData2 = [
-		{'idx': 1, 'itemName':'', 'itemPrice':''},
-		{'idx': 2, 'itemName':'', 'itemPrice':''},
-		{'idx': 3, 'itemName':'', 'itemPrice':''},
-		{'idx': 4, 'itemName':'', 'itemPrice':''},
-		{'idx': 5, 'itemName':'', 'itemPrice':''},
+		{'idx': 1, 'md_name':'', 'md_price':''},
+		{'idx': 2, 'md_name':'', 'md_price':''},
+		{'idx': 3, 'md_name':'', 'md_price':''},
+		{'idx': 4, 'md_name':'', 'md_price':''},
+		{'idx': 5, 'md_name':'', 'md_price':''},
 	];
 
+	const idx = route.params.idx;
+	const mcMbIdx = route.params.mcMbIdx;
+	
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [expiryDate, setExpiryDate] = useState(''); //유효기간
@@ -45,6 +51,7 @@ const Estimate = ({navigation, route}) => {
 	const [mbName, setMbName] = useState(''); //담당자명
 	const [mbHp, setMbHp] = useState(''); //연락처
 	const [mbEmail, setMbEmail] = useState(''); //이메일
+	const [delPeriod, setDelPeriod] = useState(''); //납품기간
 	const [compIntro, setCompIntro] = useState(''); //회사소개서
 	const [compIntroType, setCompIntroType] = useState(''); //회사소개서
 	const [compIntroUri, setCompIntroUri] = useState(''); //회사소개서
@@ -59,6 +66,8 @@ const Estimate = ({navigation, route}) => {
 	const [itemList2, setItemList2] = useState(itemData2); //디자인/설계정보
 	const [itemCnt2, setItemCnt2] = useState(1); //디자인/설계정보 개수
 
+	const [itemInfo, setItemInfo] = useState({});
+
 	let deliver = delPrice;
 	if(!deliver){
 		deliver = 0;
@@ -72,15 +81,15 @@ const Estimate = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setExpiryDate('');
-				setCompName('');
-				setCompNumber('');
-				setMbName('');
-				setMbHp('');
-				setMbEmail('');
-				setCompIntro('');
-				setCompIntroType('');
-				setCompIntroUri('');
+				// setExpiryDate('');
+				// setCompName('');
+				// setCompNumber('');
+				// setMbName('');
+				// setMbHp('');
+				// setMbEmail('');
+				// setCompIntro('');
+				// setCompIntroType('');
+				// setCompIntroUri('');
 				setPrice(0);
 				setPriceTax(0);
 				setDelPrice(0);
@@ -91,19 +100,30 @@ const Estimate = ({navigation, route}) => {
 				setCompIntroUri(1);
 				setCompIntroUri(resultTotal);
 			}
-		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
+		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	const getData = async () => {
+    await Api.send('GET', 'view_match', {'is_api': 1, mc_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("view_match : ",responseJson);
+				//console.log("mc_chat_permit : ",responseJson.mc_chat_permit);
+				setItemInfo(responseJson);
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+  }
 
 	useEffect(() => {
 		calcTotal();
@@ -150,37 +170,40 @@ const Estimate = ({navigation, route}) => {
 	const inputChange = (idx, v, col) => {
 		//console.log(idx+"//"+v+"//"+col);
 		
+		//{'idx': 10, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''},
+	//{'idx': 1, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''},
+
 		let temp = itemList.map((item, index) => {
 			if(idx === index){
-				if(col == 'itemName'){
-					return { ...item, itemName: v, itemInfo: item.itemInfo, itemCnt:item.itemCnt, itemPrice:item.itemPrice, itemTotalPrice:item.itemTotalPrice };
-				}else if(col == 'itemInfo'){
-					return { ...item, itemName: item.itemName, itemInfo: v, itemCnt:item.itemCnt, itemPrice:item.itemPrice, itemTotalPrice:item.itemTotalPrice  };
-				}else if(col == 'itemCnt'){
+				if(col == 'mp_name'){
+					return { ...item, mp_name: v, mp_material: item.mp_material, mp_qty:item.mp_qty, mp_price:item.mp_price, mp_subtotal:item.mp_subtotal };
+				}else if(col == 'mp_material'){
+					return { ...item, mp_name: item.mp_name, mp_material: v, mp_qty:item.mp_qty, mp_price:item.mp_price, mp_subtotal:item.mp_subtotal  };
+				}else if(col == 'mp_qty'){
 					let val0 = v.split(',').join('');
 
 					let val1 = 0;
 					if(val0 == '' || val0*1 <= 0){ val1 = 0; }else{ val1 = val0*1 }
 
 					let val2 = 0;
-					if(item.itemPrice == '' || (item.itemPrice)*1 <= 0){ val2 = 0; }else{ val2 = (item.itemPrice)*1; }
+					if(item.mp_price == '' || (item.mp_price)*1 <= 0){ val2 = 0; }else{ val2 = (item.mp_price)*1; }
 
 					const result = String(val1*val2);
-					return { ...item, itemName: item.itemName, itemInfo: item.itemInfo, itemCnt: val0, itemPrice:item.itemPrice, itemTotalPrice: result };
-				}else if(col == 'itemPrice'){
+					return { ...item, mp_name: item.mp_name, mp_material: item.mp_material, mp_qty: val0, mp_price:item.mp_price, mp_subtotal: result };
+				}else if(col == 'mp_price'){
 					let val0 = v.split(',').join('');
 
 					let val1 = 0;
-					if(item.itemCnt == '' || (item.itemCnt)*1 <= 0){ val1 = 0; }else{ val1 = (item.itemCnt)*1; }
+					if(item.mp_qty == '' || (item.mp_qty)*1 <= 0){ val1 = 0; }else{ val1 = (item.mp_qty)*1; }
 
 					let val2 = 0;
 					if(val0 == '' || val0*1 <= 0){ val2 = 0; }else{ val2 = val0*1 }					
 					
 					const result = String(val1*val2);
-					return { ...item, itemName: item.itemName, itemInfo: item.itemInfo, itemCnt: item.itemCnt, itemPrice:val0, itemTotalPrice: result };
+					return { ...item, mp_name: item.mp_name, mp_material: item.mp_material, mp_qty: item.mp_qty, mp_price:val0, mp_subtotal: result };
 				}
 			}else{
-				return { ...item, itemName: item.itemName, itemInfo: item.itemInfo, itemCnt: item.itemCnt, itemPrice: item.itemPrice, itemTotalPrice: item.itemTotalPrice };
+				return { ...item, mp_name: item.mp_name, mp_material: item.mp_material, mp_qty: item.mp_qty, mp_price: item.mp_price, mp_subtotal: item.mp_subtotal };
 			}
 		});
 		
@@ -190,7 +213,7 @@ const Estimate = ({navigation, route}) => {
 	const inputDelete = (idx) => {
 		let order = 0;
 		itemList.splice(idx, 1);
-		itemList.push({'idx': 11, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''})
+		itemList.push({'idx': 11, 'mp_name':'', 'mp_material':'', 'mp_qty':'', 'mp_price':'', 'mp_subtotal':''})
 
 		let temp = itemList.map((item, index) => {
 			//console.log(item.idx);
@@ -211,13 +234,13 @@ const Estimate = ({navigation, route}) => {
 		
 		let temp = itemList2.map((item, index) => {
 			if(idx === index){
-				if(col == 'itemName'){
-					return { ...item, itemName: v };
-				}else if(col == 'itemPrice'){
-					return { ...item, itemPrice: v };
+				if(col == 'md_name'){
+					return { ...item, md_name: v };
+				}else if(col == 'md_price'){
+					return { ...item, md_price : v };
 				}
 			}else{
-				return { ...item, itemName: item.itemName, itemPrice: item.itemPrice };
+				return { ...item, md_name: item.md_name, md_price : item.md_price };
 			}			
 		});
 		setItemList2(temp);		
@@ -226,7 +249,7 @@ const Estimate = ({navigation, route}) => {
 	const inputDelete2 = (idx) => {
 		let order = 0;
 		itemList2.splice(idx, 1);
-		itemList2.push({'idx': 6, 'itemName':'', 'itemInfo':'', 'itemCnt':'', 'itemPrice':'', 'itemTotalPrice':''})
+		itemList2.push({'idx': 6, 'md_name':'', 'md_price':''});
 
 		let temp = itemList2.map((item, index) => {
 			//console.log(item.idx);
@@ -245,7 +268,7 @@ const Estimate = ({navigation, route}) => {
 	function calcTotal(){
 		let total = 0;
 		let temp = itemList.map((item, index) => {
-			const val0 = (item.itemTotalPrice).split(',').join('');
+			const val0 = (item.mp_subtotal).split(',').join('');
 			if(val0 == '' || val0*1 <= 0){ 
 				total = total + 0;
 				return total;
@@ -257,7 +280,7 @@ const Estimate = ({navigation, route}) => {
 		
 		let total2 = 0;
 		let temp2 = itemList2.map((item, index) => {
-			const val1 = (item.itemPrice).split(',').join('');
+			const val1 = (item.md_price).split(',').join('');
 			if(val1 == '' || val1*1 <= 0){ 
 				total2 = total2 + 0;
 				return total2;
@@ -277,6 +300,127 @@ const Estimate = ({navigation, route}) => {
 		setPriceTax(res2);
 		setTotalPrice(res+res2+del);
 	}
+
+	const submit = async () => {
+		//Keyboard.dismiss();		
+
+		if(expiryDate == ''){ ToastMessage('유효기간을 입력해 주세요.'); return false; }
+		if(compName == ''){ ToastMessage('상호명을 입력해 주세요.'); return false; }
+		if(compNumber == ''){ ToastMessage('등록번호를 입력해 주세요.'); return false; }
+		if(mbName == ''){ ToastMessage('담당자명을 입력해 주세요.'); return false; }
+		if(mbHp == ''){ ToastMessage('연락처를 입력해 주세요.'); return false; }
+		if(mbEmail == ''){ ToastMessage('이메일을 입력해 주세요.'); return false; }		
+		if(delPeriod == ''){ ToastMessage('납품가능일을 입력해 주세요.'); return false; }
+		if(itemInfo.mc_chat_permit == 3){
+			if(compIntro == ''){ ToastMessage('회사소개서를 등록해 주세요.'); return false; }
+		}
+		
+		const arr1 = [];
+		let cnt1 = 0;
+		itemList.map((item, index) => {
+			if(item.mp_qty && item.mp_material && item.mp_name && item.mp_price && item.mp_subtotal){
+				cnt1 = cnt1 + 1;
+				const obj = {
+					mp_qty:item.mp_qty,
+					mp_material:item.mp_material,
+					mp_name:item.mp_name,
+					mp_price:item.mp_price,
+					mp_subtotal:item.mp_subtotal
+				}
+				arr1.push(obj);
+			}
+		});
+		if(cnt1 < 1){ ToastMessage('견적정보를 1개 이상 입력해 주세요.'); return false; }
+		if(cnt1 != itemCnt){ ToastMessage('추가된 견적정보의 모든 정보를 입력해 주세요.'); return false; }		
+		
+		const arr2 = [];
+		let emptyCnt = 0;
+		let cnt2 = 0;
+		itemList2.map((item, index) => {
+			if(item.md_name && item.md_price){
+				cnt2 = cnt2 + 1;
+				const obj2 = {
+					md_name:item.md_name,
+					md_price:item.md_price
+				}
+				arr2.push(obj2);
+			}
+
+			if((item.md_name && item.md_price=='') || item.md_name=='' && item.md_price){
+				emptyCnt++;
+			}			
+		});
+
+		if(emptyCnt > 0){
+			ToastMessage('디자인/설계의 모든 정보를 입력해 주세요.'); return false;
+		}
+		
+		if(itemCnt2 > 1){
+			if(cnt2 != itemCnt2){ ToastMessage('디자인/설계를 2개이상 추가한 경우\n디자인/설계의 모든 정보를 입력해 주세요.'); return false; }
+		}
+
+		const formData = {
+			is_api:1,				
+			mc_idx:idx,
+			me_end_day:expiryDate,
+			me_com_name:compName,
+			me_com_num:compNumber,
+			me_com_name2:mbName,
+			me_com_tel:mbHp,
+			me_com_email:mbEmail,
+			me_supply_day:delPeriod,
+			me_subtotal:price,
+			me_add_price:priceTax,
+			me_delivery_price:delPrice,
+			me_total_price:totalPrice,
+			total_prod:itemCnt,
+			total_design:itemCnt2,
+		};
+
+		if(itemInfo.mc_chat_permit == 3){
+			formData.md_file =  {'uri': compIntroUri, 'type': compIntroType, 'name': compIntro};
+		}
+
+		if(arr1.length > 0){
+			formData.prod = JSON.stringify(arr1);
+		}
+
+		if(arr2.length > 0){
+			formData.design = JSON.stringify(arr2);
+		}
+
+		//console.log("formData : ",formData);
+
+		Api.send('POST', 'save_estimate', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log(responseJson);
+				chatDeal();
+			}else{
+				console.log(resultItem.result_text);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+	}
+
+	const chatDeal = async () => {    
+    await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:mcMbIdx, page_code:'match', page_idx:idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("in_chat : ",responseJson);        
+        const roomName = 'match_'+responseJson.cr_idx;
+        navigation.replace('ChatRoom', {pd_idx:idx, page_code:'match', recv_idx:mcMbIdx, roomName:roomName});
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패! : ', resultItem.result_text);
+			}
+		});
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -341,6 +485,7 @@ const Estimate = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<TextInput
 									value={compNumber}
+									keyboardType = 'numeric'
 									onChangeText={(v) => {setCompNumber(v)}}
 									placeholder={"012-345-6789"}
 									style={[styles.input]}
@@ -370,10 +515,14 @@ const Estimate = ({navigation, route}) => {
 								<TextInput
 									value={mbHp}
 									keyboardType = 'numeric'
-									onChangeText={(v) => {setMbHp(v)}}
+									onChangeText={(v) => {
+										const phone = phoneFormat(v);
+										setMbHp(phone);
+									}}
 									placeholder={"담당자 연락처를 입력해 주세요."}
 									style={[styles.input]}
 									placeholderTextColor={"#C5C5C6"}
+									maxLength={13}
 								/>
 							</View>
 						</View>
@@ -395,32 +544,57 @@ const Estimate = ({navigation, route}) => {
 					</View>
 
 					<View style={[styles.registBox, styles.borderBot]}>
-						<View style={[styles.typingBox]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>회사소개서 업로드</Text>
+						<View style={styles.typingTitle}>
+							<Text style={styles.typingTitleText}>납품가능일</Text>
+						</View>
+						<View style={[styles.typingInputBox]}>
+							<TextInput
+								value={delPeriod}
+								keyboardType = 'numeric'
+								onChangeText={(v) => {setDelPeriod(v)}}
+								placeholder={"납품가능일 입력"}
+								style={[styles.input, styles.input4]}
+								placeholderTextColor={"#C5C5C6"}
+							/>
+							<View style={styles.inputUnit}>
+								<Text style={styles.inputUnitText}>일</Text>
 							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={compIntro}
-									editable = {false}
-									placeholder={'회사소개서를 업로드하여 주세요.'}
-									placeholderTextColor="#C5C5C6"
-									style={[styles.input, styles.input2]}
-								/>
-								<TouchableOpacity 
-									style={[styles.certChkBtn]}
-									activeOpacity={opacityVal}
-									onPress={openPicker}
-								>
-									<Text style={styles.certChkBtnText}>업로드</Text>
-								</TouchableOpacity>
-							</View>
-							<View style={styles.inputAlert}>
-								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
-								<Text style={styles.inputAlertText}>PDF, PPT, ZIP파일을 업로드해 주세요.</Text>
+							<View style={styles.inputUnit2}>
+								<Text style={styles.inputUnitText}>발행일로부터</Text>
+								<View style={styles.inputUnit2Line}></View>
 							</View>
 						</View>
 					</View>
+
+					{itemInfo.mc_chat_permit == 3 ? (
+						<View style={[styles.registBox, styles.borderBot]}>
+							<View style={[styles.typingBox]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>회사소개서 업로드</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={compIntro}
+										editable = {false}
+										placeholder={'회사소개서를 업로드하여 주세요.'}
+										placeholderTextColor="#C5C5C6"
+										style={[styles.input, styles.input2]}
+									/>
+									<TouchableOpacity 
+										style={[styles.certChkBtn]}
+										activeOpacity={opacityVal}
+										onPress={openPicker}
+									>
+										<Text style={styles.certChkBtnText}>업로드</Text>
+									</TouchableOpacity>
+								</View>
+								<View style={styles.inputAlert}>
+									<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
+									<Text style={styles.inputAlertText}>PDF, PPT, ZIP파일을 업로드해 주세요.</Text>
+								</View>
+							</View>
+						</View>
+					) : null}
 					
 					{itemList.map((item, index) => {
 						let openState = false;
@@ -431,13 +605,13 @@ const Estimate = ({navigation, route}) => {
 							openState = false;
 						}
 
-						let itemListCnt = (item.itemCnt).split(',').join('');
+						let itemListCnt = (item.mp_qty).split(',').join('');
 						itemListCnt = String(itemListCnt).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 
-						let itemListPrice = (item.itemPrice).split(',').join('');
+						let itemListPrice = (item.mp_price).split(',').join('');
 						itemListPrice = String(itemListPrice).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 
-						let itemListTotalPrice = (item.itemTotalPrice).split(',').join('');
+						let itemListTotalPrice = (item.mp_subtotal).split(',').join('');
 						itemListTotalPrice = String(itemListTotalPrice).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 
 						return(
@@ -450,9 +624,11 @@ const Estimate = ({navigation, route}) => {
 								<TouchableOpacity
 									style={styles.addBtn}
 									activeOpacity={opacityVal}
-									onPress={()=>{
+									onPress={()=>{										
 										if(itemCnt < 10){
 											setItemCnt(itemCnt+1);
+										}else{
+											ToastMessage("견적정보는 최대 10개까지 등록이 가능합니다.");
 										}
 									}}
 								>
@@ -469,7 +645,8 @@ const Estimate = ({navigation, route}) => {
 										style={[styles.addBtn, styles.addBtn2]}
 										activeOpacity={opacityVal}
 										onPress={()=>{
-											if(itemCnt < 10){
+											console.log("itemCnt : ",itemCnt);								
+											if(itemCnt > 1 && itemCnt <= 10){
 												inputDelete(index);
 												setItemCnt(itemCnt-1);
 											}											
@@ -481,9 +658,9 @@ const Estimate = ({navigation, route}) => {
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
-										value={item.itemName}
+										value={item.mp_name}
 										onChangeText={(v) => {
-											inputChange(index, v, 'itemName');
+											inputChange(index, v, 'mp_name');
 										}}
 										placeholder={"품명을 입력해 주세요."}
 										style={[styles.input]}
@@ -497,9 +674,9 @@ const Estimate = ({navigation, route}) => {
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
-										value={item.itemInfo}
+										value={item.mp_material}
 										onChangeText={(v) => {
-											inputChange(index, v, 'itemInfo');
+											inputChange(index, v, 'mp_material');
 										}}
 										placeholder={"재질을 입력해 주세요."}
 										style={[styles.input]}
@@ -513,7 +690,7 @@ const Estimate = ({navigation, route}) => {
 										value={itemListCnt}
 										keyboardType = 'numeric'
 										onChangeText={(v) => {											
-											inputChange(index, v, 'itemCnt');																					
+											inputChange(index, v, 'mp_qty');																					
 										}}
 										placeholder={"수량입력"}
 										style={[styles.input, styles.input6]}
@@ -523,7 +700,7 @@ const Estimate = ({navigation, route}) => {
 										value={itemListPrice}
 										keyboardType = 'numeric'
 										onChangeText={(v) => {											
-											inputChange(index, v, 'itemPrice');
+											inputChange(index, v, 'mp_price');
 										}}
 										placeholder={"단가입력"}
 										style={[styles.input, styles.input6]}
@@ -534,7 +711,7 @@ const Estimate = ({navigation, route}) => {
 										keyboardType = 'numeric'
 										editable = {false}
 										onChangeText={(v) => {
-											inputChange(index, v, 'itemTotalPrice');
+											inputChange(index, v, 'mp_subtotal');
 										}}
 										placeholder={"소계"}
 										style={[styles.input, styles.input6]}
@@ -554,7 +731,7 @@ const Estimate = ({navigation, route}) => {
 						}else{
 							openState2 = false;
 						}
-						let itemList2Price = (item.itemPrice).split(',').join('');
+						let itemList2Price = (item.md_price).split(',').join('');
 						itemList2Price = String(itemList2Price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 
 						return(
@@ -570,6 +747,8 @@ const Estimate = ({navigation, route}) => {
 									onPress={()=>{
 										if(itemCnt2 < 5){
 											setItemCnt2(itemCnt2+1);
+										}else{
+											ToastMessage("디자인/설계 정보는 최대 5개까지 등록이 가능합니다.");
 										}
 									}}
 								>
@@ -586,7 +765,7 @@ const Estimate = ({navigation, route}) => {
 										style={[styles.addBtn, styles.addBtn2]}
 										activeOpacity={opacityVal}
 										onPress={()=>{
-											if(itemCnt2 < 10){
+											if(itemCnt2 > 1 && itemCnt2 <= 5){
 												inputDelete2(index);
 												setItemCnt2(itemCnt2-1);
 											}											
@@ -598,9 +777,9 @@ const Estimate = ({navigation, route}) => {
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
-										value={item.itemName}
+										value={item.md_name}
 										onChangeText={(v) => {
-											inputChange2(index, v, 'itemName');
+											inputChange2(index, v, 'md_name');
 										}}
 										placeholder={"품명을 입력해 주세요."}
 										style={[styles.input]}
@@ -617,7 +796,7 @@ const Estimate = ({navigation, route}) => {
 										value={itemList2Price}										
 										keyboardType = 'numeric'
 										onChangeText={(v) => {
-											inputChange2(index, v, 'itemPrice');
+											inputChange2(index, v, 'md_price');
 										}}
 										placeholder={"단가를 입력해 주세요."}
 										style={[styles.input]}
@@ -693,9 +872,9 @@ const Estimate = ({navigation, route}) => {
 				<TouchableOpacity 
 					style={styles.nextBtn}
 					activeOpacity={opacityVal}
-					onPress={() => nextStep()}
+					onPress={() => submit()}
 				>
-					<Text style={styles.nextBtnText}>다음</Text>
+					<Text style={styles.nextBtnText}>확인</Text>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
@@ -733,7 +912,7 @@ const styles = StyleSheet.create({
 	certChkBtnText2: {fontFamily:Font.NotoSansBold,fontSize:16,color:'#fff'},
 	certChkBtn3: {width:110,height:58,backgroundColor:'#31B481',borderWidth:0,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	inputUnit: {height:56,position:'absolute',top:1,right:20,display:'flex',justifyContent:'center'},
-	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000'},
+	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:19,color:'#000'},
 	inputUnit2: {width:98,height:56,position:'absolute',top:1,left:12,display:'flex',justifyContent:'center'},
 	inputUnit2Line: {width:1,height:14,backgroundColor:'#E3E3E3',position:'absolute',right:0,top:21.5,},
 	secBoxTit: {marginBottom:20,paddingBottom:15,borderBottomWidth:1,borderBottomColor:'#000',position:'relative'},
