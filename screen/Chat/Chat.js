@@ -60,6 +60,7 @@ const Chat = (props) => {
 
 	const getProductList = async () => {
 		setIsLoading(false);
+		console.log("inputText : ",inputText);
 		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -239,6 +240,7 @@ const Chat = (props) => {
 	);
 	
 	const chatSch = async () => {
+		Keyboard.dismiss();
 		if(tabState == 1){
 			getProductList();
 			setNowPage(1);    

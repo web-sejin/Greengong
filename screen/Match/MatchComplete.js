@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -15,12 +15,20 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const MatchComplete = ({navigation, route}) => {
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [mbId, setMbId] = useState();
   const [score, setScore] = useState(3);
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
+  const [visible3, setVisible3] = useState(false);
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [mailIdx, setMailIdx] = useState();
+  const [indicatorSt, setIndCatorSt] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -31,21 +39,181 @@ const MatchComplete = ({navigation, route}) => {
 				setMbId();
         setVisible(false);
         setVisible2(false);
+        setVisible3(false);
         setScore(3);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'insert_end_match', {'is_api': 1, mc_idx: idx, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("insert_end_match : ",responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);
+			}else{
+				setItemList([]);
+        setNowPage(1);
+				console.log('결과 출력 실패!', responseJson);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+  const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'insert_end_match', {is_api: 1, mc_idx: idx, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log('list_chat more : ',responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+  }
+  const getList = ({item, index}) => (    
+    <View style={[styles.matchCompleteMb]}>
+      <View style={[styles.matchCompleteMbWrap, styles.matchCompleteMbFst]}>
+        <TouchableOpacity 
+          style={[styles.compBtn]}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            if(mbId && mbId==1){
+              setMbId();
+            }else{
+              setMbId(1);
+            }
+          }}
+        >
+          <View style={[styles.compWrap, styles.compWrapFst]}>
+            <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
+              <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
+            </View>
+            <View style={styles.compInfo}>
+              <View style={styles.compInfoDate}>
+                <Text style={styles.compInfoDateText}>{item.cr_lastdate}</Text>
+              </View>
+              <View style={styles.compInfoName}>
+                <Text style={styles.compInfoNameText}>{item.mb_nick}</Text>
+              </View>
+              <View style={styles.compInfoLoc}>
+                <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+                <Text style={styles.compInfoLocText}>{item.mb_loc}</Text>
+              </View>
+            </View>
+            <View style={styles.compThumb}>              
+              {item.image ? (
+                <AutoHeightImage width={79} source={{uri: item.image}} />
+              ):(
+                <AutoHeightImage width={79} source={require("../../assets/img/not_profile.png")} />
+              )}
+            </View>
+          </View>
+          <View style={styles.matchPrice}>
+            <Text style={styles.matchPriceText}>가격</Text>
+            <Text style={styles.matchPriceText2}>{item.me_total_price}원</Text>
+          </View>            
+        </TouchableOpacity>
+
+        {item.mc_chat_permit == 3 ? (
+        <View style={styles.btnBox}>
+          <TouchableOpacity
+            style={styles.btn}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setVisible3(true);
+              setMailIdx(item.md_idx);
+            }}
+          >
+            <Text style={styles.btnText}>회사소개서 받기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('EstimateResult', {idx:item.me_idx});
+              console.log(item.me_idx);
+          }}
+          >
+            <Text style={styles.btnText}>견적서 보기</Text>
+          </TouchableOpacity>
+        </View>
+        ) : null}
+
+        {item.mc_chat_permit == 2 ? (
+        <View style={styles.btnBox}>
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setVisible3(true);
+              setMailIdx(item.md_idx);
+            }}
+          >
+            <Text style={styles.btnText}>회사소개서 받기</Text>
+          </TouchableOpacity>
+        </View>   
+        ) : null}
+
+        {item.mc_chat_permit == 1 ? (
+        <View style={styles.btnBox}>
+          <TouchableOpacity
+            style={[styles.btn, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{navigation.navigate('EstimateResult', {idx:item.me_idx});}}
+          >
+            <Text style={styles.btnText}>견적서 보기</Text>
+          </TouchableOpacity>
+        </View>   
+        ) : null}
+
+      </View>    
+    </View>
+	);
+
+  function fnSendEmail(){
+    setVisible3(false);
+    setIndCatorSt(true);
+
+    const formData = {
+			is_api:1,				
+			md_idx:mailIdx,
+		};
+
+    Api.send('POST', 'down_dwg', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);
+        setIndCatorSt(false);        
+        ToastMessage('회사소개서가 메일로 전송되었습니다.');
+			}else{
+				console.log('메일 결과 출력 실패!!!', responseJson);
+        setIndCatorSt(false);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
 
   function fnSubmitBefore(){
     if(!mbId){
@@ -61,119 +229,38 @@ const MatchComplete = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<Header navigation={navigation} headertitle={'업체선정'} />
-			<ScrollView>
-        <View style={[styles.salesAlert, styles.borderBot]}>
-          <View style={styles.alertBox}>
-            <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-            <Text style={styles.alertBoxText}>발주완료 업체를 선택할 수 있습니다.</Text>
-            <Text style={[styles.alertBoxText, styles.alertBoxText2]}>업체를 선택하지 않아도 발주완료가 가능합니다.</Text>
-          </View>
-        </View>
-        <View style={styles.borderTop}>
-          <View style={[styles.matchCompleteMb]}>
-            <View style={[styles.matchCompleteMbWrap, styles.matchCompleteMbFst]}>
-              <TouchableOpacity 
-                style={[styles.compBtn]}
-                onPress={() => {
-                  if(mbId && mbId==1){
-                    setMbId();
-                  }else{
-                    setMbId(1);
-                  }
-                }}
-              >
-                <View style={[styles.compWrap, styles.compWrapFst]}>
-                  <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
-                    <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-                  </View>
-                  <View style={styles.compInfo}>
-                    <View style={styles.compInfoDate}>
-                      <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
-                    </View>
-                    <View style={styles.compInfoName}>
-                      <Text style={styles.compInfoNameText}>참좋은공장</Text>
-                    </View>
-                    <View style={styles.compInfoLoc}>
-                      <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                      <Text style={styles.compInfoLocText}>중3동</Text>
-                    </View>
-                  </View>
-                  <View style={styles.compThumb}>
-                    <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-                  </View>
-                </View>
-                <View style={styles.matchPrice}>
-                  <Text style={styles.matchPriceText}>가격</Text>
-                  <Text style={styles.matchPriceText2}>30,000원</Text>
-                </View>            
-              </TouchableOpacity>
-              <View style={styles.btnBox}>
-                <TouchableOpacity
-                  style={styles.btn}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{}}
-                >
-                  <Text style={styles.btnText}>회사소개서 받기</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.btn, styles.btn2]}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{
-                    navigation.navigate('EstimateResult', {});
-                  }}
-                >
-                  <Text style={styles.btnText}>견적서 보기</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.btnBox}>
-                <TouchableOpacity
-                  style={[styles.btn, styles.btn3]}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{}}
-                >
-                  <Text style={styles.btnText}>회사소개서 받기</Text>
-                </TouchableOpacity>
-              </View>   
-            </View>    
-          </View>
-          <View style={styles.matchCompleteMb}>
-            <View style={[styles.matchCompleteMbWrap]}>
-              <TouchableOpacity 
-                style={[styles.compBtn]}
-                onPress={() => {
-                  if(mbId && mbId==2){
-                    setMbId();
-                  }else{
-                    setMbId(2);
-                  }
-                }}
-              >
-                <View style={styles.compWrap}>
-                  <View style={[styles.compRadio, mbId==2 ? styles.comRadioChk : null]}>
-                    <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
-                  </View>
-                  <View style={styles.compInfo}>
-                    <View style={styles.compInfoDate}>
-                      <Text style={styles.compInfoDateText}>2023.07.06 · 2일전</Text>
-                    </View>
-                    <View style={styles.compInfoName}>
-                      <Text style={styles.compInfoNameText}>참좋은공장</Text>
-                    </View>
-                    <View style={styles.compInfoLoc}>
-                      <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                      <Text style={styles.compInfoLocText}>중3동</Text>
-                    </View>
-                  </View>
-                  <View style={styles.compThumb}>
-                    <AutoHeightImage width={79} source={require("../../assets/img/sample1.jpg")} />
-                  </View>
-                </View>
-              </TouchableOpacity>
+			<Header navigation={navigation} headertitle={'업체선정'} />      
+      <FlatList
+        data={itemList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+        //onEndReached={moreData}
+        ListHeaderComponent={
+          <>
+          <View style={[styles.salesAlert, styles.borderBot]}>
+            <View style={styles.alertBox}>
+              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+              <Text style={styles.alertBoxText}>발주완료 업체를 선택할 수 있습니다.</Text>
+              <Text style={[styles.alertBoxText, styles.alertBoxText2]}>업체를 선택하지 않아도 발주완료가 가능합니다.</Text>
             </View>
           </View>
-        </View>
-      </ScrollView>
+          <View style={styles.borderTop}></View>
+          </>
+        }
+        ListEmptyComponent={
+          isLoading ? (
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>발주업체가 없습니다.</Text>
+            </View>
+          ):(
+            <View style={[styles.indicator]}>
+              <ActivityIndicator size="large" />
+            </View>
+          )
+        }
+      />
       <View style={styles.nextFix}>
 				<TouchableOpacity 
 					style={styles.nextBtn}
@@ -308,6 +395,49 @@ const MatchComplete = ({navigation, route}) => {
           </View>
 				</View>
       </Modal>
+
+      <Modal
+        visible={visible3}
+        transparent={true}
+        onRequestClose={() => {setVisible3(false)}}
+      >
+        <Pressable 
+          style={styles.modalBack}
+          onPress={() => {setVisible3(false)}}
+        ></Pressable>
+        <View style={styles.modalCont3}>
+          <View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>회사소개서 받기</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>회사소개서를 받으시겠습니까?</Text>
+            <Text style={styles.avatarDescText}>회원님의 메일로 발송이 됩니다.</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {
+                setVisible3(false);
+                setMailIdx();
+              }}
+            >
+              <Text style={styles.avatarBtnText}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+              onPress={() => {fnSendEmail()}}
+            >
+              <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      
+      {indicatorSt ? (
+      <View style={[styles.indicator, styles.indicator2]}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+      ):null}
 		</SafeAreaView>
 	)
 }
@@ -344,6 +474,7 @@ const styles = StyleSheet.create({
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},	
   modalCont2: {top:((widnowHeight/2)-166)},
+  modalCont3: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-130)},
   avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
 	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
   avatarDesc: {marginTop:20,},
@@ -362,6 +493,9 @@ const styles = StyleSheet.create({
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
+
+  indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10},
+  indicator2: {backgroundColor:'rgba(0,0,0,0.5)'},
 })
 
 export default MatchComplete

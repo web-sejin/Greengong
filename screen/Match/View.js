@@ -87,7 +87,7 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("view_match : ",responseJson);
+				//console.log("view_match : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.mf_data);
         setZzim(responseJson.is_scrap);

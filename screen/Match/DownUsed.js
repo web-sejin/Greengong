@@ -79,6 +79,25 @@ const DownUsed = ({navigation, route}) => {
 		}); 
     setIsLoading(true);
   }
+  const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_request_dwg', {is_api: 1, mc_idx: idx, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log('list_chat more : ',responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+  }
   const getList = ({item, index}) => (    
     <TouchableOpacity
       style={styles.memberBoxBtn}
@@ -120,7 +139,7 @@ const DownUsed = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_end_dwg : ",responseJson);
+				//console.log("list_end_dwg : ",responseJson);
 				setItemList2(responseJson.data);
         setTotalPage2(responseJson.total_page);        
 			}else{
@@ -131,6 +150,25 @@ const DownUsed = ({navigation, route}) => {
 			}
 		}); 
     setIsLoading(true);
+  }
+  const moreData2 = async () => {    
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_end_dwg', {is_api: 1, mc_idx: idx, page:nowPage2+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log('list_chat more : ',responseJson.data);				
+          const addItem = itemList2.concat(responseJson.data);				
+          setItemList2(addItem);			
+          setNowPage2(nowPage2+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
   }
   const getList2 = ({item, index}) => (    
     <TouchableOpacity
@@ -345,7 +383,7 @@ const DownUsed = ({navigation, route}) => {
           renderItem={(getList)}
           keyExtractor={(item, index) => index.toString()}
           onEndReachedThreshold={0.6}
-          //onEndReached={moreData}
+          onEndReached={moreData}
           ListEmptyComponent={
             isLoading ? (
               <View style={styles.notData}>
@@ -366,7 +404,7 @@ const DownUsed = ({navigation, route}) => {
           renderItem={(getList2)}
           keyExtractor={(item, index) => index.toString()}
           onEndReachedThreshold={0.6}
-          //onEndReached={moreData}
+          onEndReached={moreData2}
           ListEmptyComponent={
             isLoading ? (
               <View style={styles.notData}>

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -15,8 +15,11 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const EstimateResult = ({navigation, route}) => {
+  const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [itemInfo, setItemInfo] = useState({});
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -27,18 +30,32 @@ const EstimateResult = ({navigation, route}) => {
 				//setAll(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'view_estimate', {'is_api': 1, me_idx: idx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("view_estimate : ",responseJson);
+				setItemInfo(responseJson.data);
+			}else{
+				setItemInfo({});
+				console.log('결과 출력 실패!', responseJson);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

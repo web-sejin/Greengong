@@ -58,6 +58,7 @@ const Room = (props) => {
 	if(!roomName || roomName==''){
 		roomName = 'test';
 	}
+	console.log('page_code1 : ',page_code);
 	const ref = firestore().collection(roomName);
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -80,6 +81,7 @@ const Room = (props) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);			
 			getMsg();
+			console.log('page_code2 : ',page_code);
 			if(page_code == 'product'){
 				getItemData();
 			}else{
