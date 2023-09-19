@@ -99,24 +99,24 @@ const Home = (props) => {
 
 	//중고 리스트
 	const getItemList = async () =>{
-		setIsLoading(true);
+		setIsLoading(false);
 		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson);
+				console.log(responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{
 				setItemList([]);
 				setNowPage(1);
-				console.log('결과 출력 실패!');
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
 
-		setIsLoading(false);
+		setIsLoading(true);
 	}
 
 	//중고 리스트 무한 스크롤
@@ -383,8 +383,7 @@ const Home = (props) => {
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
-			if(responseJson.result === 'success'){
-				//console.log('성공 : ',responseJson);
+			if(responseJson.result === 'success'){				
 				setItemList([]);
 				setNowPage(1);
 				setVisible(false);
@@ -423,7 +422,7 @@ const Home = (props) => {
 				</TouchableOpacity>
 			</View>
 			
-			{!isLoading ? (
+			
 				<FlatList
 					data={itemList}
 					renderItem={(getList)}
@@ -479,17 +478,20 @@ const Home = (props) => {
 						</>
 					}
 					ListEmptyComponent={
+						isLoading ? (
 						<View style={styles.notData}>
 							<AutoHeightImage width={74} source={require("../assets/img/not_data.png")} />
 							<Text style={styles.notDataText}>등록된 중고상품이 없습니다.</Text>
 						</View>
+						) : (
+							<View style={[styles.indicator]}>
+								<ActivityIndicator size="large" />
+							</View>
+						)
 					}
 				/>
-			) : (
-				<View style={[styles.indicator]}>
-					<ActivityIndicator size="large" />
-				</View>
-			)}
+			
+				
 
 			{!visible2 ? (
 			<Animated.View 

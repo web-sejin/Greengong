@@ -15,7 +15,7 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const MatchComplete = ({navigation, route}) => {
-  const idx = route.params.idx;
+  const idx = route.params.idx;  
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,15 +97,15 @@ const MatchComplete = ({navigation, route}) => {
           style={[styles.compBtn]}
           activeOpacity={opacityVal}
           onPress={() => {
-            if(mbId && mbId==1){
+            if(mbId && mbId==item.mb_idx){
               setMbId();
             }else{
-              setMbId(1);
+              setMbId(item.mb_idx);
             }
           }}
         >
-          <View style={[styles.compWrap, styles.compWrapFst]}>
-            <View style={[styles.compRadio, mbId==1 ? styles.comRadioChk : null]}>
+          <View style={[styles.compWrap, index==0 ? styles.compWrapFst : null]}>
+            <View style={[styles.compRadio, mbId==item.mb_idx ? styles.comRadioChk : null]}>
               <AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
             </View>
             <View style={styles.compInfo}>
@@ -151,7 +151,7 @@ const MatchComplete = ({navigation, route}) => {
             activeOpacity={opacityVal}
             onPress={()=>{
               navigation.navigate('EstimateResult', {idx:item.me_idx});
-              console.log(item.me_idx);
+              //console.log(item.me_idx);
           }}
           >
             <Text style={styles.btnText}>견적서 보기</Text>
@@ -199,7 +199,7 @@ const MatchComplete = ({navigation, route}) => {
 			md_idx:mailIdx,
 		};
 
-    Api.send('POST', 'down_dwg', formData, (args)=>{
+    Api.send('POST', 'down_doc', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
@@ -223,8 +223,37 @@ const MatchComplete = ({navigation, route}) => {
     }
   }
 
-  function fnSubmit(){
-    console.log("fnSubmit");    
+  function submitEndProduct(v){
+    const formData = {
+			is_api:1,				
+			mc_idx:idx
+		}; 
+
+    if(v == 2){
+      formData.recv_idx = mbId;
+    }else if(v == 3){
+      formData.recv_idx = mbId;
+      formData.so_score = score;
+    }
+
+    Api.send('POST', 'save_end_match', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible(false);
+        setVisible2(false);
+        if(route.params.returnNavi){
+					navigation.navigate(route.params.returnNavi, {isSubmit : true});
+				}else{
+					navigation.navigate('Match', {isSubmit: true});
+				}
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -297,7 +326,7 @@ const MatchComplete = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(1)}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -382,13 +411,13 @@ const MatchComplete = ({navigation, route}) => {
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
               style={styles.avatarBtn}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(2)}}
             >
               <Text style={styles.avatarBtnText}>평가 하지 않고 완료</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndProduct(3)}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -461,7 +490,7 @@ const styles = StyleSheet.create({
   matchCompleteMbFst: {borderTopWidth:0,},
   compBtn: {},
   compWrap: {display:'flex',flexDirection:'row',justifyContent:'space-between',position:'relative',paddingLeft:31},
-  compRadio: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,position:'absolute',top:0,left:0,display:'flex',alignItems:'center',justifyContent:'center'},
+  compRadio: {width:21,height:21,backgroundColor:'#fff',borderWidth:1,borderColor:'#C5C5C6',borderRadius:50,position:'absolute',top:-1,left:0,display:'flex',alignItems:'center',justifyContent:'center'},
   comRadioChk: {backgroundColor:'#31B481',borderColor:'#31B481',},
   compInfo: {width:(innerWidth-110)},
   compInfoDate: {},
@@ -496,6 +525,9 @@ const styles = StyleSheet.create({
 
   indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10},
   indicator2: {backgroundColor:'rgba(0,0,0,0.5)'},
+
+  notData: {height:(widnowHeight-270),display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
 export default MatchComplete

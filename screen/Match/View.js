@@ -68,15 +68,18 @@ const MatchView = (props) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);      
+      getData();
+      getMyData();
+      getRadioList();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
   useEffect(()=>{
-    getData();
-    getMyData();
-    getRadioList();
+    // getData();
+    // getMyData();
+    // getRadioList();
   },[])
 
   const getData = async () => {

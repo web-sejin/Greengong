@@ -38,31 +38,33 @@ const UsedBidList = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setIsLoading(false);
-        setTabState(1);
-        setIdxVal('');
-        setItemList([]);
-        setNowPage(1);
-        setTotalPage(1);
-        setItemList2([]);
-        setNowPage2(1);
-        setTotalPage2(1);
 			}
 		}else{
 			setRouteLoad(true);
-			setPageSt(!pageSt);      
+			setPageSt(!pageSt);
+      setNowPage(1);
+      setNowPage2(1);
+      getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  useEffect(()=>{
-    getData();
-    getData2();
-  },[])
-
   function fnTab(v){
     setTabState(v);
+    setNowPage(1);
+    setNowPage2(1);
+    if(v == 1){
+      getData();
+      setTimeout(function(){
+        setItemList2([]);
+      },200);
+    }else if(v == 2){
+      getData2();
+      setTimeout(function(){
+        setItemList([]);
+      },200);
+    }
   }
 
   //판매자가 입찰 승인
@@ -80,7 +82,7 @@ const UsedBidList = ({navigation, route}) => {
 				console.log('성공 : ',responseJson);
         getData();
 			}else{
-				console.log('결과 출력 실패!', resultItem.result_text);
+				console.log('결과 출력 실패!', responseJson);
 				//ToastMessage(responseJson.result_text);
 			}
 		});
@@ -101,7 +103,7 @@ const UsedBidList = ({navigation, route}) => {
 				console.log('성공 : ',responseJson);
         getData();
 			}else{
-				console.log('결과 출력 실패!', resultItem.result_text);
+				console.log('결과 출력 실패!', responseJson);
 				//ToastMessage(responseJson.result_text);
 			}
 		});
@@ -122,12 +124,51 @@ const UsedBidList = ({navigation, route}) => {
 				console.log('성공 : ',responseJson);
         getData2();
 			}else{
-				console.log('결과 출력 실패!', resultItem);
-				//ToastMessage(responseJson.result_text);
+				console.log('결과 출력 실패!', responseJson);
+				ToastMessage(responseJson.result_text);
 			}
 		});
   }
 
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_sale_bid_product', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_sale_bid_product : ",responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);        
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+  const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_sale_bid_product', {is_api: 1, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          //console.log(responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
   const getList = ({item, index}) => (
     <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
       <View style={[styles.compBtn]}>
@@ -191,17 +232,14 @@ const UsedBidList = ({navigation, route}) => {
 
           {item.bd_status_org == 2 ? (
           <>
-          <View style={styles.btn3TextBox}>
+          {/* <View style={styles.btn3TextBox}>
             <Text style={styles.btn3TextBoxText}>가격 입찰 제안이 수락되었습니다.</Text>
-          </View>
+          </View> */}
           <TouchableOpacity
             style={[styles.btn, styles.btn2, styles.btn3]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              navigation.navigate('ChatRoom', {});
-            }}
+            activeOpacity={1}
           >
-            <Text style={styles.btnText}>채팅하기</Text>
+            <Text style={styles.btnText}>가격 입찰 제안을 수락했습니다.</Text>
           </TouchableOpacity>
           </>
           ) : null }
@@ -209,22 +247,16 @@ const UsedBidList = ({navigation, route}) => {
           {item.bd_status_org == 3 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            activeOpacity={1}
           >
-            <Text style={[styles.btnText, styles.btnText2]}>입찰을 취소했습니다.</Text>
+            <Text style={[styles.btnText, styles.btnText2]}>입찰을 거절했습니다.</Text>
           </TouchableOpacity>
           ) : null }
 
           {item.bd_status_org == 4 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            activeOpacity={1}
           >
             <Text style={[styles.btnText, styles.btnText2]}>입찰자가 입찰을 취소했습니다.</Text>
           </TouchableOpacity>
@@ -234,40 +266,39 @@ const UsedBidList = ({navigation, route}) => {
       </View>  
     </View>
 	);
-
-  const getData = async () => {
+  
+  const getData2 = async () => {
     setIsLoading(false);
-    await Api.send('GET', 'list_sale_bid_product', {'is_api': 1, page: 1}, (args)=>{
+    await Api.send('GET', 'list_buy_bid_product', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_sale_bid_product : ",responseJson);
-				setItemList(responseJson.data);
-        setTotalPage(responseJson.total_page);        
+				console.log("list_buy_bid_product : ",responseJson);
+				setItemList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);        
 			}else{
-				setItemList([]);
-				setNowPage(1);
+				setItemList2([]);
+				setNowPage2(1);
 				console.log('결과 출력 실패!', responseJson.result_text);
         //ToastMessage(responseJson.result_text);
 			}
 		}); 
     setIsLoading(true);
   }
-
-  const moreData = async () => {    
-    if(totalPage > nowPage){
-      await Api.send('GET', 'list_sale_bid_product', {is_api: 1, page:nowPage+1}, (args)=>{
+  const moreData2 = async () => {
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_buy_bid_product', {is_api: 1, page:nowPage2+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
           //console.log(responseJson.data);				
-          const addItem = itemList.concat(responseJson.data);				
-          setItemList(addItem);			
-          setNowPage(nowPage+1);
+          const addItem = itemList2.concat(responseJson.data);				
+          setItemList2(addItem);			
+          setNowPage2(nowPage2+1);
         }else{
           console.log(responseJson.result_text);
           //console.log('결과 출력 실패!');
@@ -275,7 +306,6 @@ const UsedBidList = ({navigation, route}) => {
       });
     }
 	}
-
   const getList2 = ({item, index}) => (
     <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList2.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
       <View style={[styles.compBtn]}>
@@ -332,9 +362,7 @@ const UsedBidList = ({navigation, route}) => {
           <TouchableOpacity
             style={[styles.btn, styles.btn2, styles.btn3]}
             activeOpacity={opacityVal}
-            onPress={()=>{
-              navigation.navigate('ChatRoom', {});
-            }}
+            onPress={()=>{chatDeal(item.pd_idx, item.pd_mb_idx)}}
           >
             <Text style={styles.btnText}>채팅하기</Text>
           </TouchableOpacity>
@@ -344,24 +372,18 @@ const UsedBidList = ({navigation, route}) => {
           {item.bd_status == 3 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            activeOpacity={1}
           >
-            <Text style={[styles.btnText, styles.btnText2]}>입찰을 취소했습니다.</Text>
+            <Text style={[styles.btnText, styles.btnText2]}>가격 입찰 제안이 거절되었습니다.</Text>
           </TouchableOpacity>
           ) : null }
 
           {item.bd_status == 4 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              
-            }}
+            activeOpacity={1}
           >
-            <Text style={[styles.btnText, styles.btnText2]}>가격 입찰 제안이 거절되었습니다.</Text>
+            <Text style={[styles.btnText, styles.btnText2]}>입찰을 취소했습니다.</Text>
           </TouchableOpacity>
           ) : null }       
         </>
@@ -369,46 +391,22 @@ const UsedBidList = ({navigation, route}) => {
     </View>
 	)
 
-  const getData2 = async () => {
-    setIsLoading(false);
-    await Api.send('GET', 'list_buy_bid_product', {'is_api': 1, page: 1}, (args)=>{
+  const chatDeal = async (pdIdx, pdMbIdx) => {    
+    await Api.send('GET', 'in_chat', {'is_api': 1, recv_idx:pdMbIdx, page_code:'product', page_idx:pdIdx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
-			//console.log('args ', args);
+			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("list_buy_bid_product : ",responseJson);
-				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);        
+				console.log("in_chat : ",responseJson);				
+        const roomName = 'product_'+responseJson.cr_idx;
+        navigation.navigate('ChatRoom', {pd_idx:pdIdx, page_code:'product', recv_idx:pdMbIdx, roomName:roomName});
 			}else{
-				setItemList2([]);
-				setNowPage2(1);
-				console.log('결과 출력 실패!', responseJson.result_text);
-        //ToastMessage(responseJson.result_text);
+				//setItemList([]);				
+				console.log('결과 출력 실패! : ', responseJson.result_text);
 			}
-		}); 
-    setIsLoading(true);
+		});
   }
-
-  const moreData2 = async () => {
-    if(totalPage2 > nowPage2){
-      await Api.send('GET', 'list_buy_bid_product', {is_api: 1, page:nowPage2+1}, (args)=>{
-        let resultItem = args.resultItem;
-        let responseJson = args.responseJson;
-        let arrItems = args.arrItems;
-        //console.log('args ', args);
-        if(responseJson.result === 'success' && responseJson){
-          //console.log(responseJson.data);				
-          const addItem = itemList2.concat(responseJson.data);				
-          setItemList2(addItem);			
-          setNowPage2(nowPage+1);
-        }else{
-          console.log(responseJson.result_text);
-          //console.log('결과 출력 실패!');
-        }
-      });
-    }
-	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -443,41 +441,48 @@ const UsedBidList = ({navigation, route}) => {
           )}
         </TouchableOpacity>
       </View>
-			{isLoading ? (
-        tabState == 1 ? (
-          <FlatList
-            data={itemList}
-            renderItem={(getList)}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReachedThreshold={0.6}
-            onEndReached={moreData}	
-            ListEmptyComponent={
+		
+      {tabState == 1 ? (
+        <FlatList
+          data={itemList}
+          renderItem={(getList)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
+          ListEmptyComponent={
+            isLoading ? (
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
                 <Text style={styles.notDataText}>등록된 판매내역이 없습니다.</Text>
               </View>
-            }
-          />
-        ) : (
-          <FlatList
-            data={itemList2}
-            renderItem={(getList2)}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReachedThreshold={0.6}
-            onEndReached={moreData2}	
-            ListEmptyComponent={
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
+        />
+      ) : (
+        <FlatList
+          data={itemList2}
+          renderItem={(getList2)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData2}	
+          ListEmptyComponent={
+            isLoading ? (
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
                 <Text style={styles.notDataText}>등록된 구매내역이 없습니다.</Text>
               </View>
-            }
-          />
-        )
-      ) : (
-        <View style={[styles.indicator]}>
-          <ActivityIndicator size="large" />
-        </View>
-      )}	
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )              
+          }
+        />
+      )}
 		</SafeAreaView>
 	)
 }
@@ -491,7 +496,7 @@ const styles = StyleSheet.create({
   tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
   tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
-  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},  
+  indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
   matchCompleteMb: {paddingVertical:30},
   matchCompleteMbFst: {paddingTop:20,},
   compBtn: {paddingHorizontal:20},
@@ -517,7 +522,8 @@ const styles = StyleSheet.create({
   btn4: {backgroundColor:'#fff',borderWidth:1,borderColor:'#000',},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
   btnText2: {color:'#353636',},
-  btn3TextBox: {},
+  btn3TextBox: {marginTop:25,marginBottom:5,},
+  btn3TextBoxText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#353636',},
   notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })

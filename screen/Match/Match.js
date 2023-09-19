@@ -113,7 +113,7 @@ const Match = (props) => {
 			}else{
 				setItemList([]);
 				setNowPage(1);
-				console.log('결과 출력 실패!');
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
 
@@ -128,7 +128,7 @@ const Match = (props) => {
 				let arrItems = args.arrItems;
 				//console.log('args ', args);
 				if(responseJson.result === 'success' && responseJson){
-					//console.log(responseJson.data);				
+					console.log("more : ", responseJson.data);				
 					const addItem = itemList.concat(responseJson.data);				
 					setItemList(addItem);			
 					setNowPage(nowPage+1);
@@ -159,31 +159,31 @@ const Match = (props) => {
 					<AutoHeightImage width={99} source={{uri: item.mc_image}}  style={styles.listImg} />				
 				</View>
 			) : null}			
-				<View style={styles.listInfoBox}>
-					<View style={styles.listInfoTitle}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.mc_name}</Text>
+			<View style={styles.listInfoBox}>
+				<View style={styles.listInfoTitle}>
+					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.mc_name}</Text>
+				</View>
+				<View style={styles.listInfoDesc}>
+					<Text style={styles.listInfoDescText}>{item.mc_loc} · {item.mc_date}</Text>
+				</View>
+				<View style={styles.listInfoCate}>
+					<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.mc_summary}</Text>
+				</View>
+				<View style={styles.listInfoCnt}>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
 					</View>
-					<View style={styles.listInfoDesc}>
-						<Text style={styles.listInfoDescText}>{item.mc_loc} · {item.mc_date}</Text>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
 					</View>
-					<View style={styles.listInfoCate}>
-						<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.mc_summary}</Text>
-					</View>
-					<View style={styles.listInfoCnt}>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
-						</View>
-						<View style={styles.listInfoCntBox}>
-							<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
-						</View>
-						<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-							<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-							<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
-						</View>
+					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
 					</View>
 				</View>
+			</View>
 			</>
 		</TouchableOpacity>
 	);
@@ -361,7 +361,7 @@ const Match = (props) => {
 				</TouchableOpacity>
 			</View>
 
-			{isLoading ? (
+			
 				<FlatList
 					data={itemList}
 					renderItem={(getList)}
@@ -417,17 +417,19 @@ const Match = (props) => {
 						</>
 					}
 					ListEmptyComponent={
+						isLoading ? (
 						<View style={styles.notData}>
 							<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
 							<Text style={styles.notDataText}>등록된 매칭이 없습니다.</Text>
 						</View>
+						) : (
+							<View style={[styles.indicator]}>
+								<ActivityIndicator size="large" />
+							</View>
+						)
 					}
 				/>
-			) : (
-				<View style={[styles.indicator]}>
-					<ActivityIndicator size="large" />
-				</View>
-			)}
+			
 
 			{!visible2 ? (
 			<Animated.View 
@@ -655,7 +657,7 @@ const styles = StyleSheet.create({
 	filterLabelText: {fontSize:13,lineHeight:17,color:'#fff'},
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	pdImage: {width:99,height:99,borderRadius:8,overflow:'hidden'},
+	pdImage: {width:99,height:99,borderRadius:8,overflow:'hidden',alignItems:'center',justifyContent:'center'},
 	listImg: {borderRadius:8},
 	listInfoBox: {width:(innerWidth - 99),paddingLeft:15,},
 	listInfoTitle: {},

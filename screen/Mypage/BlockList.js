@@ -165,7 +165,7 @@ const BlockList = ({navigation, route}) => {
         }
       });
     }
-	}	
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

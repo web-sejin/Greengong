@@ -375,6 +375,9 @@ const styles = StyleSheet.create({
   star: {marginHorizontal:4,},
 
   indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
+
+  notData: {height:(widnowHeight-270),display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
 //export default SalesComplete

@@ -339,9 +339,10 @@ const Estimate = ({navigation, route}) => {
 		itemList2.map((item, index) => {
 			if(item.md_name && item.md_price){
 				cnt2 = cnt2 + 1;
+				let mdPrice = (item.md_price).split(',').join('');
 				const obj2 = {
 					md_name:item.md_name,
-					md_price:item.md_price
+					md_price:mdPrice
 				}
 				arr2.push(obj2);
 			}
@@ -378,7 +379,7 @@ const Estimate = ({navigation, route}) => {
 		};
 
 		if(itemInfo.mc_chat_permit == 3){
-			formData.md_file =  {'uri': compIntroUri, 'type': compIntroType, 'name': compIntro};
+			formData.md_file =  {'uri': compIntroUri, 'type': compIntroType, 'name': encodeURIComponent(compIntro)};
 		}
 
 		if(arr1.length > 0){
@@ -399,7 +400,7 @@ const Estimate = ({navigation, route}) => {
 				//console.log(responseJson);
 				chatDeal();
 			}else{
-				console.log(resultItem.result_text);
+				console.log(responseJson);
 				ToastMessage(responseJson.result_text);
 			}
 		});

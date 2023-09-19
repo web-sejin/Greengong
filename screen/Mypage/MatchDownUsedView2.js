@@ -14,7 +14,7 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MatchDownUsedView = ({navigation, route}) => {
+const MatchDownUsedView2 = ({navigation, route}) => {
   const usedState = route.state;
   let pageTitle = '도면권한 요청내역';
 
@@ -54,13 +54,13 @@ const MatchDownUsedView = ({navigation, route}) => {
 
   const getData = async () => {
     setIsLoading(false);
-    await Api.send('GET', 'list_request_dwg', {'is_api': 1, mc_idx: idx, page: 1}, (args)=>{
+    await Api.send('GET', 'list_end_dwg', {'is_api': 1, mc_idx: idx, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_request_dwg : ",responseJson);
+				console.log("list_end_dwg : ",responseJson);
         setItemInfo(responseJson);
 				setItemList(responseJson.data);
         setTotalPage(responseJson.total_page);
@@ -76,7 +76,7 @@ const MatchDownUsedView = ({navigation, route}) => {
   }
   const moreData = async () => {    
     if(totalPage > nowPage){
-      await Api.send('GET', 'list_request_dwg', {is_api: 1, mc_idx: idx, page:nowPage+1}, (args)=>{
+      await Api.send('GET', 'list_end_dwg', {is_api: 1, mc_idx: idx, page:nowPage+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -94,15 +94,8 @@ const MatchDownUsedView = ({navigation, route}) => {
     }
   }
   const getList = ({item, index}) => (    
-    <TouchableOpacity
-      style={styles.memberBoxBtn}
-      activeOpacity={opacityVal}
-      onPress={() => {handleChange(item.dp_idx)}}
-    >
+    <View style={styles.memberBoxBtn}>
       <View style={[styles.memberBoxBtnWrap, index==0?styles.memberBoxNotLine:null,]}>
-        <View style={[styles.chkShape, styles.chkShapeAbs, item.is_checked==1 ? styles.chkShapeOn : null]}>
-          <AutoHeightImage width={13} source={require("../../assets/img/icon_chk_on.png")} />
-        </View>
         <View style={styles.memberInfo}>
           <View style={styles.memberDate}>
             <Text style={styles.memberDateText}>{item.dp_regdate}</Text>
@@ -123,112 +116,8 @@ const MatchDownUsedView = ({navigation, route}) => {
           )}          
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
 	);
-
-  useEffect(() => {
-		//console.log('allChk : ', allChk);
-    let chkVal = 0;
-    if(allChk){
-      chkVal = 1;
-    }else{
-      chkVal = 0;
-    }
-		let selectCon = itemList.map((item) => {
-			if(item.is_checked === chkVal){
-				return {...item, is_checked: chkVal};
-			}else{
-				return {...item, is_checked: item.is_checked};
-			}
-		});
-
-		setItemList(selectCon);
-	}, [allChk]);
-
-  //개별 선택
-  const handleChange = (idx) => {  
-    let temp = itemList.map((item) => {
-			if(idx === item.dp_idx){
-				//console.log('idx : ', idx, ' con idx : ', item.dp_idx);
-        //console.log(item.is_checked);
-        if(item.is_checked == 0){
-          return { ...item, is_checked:1 };
-        }else{
-          return { ...item, is_checked:0 };
-        }				
-			}
-
-			return item;
-		}); 
-    //console.log("temp : ",temp);   
-		setItemList(temp);
-
-    let selectedTotal = temp.filter((item) => item.is_checked);
-		//console.log('temp.length : ', temp.length, 'totalSelected : ', selectedTotal.length);
-		if(temp.length === selectedTotal.length){
-			setAllChk(true);
-		}else{			
-			setAllChk(false);
-		}
-	};
-
-  //전체 선택, 전체 선택 해제
-	const changeAllChecked = (checked) => {
-		let allCheckStatus = checked;
-    let allCheckStatus2 = 0;
-		//console.log('checked : ', checked);
-		if(checked === true){
-      allCheckStatus = false;
-			allCheckStatus2 = 0;
-		}else{
-      allCheckStatus = true;
-			allCheckStatus2 = 1;
-		}
-		let selectCon = itemList.map((item) => {
-			return {...item, is_checked: allCheckStatus2};
-		});
-
-		setItemList(selectCon);
-		setAllChk(allCheckStatus);
-	}
-
-  //선택된 회원 권한 허용
-  const checkedPermit = async () => {
-    let permitList = '';
-    itemList.map((item, index) => {
-      if(item.is_checked == 1){
-        if(permitList != ''){ permitList += ","; }        
-        permitList += item.dp_idx;
-      }
-    })
-
-    if(permitList == ''){
-      ToastMessage('허용할 회원을 1명 이상 선택해 주세요.');
-    }else{
-      const formData = {
-        is_api:1,
-        mc_idx:idx,
-        permit:permitList
-      };
-  
-      Api.send('POST', 'ok_permit_dwg', formData, (args)=>{
-        let resultItem = args.resultItem;
-        let responseJson = args.responseJson;
-  
-        if(responseJson.result === 'success'){
-          console.log('성공 : ',responseJson);
-          setNowPage(1);
-          setTotalPage(1);
-          getData();
-          setAllChk(false);
-          ToastMessage('선택한 회원의 다운로드 권한을 허용했습니다.');
-        }else{
-          console.log('결과 출력 실패!', responseJson);
-          //ToastMessage(responseJson.result_text);
-        }
-      });
-    }
-  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -268,29 +157,6 @@ const MatchDownUsedView = ({navigation, route}) => {
         </>
       </View>
 
-      <View style={styles.allChkBox}>
-        <TouchableOpacity
-          style={styles.allChkBtn}
-          activeOpacity={opacityVal}
-          onPress={() => changeAllChecked(allChk)}
-        >
-          <View style={[styles.chkShape, allChk ? styles.chkShapeOn : null]}>
-            <AutoHeightImage width={13} source={require("../../assets/img/icon_chk_on.png")} />
-          </View>
-          <View style={styles.chkTextBox}>
-            <Text style={styles.chkText}>전체</Text>
-            <Text style={[styles.chkText, styles.chkTextBold]}>{totalCnt}개</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.submitBtn}
-          activeOpacity={opacityVal}
-          onPress={()=>{checkedPermit()}}
-        >
-          <Text style={styles.submitBtnText}>선택 허용</Text>
-        </TouchableOpacity>
-      </View>
-
       <FlatList
         data={itemList}
         renderItem={(getList)}
@@ -301,7 +167,7 @@ const MatchDownUsedView = ({navigation, route}) => {
           isLoading ? (
             <View style={styles.notData}>
               <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-              <Text style={styles.notDataText}>권한 요청한 회원이 없습니다.</Text>
+              <Text style={styles.notDataText}>권한이 완료된 회원이 없습니다.</Text>
             </View>
           ):(
             <View style={[styles.indicator]}>
@@ -309,7 +175,7 @@ const MatchDownUsedView = ({navigation, route}) => {
             </View>
           )
         }
-      />
+      />      
 		</SafeAreaView>
 	)
 }
@@ -355,7 +221,7 @@ const styles = StyleSheet.create({
   submitBtnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:19,color:'#000'},
   memberList: {paddingHorizontal:20,},
   memberBoxBtn: {paddingHorizontal:20,},
-  memberBoxBtnWrap: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',position:'relative',paddingVertical:30,paddingLeft:31,borderTopWidth:1,borderColor:'#E9EEF6',},
+  memberBoxBtnWrap: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',position:'relative',paddingVertical:30,borderTopWidth:1,borderColor:'#E9EEF6',},
   memberBoxNotLine: {borderTopWidth:0},
   memberBoxComplete: {paddingLeft:0,},
   memberInfo: {width:(innerWidth-139)},
@@ -371,4 +237,4 @@ const styles = StyleSheet.create({
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
-export default MatchDownUsedView
+export default MatchDownUsedView2

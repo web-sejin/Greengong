@@ -20,6 +20,8 @@ const EstimateResult = ({navigation, route}) => {
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [itemInfo, setItemInfo] = useState({});
+  const [podList, setPodList] = useState({});
+  const [desList, setDesList] = useState({});
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -47,7 +49,9 @@ const EstimateResult = ({navigation, route}) => {
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
 				console.log("view_estimate : ",responseJson);
-				setItemInfo(responseJson.data);
+				setItemInfo(responseJson);
+        setPodList(responseJson.product);
+        setDesList(responseJson.design);
 			}else{
 				setItemInfo({});
 				console.log('결과 출력 실패!', responseJson);
@@ -68,12 +72,12 @@ const EstimateResult = ({navigation, route}) => {
               </View>
               <View style={styles.alertBox}>
                 <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-                <Text style={styles.alertBoxText}>참좋은공장</Text>
-                <Text style={[styles.alertBoxText, styles.alertBoxText2]}>아직 밝혀지지 않은 달 뒤를 가보고 남은 장비 프로젝트</Text>
+                <Text style={styles.alertBoxText}>판매 완료 업체를 선택할 수 있습니다.</Text>
+                <Text style={[styles.alertBoxText, styles.alertBoxText2]}>업체를 선택하지 않아도 판매 완료가 가능합니다.</Text>
               </View>
               <View style={[styles.tableCust, styles.mgTop10]}>
                 <Text style={styles.tableCustText}>유효기간</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2, styles.tableCustTextBold]}>발행일로부터 2일</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2, styles.tableCustTextBold]}>발행일로부터 {itemInfo.me_end_day}일</Text>
               </View>
           </View>
 
@@ -83,23 +87,23 @@ const EstimateResult = ({navigation, route}) => {
               </View>
               <View style={[styles.tableCust, styles.mgTop15]}>
                 <Text style={styles.tableCustText}>상호명</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2]}>넥센타이어</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2]}>{itemInfo.me_com_name}</Text>
               </View>
               <View style={[styles.tableCust, styles.mgTop15]}>
                 <Text style={styles.tableCustText}>등록번호</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2]}>1112-2222-3333</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2]}>{itemInfo.me_com_num}</Text>
               </View>
               <View style={[styles.tableCust, styles.mgTop15]}>
                 <Text style={styles.tableCustText}>담당자명</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2]}>홍길동</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2]}>{itemInfo.me_com_name2}</Text>
               </View>
               <View style={[styles.tableCust, styles.mgTop15]}>
                 <Text style={styles.tableCustText}>담당자 연락처</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2]}>010-1234-5678</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2]}>{itemInfo.me_com_tel}</Text>
               </View>
               <View style={[styles.tableCust, styles.mgTop15]}>
                 <Text style={styles.tableCustText}>담당자 이메일</Text>
-                <Text style={[styles.tableCustText, styles.tableCustText2]}>nexen@google.com</Text>
+                <Text style={[styles.tableCustText, styles.tableCustText2]}>{itemInfo.me_com_email}</Text>
               </View>
           </View>
 
@@ -109,25 +113,39 @@ const EstimateResult = ({navigation, route}) => {
             </View>
             <View style={[styles.tableCust, styles.mgTop15]}>
               <Text style={styles.tableCustText}>납품가능일</Text>
-              <Text style={[styles.tableCustText, styles.tableCustText2]}>발주일로부터 5일</Text>
+              <Text style={[styles.tableCustText, styles.tableCustText2]}>발주일로부터 {itemInfo.me_supply_day}일</Text>
             </View>
           </View>
 
+          {podList.length > 0 ? (
           <View style={[styles.registBox, styles.borderBot]}>
             <View>
-              <Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>견적정보 (2개)</Text>
+              <Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>견적정보 ({itemInfo.total_prod}개)</Text>
             </View>
             <View style={styles.mgTop15}>
-              <View style={[styles.tableCust, styles.tableCustFlex, styles.borderBot, styles.paddBot30]}>
-                <View>
-                  <Text style={styles.tableCustText3}>저장된품명1</Text>
-                  <Text style={styles.tableCustText}>저장된재질1</Text>
+              {podList.map((item, index) => {
+                return(
+                <View 
+                  key={index}
+                  style={[
+                    styles.tableCust, styles.tableCustFlex, 
+                    (index+1)!=itemInfo.total_prod ? styles.borderBot : null,
+                    (index+1)!=itemInfo.total_prod ? styles.paddBot30 : null,
+                    index!=0 ? styles.paddTop30 : null,
+                  ]}
+                >
+                  <View>
+                    <Text style={styles.tableCustText3}>{item.mp_name}</Text>
+                    <Text style={styles.tableCustText}>{item.mp_material}</Text>
+                  </View>
+                  <View>
+                    <Text style={[styles.tableCustText, styles.tableCustText2]}>({item.mp_qty}개) {item.mp_subtotal}원</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={[styles.tableCustText, styles.tableCustText2]}>(1개) 3,000원</Text>
-                </View>
-              </View>
-              <View style={[styles.tableCust, styles.tableCustFlex, styles.paddTop30]}>
+                )
+              })}
+
+              {/* <View style={[styles.tableCust, styles.tableCustFlex, styles.paddTop30]}>
                 <View>
                   <Text style={styles.tableCustText3}>저장된품명2</Text>
                   <Text style={styles.tableCustText}>저장된재질2</Text>
@@ -135,33 +153,48 @@ const EstimateResult = ({navigation, route}) => {
                 <View>
                   <Text style={[styles.tableCustText, styles.tableCustText2]}>(1개) 3,000원</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
+          ) : null}
 
+          {desList.length > 0 ? (
           <View style={[styles.registBox, styles.borderBot]}>
             <View>
-              <Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>디자인/설계 정보 (2개)</Text>
+              <Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>디자인/설계 정보 ({itemInfo.total_design}개)</Text>
             </View>
             <View style={styles.mgTop15}>
-              <View style={[styles.tableCust, styles.tableCustFlex, styles.borderBot, styles.paddBot30]}>
-                <View>
-                  <Text style={[styles.tableCustText3, styles.tableCustText4]}>품명1</Text>
+              {desList.map((item, index) => {
+                return(
+                <View 
+                  key={index}
+                  style={[
+                    styles.tableCust, styles.tableCustFlex, 
+                    (index+1)!=itemInfo.total_design ? styles.borderBot : null,
+                    (index+1)!=itemInfo.total_design ? styles.paddBot30 : null,
+                    index!=0 ? styles.paddTop30 : null,
+                  ]}
+                >
+                  <View>
+                    <Text style={[styles.tableCustText3, styles.tableCustText4]}>{item.md_name}</Text>
+                  </View>
+                  <View>
+                    <Text style={[styles.tableCustText, styles.tableCustText2]}>{item.md_price}원</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={[styles.tableCustText, styles.tableCustText2]}>3,000원</Text>
-                </View>
-              </View>
-              <View style={[styles.tableCust, styles.tableCustFlex, styles.paddTop30]}>
+                )
+              })}
+              {/* <View style={[styles.tableCust, styles.tableCustFlex, styles.paddTop30]}>
                 <View>
                 <Text style={[styles.tableCustText3, styles.tableCustText4]}>품명2</Text>
                 </View>
                 <View>
                   <Text style={[styles.tableCustText, styles.tableCustText2]}>3,000원</Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
+          ) : null}
 
           <View style={[styles.registBox]}>
 						<View>
@@ -170,28 +203,28 @@ const EstimateResult = ({navigation, route}) => {
 						<View style={styles.table}>
 							<Text style={styles.tableth}>공급가액</Text>
 							<View style={styles.tabletd}>
-								<Text style={[styles.tabletdText]}>1,230,000</Text>
+								<Text style={[styles.tabletdText]}>{itemInfo.me_subtotal}</Text>
 								<Text style={styles.tabletdText}>원</Text>
 							</View>
 						</View>
 						<View style={styles.table}>
 							<Text style={styles.tableth}>부가세(10%)</Text>
 							<View style={styles.tabletd}>
-								<Text style={[styles.tabletdText]}>123,000</Text>
+								<Text style={[styles.tabletdText]}>{itemInfo.me_add_price}</Text>
 								<Text style={styles.tabletdText}>원</Text>
 							</View>
 						</View>
             <View style={styles.table}>
 							<Text style={styles.tableth}>배송비</Text>
 							<View style={styles.tabletd}>
-								<Text style={[styles.tabletdText]}>1,000</Text>
+								<Text style={[styles.tabletdText]}>{itemInfo.me_delivery_price}</Text>
 								<Text style={styles.tabletdText}>원</Text>
 							</View>
 						</View>
 						<View style={[styles.table, styles.table2]}>
 							<Text style={[styles.tableth, styles.tablethBold]}>총 견적금액</Text>
 							<View style={[styles.tabletd]}>
-								<Text style={[styles.tabletdText, styles.tabletdTextBold, styles.tabletdTextGreen]}>30,000</Text>
+								<Text style={[styles.tabletdText, styles.tabletdTextBold, styles.tabletdTextGreen]}>{itemInfo.me_total_price}</Text>
 								<Text style={[styles.tabletdText, styles.tabletdTextGreen]}>원</Text>
 							</View>
 						</View>

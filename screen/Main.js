@@ -75,7 +75,8 @@ import MatchComparison from './Mypage/MatchComparison'; //마이페이지 비교
 import MatchComparisonView from './Mypage/MatchComparisonView'; //마이페이지 발주업체 비교내역
 import MatchOrder from './Mypage/MatchOrder'; //마이페이지 발주내역
 import MatchDownUsed from './Mypage/MatchDownUsed'; //마이페이지 도면권한요청내역
-import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 뷰
+import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 요청 뷰
+import MatchDownUsedView2 from './Mypage/MatchDownUsedView2'; //마이페이지 도면권한요청내역 완료 뷰
 import Keyword from './Mypage/Keyword'; //마이페이지 키워드 등록
 import Message from './Mypage/Message'; //마이페이지 자주쓰는메세지
 import MessageWrite from './Mypage/Message_write'; //마이페이지 자주쓰는메세지 작성
@@ -229,8 +230,8 @@ const TabNavigator = ({ navigation }) => {
       screenOptions={{headerShown: false}}
       tabBar={ (props) => <TabBarMenu {...props} /> }
     >
-      <Tab.Screen name="Home" component={Home} options={{}} />
-      <Tab.Screen name="Match" component={Match} options={{}} />
+      <Tab.Screen name="Home" component={Home} options={{}} initialParams={{isSubmit: true}} />
+      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{isSubmit: true}} />
       <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on'}} />
       <Tab.Screen name="Mypage" component={Mypage} options={{}} />
     </Tab.Navigator>
@@ -289,6 +290,7 @@ const StackNavigator = () => {
       <Stack.Screen name="MatchOrder" component={MatchOrder} />
       <Stack.Screen name="MatchDownUsed" component={MatchDownUsed} />
       <Stack.Screen name="MatchDownUsedView" component={MatchDownUsedView} />
+      <Stack.Screen name="MatchDownUsedView2" component={MatchDownUsedView2} />
       <Stack.Screen name="Keyword" component={Keyword} />
       <Stack.Screen name="Message" component={Message} />
       <Stack.Screen name="MessageWrite" component={MessageWrite} />

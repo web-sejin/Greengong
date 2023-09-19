@@ -58,7 +58,6 @@ const Room = (props) => {
 	if(!roomName || roomName==''){
 		roomName = 'test';
 	}
-	console.log('page_code1 : ',page_code);
 	const ref = firestore().collection(roomName);
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -80,8 +79,7 @@ const Room = (props) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);			
-			getMsg();
-			console.log('page_code2 : ',page_code);
+			getMsg();			
 			if(page_code == 'product'){
 				getItemData();
 			}else{
@@ -296,7 +294,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_chat_room_product : ",responseJson);
+				console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -315,9 +313,8 @@ const Room = (props) => {
 				console.log("get_chat_room_match : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
-			}else{
-				//setItemList([]);				
-				//console.log('결과 출력 실패! : ', resultItem.result_text);
+			}else{		
+				console.log('결과 출력 실패! : ', responseJson);
 			}
 		});
 	}

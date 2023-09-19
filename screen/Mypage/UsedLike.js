@@ -30,6 +30,66 @@ const UsedLike = ({navigation, route}) => {
   const [nowPage2, setNowPage2] = useState(1);
   const [totalPage2, setTotalPage2] = useState(1);
 
+	const isFocused = useIsFocused();
+	useEffect(() => {
+		let isSubscribed = true;
+
+		if(!isFocused){
+			if(!pageSt){
+				//setIsLoading(false);
+        //setTabState(1);
+			}
+		}else{
+			setRouteLoad(true);
+			setPageSt(!pageSt);
+      setNowPage(1);
+      setNowPage2(1);
+      getData();
+      //getData2();      
+		}
+
+		return () => isSubscribed = false;
+	}, [isFocused]);
+
+  const getData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_scrap_product', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("list_scrap_product : ",responseJson);
+				setItemList(responseJson.data);
+        setTotalPage(responseJson.total_page);        
+			}else{
+				setItemList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+	const moreData = async () => {    
+    if(totalPage > nowPage){
+      await Api.send('GET', 'list_scrap_product', {is_api: 1, page:nowPage+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          console.log(responseJson.data);				
+          const addItem = itemList.concat(responseJson.data);				
+          setItemList(addItem);			
+          setNowPage(nowPage+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
   const getList = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
@@ -89,6 +149,45 @@ const UsedLike = ({navigation, route}) => {
 		</View>
 	);
 
+  const getData2 = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'list_scrap_seller', {'is_api': 1, page: 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('list_scrap_seller : ',responseJson);
+				setItemList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);
+			}else{
+				setItemList2([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson.result_text);
+        //ToastMessage(responseJson.result_text);
+			}
+		}); 
+    setIsLoading(true);
+  }
+  const moreData2 = async () => {
+    if(totalPage2 > nowPage2){
+      await Api.send('GET', 'list_scrap_seller', {is_api: 1, page:nowPage2+1}, (args)=>{
+        let resultItem = args.resultItem;
+        let responseJson = args.responseJson;
+        let arrItems = args.arrItems;
+        //console.log('args ', args);
+        if(responseJson.result === 'success' && responseJson){
+          console.log(responseJson.data);				
+          const addItem = itemList2.concat(responseJson.data);				
+          setItemList2(addItem);			
+          setNowPage2(nowPage2+1);
+        }else{
+          console.log(responseJson.result_text);
+          //console.log('결과 출력 실패!');
+        }
+      });
+    }
+	}
   const getList2 = ({item, index}) => (
 		<View style={styles.borderBot}>
 			<>
@@ -127,109 +226,21 @@ const UsedLike = ({navigation, route}) => {
 		</View>
 	);
 
-	const isFocused = useIsFocused();
-	useEffect(() => {
-		let isSubscribed = true;
-
-		if(!isFocused){
-			if(!pageSt){
-				//setIsLoading(false);
-        //setTabState(1);
-			}
-		}else{
-			setRouteLoad(true);
-			setPageSt(!pageSt);
-      setNowPage(1);
-      setNowPage2(1);
-      getData();
-      getData2();      
-		}
-
-		return () => isSubscribed = false;
-	}, [isFocused]);
-
-  const getData = async () => {
-    setIsLoading(true);
-    await Api.send('GET', 'list_scrap_product', {'is_api': 1, page: 1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', args);
-			if(responseJson.result === 'success' && responseJson){
-				console.log("list_scrap_product : ",responseJson);
-				setItemList(responseJson.data);
-        setTotalPage(responseJson.total_page);        
-			}else{
-				setItemList([]);
-				setNowPage(1);
-				console.log('결과 출력 실패!', responseJson.result_text);
-        //ToastMessage(responseJson.result_text);
-			}
-		}); 
-    setIsLoading(false);
-  }
-	const moreData = async () => {    
-    if(totalPage > nowPage){
-      await Api.send('GET', 'list_scrap_product', {is_api: 1, page:nowPage+1}, (args)=>{
-        let resultItem = args.resultItem;
-        let responseJson = args.responseJson;
-        let arrItems = args.arrItems;
-        //console.log('args ', args);
-        if(responseJson.result === 'success' && responseJson){
-          console.log(responseJson.data);				
-          const addItem = itemList.concat(responseJson.data);				
-          setItemList(addItem);			
-          setNowPage(nowPage+1);
-        }else{
-          console.log(responseJson.result_text);
-          //console.log('결과 출력 실패!');
-        }
-      });
-    }
-	}
-
-  const getData2 = async () => {
-    setIsLoading(true);
-    await Api.send('GET', 'list_scrap_seller', {'is_api': 1, page: 1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', args);
-			if(responseJson.result === 'success' && responseJson){
-				console.log('list_scrap_seller : ',responseJson);
-				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);
-			}else{
-				setItemList2([]);
-				setNowPage2(1);
-				console.log('결과 출력 실패!', responseJson.result_text);
-        //ToastMessage(responseJson.result_text);
-			}
-		}); 
-    setIsLoading(false);
-  }
-  const moreData2 = async () => {
-    if(totalPage2 > nowPage2){
-      await Api.send('GET', 'list_scrap_seller', {is_api: 1, page:nowPage2+1}, (args)=>{
-        let resultItem = args.resultItem;
-        let responseJson = args.responseJson;
-        let arrItems = args.arrItems;
-        //console.log('args ', args);
-        if(responseJson.result === 'success' && responseJson){
-          console.log(responseJson.data);				
-          const addItem = itemList2.concat(responseJson.data);				
-          setItemList2(addItem);			
-          setNowPage2(nowPage+1);
-        }else{
-          console.log(responseJson.result_text);
-          //console.log('결과 출력 실패!');
-        }
-      });
-    }
-	}
-
   function fnTab(v){
     setTabState(v);
+    setNowPage(1);
+    setNowPage2(1);
+    if(v == 1){
+      getData();
+      setTimeout(function(){
+        setItemList2([]);
+      },200);
+    }else if(v == 2){
+      getData2();
+      setTimeout(function(){
+        setItemList([]);
+      },200);
+    }
   }
 
 	return (
@@ -265,40 +276,47 @@ const UsedLike = ({navigation, route}) => {
           )}
         </TouchableOpacity>
       </View>
-      {!isLoading ? (
-        tabState == 1 ? (
-          <FlatList
-            data={itemList}
-            renderItem={(getList)}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReachedThreshold={0.6}
-					  onEndReached={moreData}
-            ListEmptyComponent={
+
+      {tabState == 1 ? (
+        <FlatList
+          data={itemList}
+          renderItem={(getList)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
+          ListEmptyComponent={
+            isLoading ? (
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
                 <Text style={styles.notDataText}>등록된 관심 중고상품이 없습니다.</Text>
               </View>
-            }
-          />
-        ) : (
-          <FlatList
-            data={itemList2}
-            renderItem={(getList2)}
-            keyExtractor={(item, index) => index.toString()}
-            onEndReachedThreshold={0.6}
-					  onEndReached={moreData2}
-            ListEmptyComponent={
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
+        />
+      ) : (
+        <FlatList
+          data={itemList2}
+          renderItem={(getList2)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData2}
+          ListEmptyComponent={
+            isLoading ? (
               <View style={styles.notData}>
                 <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
                 <Text style={styles.notDataText}>등록된 관심 판매자가 없습니다.</Text>
               </View>
-            }
-          />
-        )
-      ) : (
-        <View style={[styles.indicator]}>
-          <ActivityIndicator size="large" />
-        </View>
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
+        />
       )}
 		</SafeAreaView>
 	)
@@ -313,7 +331,7 @@ const styles = StyleSheet.create({
   tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
   tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
-  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
   listLi: {display:'flex',flexDirection:'row',padding:20,},
   listLi2: {alignItems:'stretch',paddingVertical:0,},

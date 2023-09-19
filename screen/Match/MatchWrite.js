@@ -383,7 +383,6 @@ const MatchWrite = ({navigation, route}) => {
 		setFloorFile('');
 		setFloorFileType('');
 		setFloorFileUri('');
-		console.log('?');
 	}
 
 	function writeUpdate(){
