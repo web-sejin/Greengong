@@ -18,7 +18,8 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const UsedLike = ({navigation, route}) => {
+const UsedLike = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;  
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +101,9 @@ const UsedLike = ({navigation, route}) => {
           style={styles.otherPeople2}
           activeOpacity={opacityVal}
           onPress={()=>{
-            navigation.navigate('Other', {idx:item.mb_idx});
+            if(item.mb_idx != userInfo?.mb_idx){
+              navigation.navigate('Other', {idx:item.mb_idx})
+            }
           }}
         >
           {item.image ? (
@@ -196,7 +199,9 @@ const UsedLike = ({navigation, route}) => {
           style={styles.otherPeople}
           activeOpacity={opacityVal}
           onPress={()=>{
-            navigation.navigate('Other', {idx:item.mb_idx});
+            if(item.mb_idx != userInfo?.mb_idx){
+              navigation.navigate('Other', {idx:item.mb_idx})
+            }
           }}
         >
           {item.mb_img1 != '' ? (

@@ -22,8 +22,7 @@ const opacityVal = 0.8;
 
 const MatchView = (props) => {
   const scrollRef = useRef();
-
-  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;  
   const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -480,7 +479,9 @@ const MatchView = (props) => {
                   style={styles.otherProfile}
                   activeOpacity={opacityVal}
                   onPress={()=>{
-                    navigation.navigate('Other', {idx:itemInfo.mc_mb_idx});
+                    if(itemInfo.mc_mb_idx != userInfo?.mb_idx){
+                      navigation.navigate('Other', {idx:itemInfo.mc_mb_idx});
+                    }
                   }}
                 >
                   {itemInfo.mb_img ? (
@@ -1125,4 +1126,15 @@ const styles = StyleSheet.create({
   mgTop20: {marginTop:20},
 })
 
-export default MatchView
+//export default MatchView
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(MatchView);

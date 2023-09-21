@@ -9,13 +9,16 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-community/async-storage';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MatchComparisonView = ({navigation, route}) => {
+const MatchComparisonView = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;  
   const idx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -110,7 +113,11 @@ const MatchComparisonView = ({navigation, route}) => {
             <TouchableOpacity 
               style={styles.compThumb}
               activeOpacity={opacityVal}
-              onPress={()=>{navigation.navigate('Other', {idx:item.mb_idx})}}
+              onPress={()=>{
+                if(item.mb_idx != userInfo?.mb_idx){
+                  navigation.navigate('Other', {idx:item.mb_idx});
+                }
+             }}
             >
               {item.mb_img ? (
                 <AutoHeightImage width={79} source={{uri: item.mb_img}} />
@@ -686,4 +693,15 @@ const styles = StyleSheet.create({
   matchPriceText2: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:20,color:'#31B481'},
 })
 
-export default MatchComparisonView
+//export default MatchComparisonView
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(MatchComparisonView);

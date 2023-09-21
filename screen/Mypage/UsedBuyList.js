@@ -9,12 +9,16 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const UsedBuyList = ({navigation, route}) => {
+const UsedBuyList = (props) => {
+  const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
   const {params} = route;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);  
@@ -108,8 +112,8 @@ const UsedBuyList = ({navigation, route}) => {
           {item.pd_image ? (
           <TouchableOpacity 
             style={styles.compThumb}
-            activeOpacity={opacityVal}
-            onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
+            activeOpacity={1}
+            //onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
           >
             <AutoHeightImage width={63} source={{uri: item.pd_image}} />
           </TouchableOpacity>
@@ -344,4 +348,15 @@ const styles = StyleSheet.create({
   indicator2: {marginTop:62},
 })
 
-export default UsedBuyList
+//export default UsedBuyList
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(UsedBuyList);

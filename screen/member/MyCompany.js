@@ -37,7 +37,7 @@ const MyCompany = (props) => {
 	const [mbName, setMbName] = useState('');
 	const [mbCompanyAddr, setMbCompanyAddr] = useState('');	
   const [picture, setPickture] = useState('');	
-  const [state, setState] = useState(true);
+  const [state, setState] = useState(0);
   const [factName1, setFactName1] = useState('');
 	const [factCode1, setFactCode1] = useState('');
 	const [factAddr1, setFactAddr1] = useState('');
@@ -87,7 +87,10 @@ const MyCompany = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("insert_fac : ",responseJson);
+				//console.log("insert_fac : ",responseJson);
+				if(responseJson.cert.bc_no){
+					setState(1);
+				}
 				setMbCompanyNumber(responseJson.cert.bc_no);
 				setMbCompanyName(responseJson.cert.bc_com_name);
 				setMbName(responseJson.cert.bc_name);
@@ -175,6 +178,34 @@ const MyCompany = (props) => {
     );
 	}
 
+	function findMyAddr(lat, lng, v){		
+		Api.send('GET', '	gps_to_addr', {lat:lat, lng:lng, is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let arrItems = args.arrItems;
+			let responseJson = args.responseJson;
+			console.log(args);
+			if(resultItem.result === 'Y' && responseJson){
+					//console.log('출력확인..', responseJson);
+					if(v == "1"){
+						setPostcodeOn(false);
+						setFactCode1((responseJson.si_idx).toString());
+						setFactAddr1(responseJson.sido+" "+responseJson.sigungu+" "+responseJson.dong);
+						setFactAddrDt1('');
+					}else{
+						setPostcodeOn2(false);
+						setFactCode2((responseJson.si_idx).toString());
+						setFactAddr2(responseJson.sido+" "+responseJson.sigungu+" "+responseJson.dong);
+						setFactAddrDt2('');
+					}
+
+			}else if(responseJson.result === 'error'){
+					ToastMessage(responseJson.result_text);
+			}else{
+					console.log('결과 출력 실패!', resultItem);
+					//ToastMessage(resultItem.message);
+			}
+		});
+	}
 
 	function chkFactoryInfo(v){
 		if(v == "1"){
@@ -263,7 +294,97 @@ const MyCompany = (props) => {
 	}
 
 	function submitRegist(){
+		if(!my1){
+			setToastText('내 공장1을 등록해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
+			return false;
+		}
 
+		if(state){
+			if(mbcompanyNumber == ''){
+				setToastText('사업자 번호를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbcompanyName == ''){
+				setToastText('상호(법인명)를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbName == ''){
+				setToastText('성명을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbCompanyAddr == ''){
+				setToastText('사업장 소재지를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(picture == undefined || picture == ''){
+				setToastText('사업자등록증 사진을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+		}
+
+		Keyboard.dismiss();
+
+		let fac_use = 0;
+		let fac_use2 = 0;
+		if(factActive == "1"){
+			fac_use = 1;
+			fac_use2 = 0;
+		}else if(factActive == "2"){
+			fac_use = 0;
+			fac_use2 = 1;
+		}
+
+		let formData = {
+			is_api:1,
+			os:Platform.OS,
+			fac1_name:factName1, 
+			fac1_zip:factCode1, 
+			fac1_addr1:factAddr1, 
+			fac1_addr2:factAddrDt1, 
+			fac2_name:factName2, 
+			fac2_zip:factCode2, 
+			fac2_addr1:factAddr2, 
+			fac2_addr2:factAddrDt2, 
+			fac1_use:fac_use, 
+			fac2_use:fac_use2, 
+			is_cert:state
+		};
+		
+		if(state){
+			formData.bc_no= mbcompanyNumber;
+			formData.bc_com_name= mbcompanyName;
+			formData.bc_name= mbName;
+			formData.bc_local= mbCompanyAddr;
+			formData.bc_img= { 'uri': picture, 'type': 'image/png', 'name': 'bc.png'}
+		}
+
+		// Api.send('POST', 'modify_fac', formData2, (args)=>{
+		// 	let resultItem = args.resultItem;
+		// 	let responseJson = args.responseJson;
+
+		// 	if(responseJson.result === 'success'){
+		// 		console.log('성공 : ',responseJson);				
+		// 	}else{
+		// 		console.log('결과 출력 실패!', resultItem);
+		// 		ToastMessage(responseJson.result_text);
+		// 	}
+		// });
 	}	
 
 	return (

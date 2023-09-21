@@ -434,7 +434,9 @@ const UsedView = (props) => {
                 style={styles.otherProfile}
                 activeOpacity={opacityVal}
                 onPress={()=>{
-                  navigation.navigate('Other', {idx:itemInfo.pd_mb_idx});
+                  if(itemInfo.pd_mb_idx != userInfo?.mb_idx){
+                    navigation.navigate('Other', {idx:itemInfo.pd_mb_idx});
+                  }
                 }}
               >
                 {itemInfo.mb_img ? (

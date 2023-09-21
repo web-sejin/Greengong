@@ -332,19 +332,8 @@ const styles = StyleSheet.create({
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
   btnText2: {color:'#353636'},
 
-  // modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
-	// modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	
-  // modalCont2: {top:((widnowHeight/2)-166)},
-  // avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
-	// avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
-  // avatarDesc: {marginTop:20,},
-  // avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
-	// avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
-	// avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
-	// avatarBtn2: {backgroundColor:'#31B481'},
-	// avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
-  // starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
-  // star: {marginHorizontal:4,},
+  notData: {height:widnowHeight-220,display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
 export default MatchOrder

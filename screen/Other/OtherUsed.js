@@ -4,10 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
+import { getProfileData } from 'react-native-calendars/src/Profiler';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -15,6 +16,7 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const OtherUsed = ({navigation, route}) => {
+  const otherIdx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -23,6 +25,16 @@ const OtherUsed = ({navigation, route}) => {
   const [radio, setRadio] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 	const [tabState, setTabState] = useState(0);
+  const [profileImg, setProfileImg] = useState('');
+  const [nick, setNick] = useState('');
+  const [factName, setFactName] = useState('');
+  const [score, setScore] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [total1, setTotal1] = useState(0);
+  const [total2, setTotal2] = useState(0);
+  const [total3, setTotal3] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -37,123 +49,150 @@ const OtherUsed = ({navigation, route}) => {
         setTabState(0);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
-			setPageSt(!pageSt);
+			setPageSt(!pageSt);      
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-      state: 1,
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고자재',
-			naviPage: 'UsedWrite2',
-			stateVal: '나눔',
-      state: 1,
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고기계/장비',
-			naviPage: 'UsedWrite3',
-			stateVal: '입찰',
-      state: 2,
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '폐기물',
-			naviPage: 'UsedWrite4',
-			stateVal: '',
-      state: 1,
-		},
-	];  
+  useEffect(()=>{
+    getOtherData();
+    getData();
+  },[]);
 
+  const getOtherData = async () => {    
+    await Api.send('GET', 'other_member', {is_api: 1, mb_idx:otherIdx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("other_member : ",responseJson);	
+        setProfileImg(responseJson.mb_img);
+        setNick(responseJson.mb_nick);
+        setFactName(responseJson.fc_name);
+        setScore(responseJson.mb_score);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!',responseJson);
+			}
+		});
+  }
+
+  const getData = async (v) => {
+    let number = v;
+    if(!number || number == ''){
+      number = 0;
+    }
+
+    let apiName = '';
+    if(number == 0){ apiName = 'other_list_product'; }
+    if(number == 1){ apiName = 'other_sale_list_product'; }
+    if(number == 2){ apiName = 'other_end_list_product'; }
+
+    setIsLoading(false);
+    await Api.send('GET', apiName, {is_api: 1, other_mb_idx:otherIdx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			if(responseJson.result === 'success' && responseJson){
+				console.log('중고상품 리스트 ::: ',responseJson);	
+        
+        if(number == 0){
+          setTotal1(responseJson.total_count);
+          setTotal2(responseJson.pd_sale_total);
+          setTotal3(responseJson.pd_end_total);
+        }else if(number == 1){
+          setTotal1(responseJson.pd_total);
+          setTotal2(responseJson.total_count);
+          setTotal3(responseJson.pd_end_total);
+        }else if(number == 2){
+          setTotal1(responseJson.pd_total);
+          setTotal2(responseJson.pd_sale_total);
+          setTotal3(responseJson.total_count);
+        }
+
+        setItemList(responseJson.data);
+        setNowPage(1);
+        setTotalPage(responseJson.total_page);
+			}else{
+				setItemList([]);			
+				setNowPage(1);		
+				console.log('결과 출력 실패!',responseJson);
+			}
+		});
+    setIsLoading(true);
+  }
+  const moreData = async () => {
+		//console.log("nowPage : ",nowPage);
+
+    let apiName = '';
+    if(tabState == 0){ apiName = 'other_list_product'; }
+    if(tabState == 1){ apiName = 'other_sale_list_product'; }
+    if(tabState == 2){ apiName = 'other_end_list_product'; }
+
+		if(totalPage > nowPage){
+			await Api.send('GET', apiName, {is_api: 1, other_mb_idx:otherIdx, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = itemList.concat(responseJson.data);				
+					setItemList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
   const getList = ({item, index}) => (    
 		<TouchableOpacity 
       style={[styles.listLi]}
       activeOpacity={opacityVal}
       onPress={() => {
-        navigation.navigate('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
+        navigation.navigate('UsedView', {idx:item.pd_idx})
       }}
     >
       <>
       <View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
-        <AutoHeightImage width={131} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+        {item.pd_image ? (
+        <View style={styles.pdImage}>
+          <AutoHeightImage width={131} source={{uri: item.pd_image}}  style={styles.listImg} />
+        </View>
+        ) : null}
         <View style={styles.listInfoBox}>
           <View style={styles.listInfoTitle}>
-            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-              {item.title}
-            </Text>
+            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.pd_name}</Text>
           </View>
           <View style={styles.listInfoDesc}>
-            <Text style={styles.listInfoDescText}>{item.desc}</Text>
+            <Text style={styles.listInfoDescText}>{item.pd_loc} · {item.pd_date}</Text>
           </View>
           <View style={styles.listInfoCate}>
-            <Text style={styles.listInfoCateText}>{item.cate}</Text>
+            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.pd_summary}</Text>
           </View>
           <View style={styles.listInfoCnt}>
             <View style={styles.listInfoCntBox}>
               <AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-              <Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+              <Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
             </View>
             <View style={styles.listInfoCntBox}>
               <AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-              <Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+              <Text style={styles.listInfoCntBoxText}>{item.pd_chat_cnt}</Text>
             </View>
             <View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
               <AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-              <Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+              <Text style={styles.listInfoCntBoxText}>{item.pd_like_cnt}</Text>
             </View>
           </View>
           <View style={styles.listInfoPriceBox}>
-            {index == 0 ? (
+            {item.is_free != 1 && item.pd_status_org == 1 ? (
             <View style={[styles.listInfoPriceArea]}>
-              <View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
-                <Text style={styles.listInfoPriceStateText}>예약중</Text>
-              </View>
               <View style={styles.listInfoPrice}>
-                <Text style={styles.listInfoPriceText}>200,000,000원</Text>
+                <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
               </View>
             </View>
             )
@@ -161,7 +200,7 @@ const OtherUsed = ({navigation, route}) => {
             null
             }
 
-            {index == 1 ? (
+            {item.is_free == 1 && item.pd_status_org == 1 ? (
             <View style={[styles.listInfoPriceArea]}>
               <View style={[styles.listInfoPriceState, styles.listInfoPriceState2]}>
                 <Text style={styles.listInfoPriceStateText}>나눔</Text>
@@ -172,30 +211,37 @@ const OtherUsed = ({navigation, route}) => {
             null
             }
 
-            {index == 2 ? (
+            {item.pd_status_org == 2 ? (
             <View style={[styles.listInfoPriceArea]}>
-              <View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
-                <Text style={styles.listInfoPriceStateText}>판매완료</Text>
+              <View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
+                <Text style={styles.listInfoPriceStateText}>예약중</Text>
               </View>
+              {item.is_free != 1 ? (
               <View style={styles.listInfoPrice}>
-                <Text style={styles.listInfoPriceText}>200,000,000원</Text>
+                <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
               </View>
+              ) : null }
             </View>
             )
             :
             null
             }
 
-            {index >= 3 ? (
+            {item.pd_status_org == 3 ? (
             <View style={[styles.listInfoPriceArea]}>
-              <View style={styles.listInfoPrice}>
-                <Text style={styles.listInfoPriceText}>200,000,000원</Text>
+              <View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
+                <Text style={styles.listInfoPriceStateText}>판매완료</Text>
               </View>
+              {item.is_free != 1 ? (
+              <View style={styles.listInfoPrice}>
+                <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+              </View>
+              ) : null }
             </View>
             )
             :
             null
-            }
+            }					
           </View>
         </View>
       </View>
@@ -207,22 +253,9 @@ const OtherUsed = ({navigation, route}) => {
     setVisible(true);
   }
 
-  function _submit(){
-    console.log("search!");
-  }
-
-	useEffect(() => {
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
-  }, []);
-
   function fnTab(v){
-    setIsLoading(false);
     setTabState(v);
-    setTimeout(function(){
-      setIsLoading(true);
-    }, 1000);
+    getData(v);
   }
 
 	return (
@@ -232,90 +265,100 @@ const OtherUsed = ({navigation, route}) => {
         headertitle={'다른 회원 상품'} 
         ModalEvent={ModalOn}
       />
-			<ScrollView>
-        <View style={[styles.otherBox, styles.borderBot]}>
-          <View style={styles.otherWrap}>
-            <View style={styles.otherBoxLeft}>
-              <View style={styles.otherProfile}>
-                <AutoHeightImage width={69} source={require("../../assets/img/sample1.jpg")} />  
+      
+      <FlatList
+        data={itemList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}                        
+        onEndReachedThreshold={0.6}
+        onEndReached={moreData}
+        ListHeaderComponent={
+          <>
+            <View style={[styles.otherBox, styles.borderBot]}>
+              <View style={styles.otherWrap}>
+                <View style={styles.otherBoxLeft}>
+                  <View style={styles.otherProfile}>
+                  {profileImg ? (
+                      <AutoHeightImage width={69} source={{uri: profileImg}} />  
+                    ):(
+                      <AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />  
+                    )}
+                  </View>
+                  <View style={styles.otherBoxInfo}>
+                    <Text style={styles.otherBoxInfoText}>{nick}</Text>
+                    <Text style={styles.otherBoxInfoText2}>{factName}</Text>
+                  </View>
+                </View>
+                {/* <View style={styles.otherBoxRight}>
+                  <Text style={styles.otherBoxRightText}>최근 3일 이내 활동</Text>
+                  <Text style={styles.otherBoxRightText2}>2023.07.04 가입 완료</Text>
+                </View> */}
               </View>
-              <View style={styles.otherBoxInfo}>
-                <Text style={styles.otherBoxInfoText}>참좋은공장</Text>
-                <Text style={styles.otherBoxInfoText2}>넥센공장</Text>
+              <View style={styles.myDealResultBox}>
+                <Text style={styles.myDealResultBoxText}>거래평가점수</Text>
+                <Text style={styles.myDealResultBoxText2}>{score}점</Text>
               </View>
             </View>
-            {/* <View style={styles.otherBoxRight}>
-              <Text style={styles.otherBoxRightText}>최근 3일 이내 활동</Text>
-              <Text style={styles.otherBoxRightText2}>2023.07.04 가입 완료</Text>
-            </View> */}
+            <View style={[styles.borderTop]}></View>
+            <View style={styles.tabBox}>
+              <TouchableOpacity
+                style={styles.tabBtn}
+                activeOpacity={opacityVal}
+                onPress={()=>{fnTab(0)}}
+              > 
+                {tabState == 0 ? (
+                  <>
+                  <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>전체 ({total1})</Text>
+                  <View style={styles.tabLine}></View>
+                  </>
+                ) : (
+                  <Text style={styles.tabBtnText}>전체 ({total1})</Text>  
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.tabBtn}
+                activeOpacity={opacityVal}
+                onPress={()=>{fnTab(1)}}
+              >
+                {tabState == 1 ? (
+                  <>
+                  <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 ({total2})</Text>
+                  <View style={styles.tabLine}></View>
+                  </>
+                ) : (
+                  <Text style={styles.tabBtnText}>판매중 ({total2})</Text>  
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.tabBtn}
+                activeOpacity={opacityVal}
+                onPress={()=>{fnTab(2)}}
+              >
+                {tabState == 2 ? (
+                  <>
+                  <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매완료 ({total3})</Text>
+                  <View style={styles.tabLine}></View>
+                  </>
+                ) : (
+                  <Text style={styles.tabBtnText}>판매완료 ({total3})</Text>  
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+        ListEmptyComponent={
+          isLoading ? (
+          <View style={styles.notData}>
+            <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+            <Text style={styles.notDataText}>등록된 상품이 없습니다.</Text>
           </View>
-          <View style={styles.myDealResultBox}>
-            <Text style={styles.myDealResultBoxText}>거래평가점수</Text>
-            <Text style={styles.myDealResultBoxText2}>4점</Text>
-          </View>
-        </View>
-        
-        <View style={[styles.borderTop, styles.borderBot]}>
-          <View style={styles.tabBox}>
-            <TouchableOpacity
-              style={styles.tabBtn}
-              activeOpacity={opacityVal}
-              onPress={()=>{fnTab(0)}}
-            > 
-              {tabState == 0 ? (
-                <>
-                <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>전체 (5)</Text>
-                <View style={styles.tabLine}></View>
-                </>
-              ) : (
-                <Text style={styles.tabBtnText}>전체 (5)</Text>  
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.tabBtn}
-              activeOpacity={opacityVal}
-              onPress={()=>{fnTab(1)}}
-            >
-              {tabState == 1 ? (
-                <>
-                <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매중 (5)</Text>
-                <View style={styles.tabLine}></View>
-                </>
-              ) : (
-                <Text style={styles.tabBtnText}>판매중 (5)</Text>  
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.tabBtn}
-              activeOpacity={opacityVal}
-              onPress={()=>{fnTab(2)}}
-            >
-              {tabState == 2 ? (
-                <>
-                <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>판매완료 (5)</Text>
-                <View style={styles.tabLine}></View>
-                </>
-              ) : (
-                <Text style={styles.tabBtnText}>판매완료 (5)</Text>  
-              )}
-            </TouchableOpacity>
-          </View>  
-
-          <FlatList
-            data={DATA}
-            renderItem={(getList)}
-            keyExtractor={item => item.id}
-            //onScroll={onScroll}
-            //ListHeaderComponent={}
-            ListEmptyComponent={
-              <View style={styles.notData}>
-                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-                <Text style={styles.notDataText}>등록된 상품이 없습니다.</Text>
-              </View>
-            }
-          />
-        </View>
-      </ScrollView>
+          ):(
+            <View style={[styles.indicator]}>
+              <ActivityIndicator size="large" />
+            </View>
+          )
+        }
+      />        
 
       <Modal
 				visible={visible}
@@ -499,7 +542,7 @@ const styles = StyleSheet.create({
 	borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
   borderTop2: {borderTopWidth:1,borderTopColor:'#E3E3E4'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
-	indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+	indicator: {height:widnowHeight-320, display:'flex', alignItems:'center', justifyContent:'center'},
   indicator2: {marginTop:62},
   otherBox: {padding:20,},
   otherWrap: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',},
@@ -524,6 +567,7 @@ const styles = StyleSheet.create({
   listLi: {paddingHorizontal:20,},
 	listLiBorder: {flexDirection:'row',paddingVertical:20,borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	listLiBorderNot: {borderTopWidth:0,},
+  pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoBox2: {width:(innerWidth - 99)},
@@ -547,7 +591,7 @@ const styles = StyleSheet.create({
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
 
-  notData: {paddingVertical:60,display:'flex',alignItems:'center',justifyContent:'center',},
+  notData: {height:widnowHeight-350,display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 
   modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},

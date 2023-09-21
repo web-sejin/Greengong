@@ -187,10 +187,8 @@ const UsedBidList = ({navigation, route}) => {
           </View>
           <TouchableOpacity 
             style={styles.compThumb}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              navigation.navigate('Other', {idx:item.bd_mb_idx});
-            }}
+            activeOpacity={1}
+            //onPress={()=>{navigation.navigate('Other', {idx:item.bd_mb_idx})}}
           >
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />
@@ -320,10 +318,8 @@ const UsedBidList = ({navigation, route}) => {
           </View>
           <TouchableOpacity 
             style={styles.compThumb}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              navigation.navigate('Other', {idx:item.bd_mb_idx});
-            }}
+            activeOpacity={1}
+            //onPress={()=>{navigation.navigate('Other', {idx:item.bd_mb_idx})}}
           >
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />

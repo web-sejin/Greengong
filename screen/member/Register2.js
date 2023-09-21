@@ -580,7 +580,7 @@ const Register2 = ({navigation, route}) => {
 		if(factActive == "1"){
 			fac_use = 1;
 			fac_use2 = 0;
-		}else{
+		}else if(factActive == "2"){
 			fac_use = 0;
 			fac_use2 = 1;
 		}
