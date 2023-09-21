@@ -19,11 +19,11 @@ const MatchOrder = ({navigation, route}) => {
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [buyList, setBuyList] = useState([]);
+  const [odList, setOdList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [initLoading, setInitLoading] = useState(false);
-  const [mdIdx, setMcIdx] = useState();
+  const [mcIdx, setMcIdx] = useState();
   const [score, setScore] = useState(3);
 
 	const isFocused = useIsFocused();
@@ -56,10 +56,10 @@ const MatchOrder = ({navigation, route}) => {
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
 				console.log('order_list_match2 : ',responseJson);
-				setBuyList(responseJson.data);
+				setOdList(responseJson.data);
         setTotalPage(responseJson.total_page);  
 			}else{
-				setBuyList([]);
+				setOdList([]);
 				setNowPage(1);
 				console.log('결과 출력 실패!', responseJson);
 			}
@@ -76,8 +76,8 @@ const MatchOrder = ({navigation, route}) => {
 				//console.log('args ', args);
 				if(responseJson.result === 'success' && responseJson){
 					//console.log(responseJson.data);				
-					const addItem = buyList.concat(responseJson.data);				
-					setBuyList(addItem);			
+					const addItem = odList.concat(responseJson.data);				
+					setOdList(addItem);			
 					setNowPage(nowPage+1);
 				}else{
 					console.log(responseJson);
@@ -87,131 +87,103 @@ const MatchOrder = ({navigation, route}) => {
 		}
 	}
   const getList = ({item, index}) => (     
-    <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
+    <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
-          <View style={styles.compInfo}>
-            <View style={styles.compInfoDate}>
-              <Text style={styles.compInfoDateText}>{item.mb_nick}</Text>
-            </View>
+          <View style={styles.compInfo}>                  
             <View style={styles.compInfoName}>
-              <Text style={styles.compInfoNameText}>[{item.c1_name}] {item.pd_name}</Text>
+              <Text style={styles.compInfoNameText}>{item.mc_name}</Text>
+            </View>
+            <View style={styles.compInfoDate}>
+              <Text style={styles.compInfoDateText}>{item.mc_loc} · {item.mc_regdate}</Text>
             </View>
             <View style={styles.compInfoLoc}>
-              <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-              <Text style={styles.compInfoLocText}>중3동</Text>
+              <Text style={styles.compInfoLocText}>{item.mc_summary}</Text>
             </View>
           </View>
-          {item.pd_image ? (
-          <TouchableOpacity 
-            style={styles.compThumb}
-            activeOpacity={opacityVal}
-            onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
-          >
-            <AutoHeightImage width={63} source={{uri: item.pd_image}} />
-          </TouchableOpacity>
-          ) : null}          
+          <View style={styles.compThumb}>
+            <AutoHeightImage width={70} source={require("../../assets/img/sample1.jpg")} />
+          </View>
         </View>
+        {item.is_estimate == 1 ? (
         <View style={styles.matchPrice}>
-          <Text style={styles.matchPriceText}>판매가</Text>
-          <Text style={styles.matchPriceText2}>{String(item.pd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
+          <Text style={styles.matchPriceText}>발주금액</Text>
+          <Text style={styles.matchPriceText2}>{item.me_total_price}원</Text>
         </View>
-        <View style={styles.matchPrice}>
-          <Text style={styles.matchPriceText}>입찰가</Text>
-          <Text style={styles.matchPriceText2}>{String(item.bd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
-        </View>
+        ) : null}
       </View>
       <View style={styles.btnBox}>
-        <TouchableOpacity
-          style={[styles.btn, styles.btn2, styles.btn3]}
-          activeOpacity={opacityVal}
-          onPress={()=>{
-            setPdIdx(item.pd_mb_idx);
-            setVisible(true);
-          }}
-        >
-          <Text style={styles.btnText}>거래평가 작성</Text>
-        </TouchableOpacity>
+        {item.so_score > 0 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
+            activeOpacity={1}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>거래평가를 완료했습니다.</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setMcIdx(item.pd_idx);
+              setVisible(true);
+            }}
+          >
+            <Text style={styles.btnText}>거래평가 작성</Text>
+          </TouchableOpacity>
+        )}
       </View>  
     </View>
 	);
 
+  const submitEndMatch = async () => {
+    const formData = {
+			is_api:1,
+      page_code:'match',
+      article_idx: mcIdx,
+      so_score: score,
+		}; 
+
+    Api.send('POST', 'save_score', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible(false);
+        setNowPage(1);
+			  getData();
+        setMcIdx();
+        setScore(3);
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'발주내역'} />
-			<ScrollView>
-        <View>
-          <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
-            <View style={[styles.compBtn]}>
-              <View style={[styles.compWrap, styles.compWrapFst]}>
-                <View style={styles.compInfo}>                  
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>견적 요청 드립니다.</Text>
-                  </View>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>김포시 고촌읍 · 3일전</Text>
-                  </View>
-                  <View style={styles.compInfoLoc}>
-                    <Text style={styles.compInfoLocText}>NC가공-밀링-플라스틱-도면무</Text>
-                  </View>
-                </View>
-                <View style={styles.compThumb}>
-                  <AutoHeightImage width={70} source={require("../../assets/img/sample1.jpg")} />
-                </View>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>발주금액</Text>
-                <Text style={styles.matchPriceText2}>10,000원</Text>
-              </View>
+      <FlatList
+        data={odList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+        onEndReached={moreData}
+        ListEmptyComponent={
+          isLoading ? (
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>발주내역이 없습니다.</Text>
             </View>
-            <View style={styles.btnBox}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn2, styles.btn3]}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  setVisible(true);
-                }}
-              >
-                <Text style={styles.btnText}>거래평가 작성</Text>
-              </TouchableOpacity>
-            </View>  
-          </View>
-          <View style={[styles.matchCompleteMb, styles.borderTop]}>
-            <View style={[styles.compBtn]}>
-              <View style={styles.compWrap}>
-                <View style={styles.compInfo}>                  
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>견적 요청 드립니다.</Text>
-                  </View>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>김포시 고촌읍 · 3일전</Text>
-                  </View>
-                  <View style={styles.compInfoLoc}>
-                    <Text style={styles.compInfoLocText}>NC가공-밀링-플라스틱-도면무</Text>
-                  </View>
-                </View>
-                <TouchableOpacity 
-                  style={styles.compThumb}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{
-                    navigation.navigate('Other', {});
-                  }}
-                >
-                  <AutoHeightImage width={70} source={require("../../assets/img/sample1.jpg")} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>발주금액</Text>
-                <Text style={styles.matchPriceText2}>100,000원</Text>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>거래평가점수</Text>
-                <Text style={styles.matchPriceText2}>2점</Text>
-              </View>
+          ):(
+            <View style={[styles.indicator]}>
+              <ActivityIndicator size="large" />
             </View>
-          </View>
-        </View>
-      </ScrollView>
+          )
+        }
+      />
 
       <Modal
         visible={visible}
@@ -295,14 +267,8 @@ const MatchOrder = ({navigation, route}) => {
           </View>
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
-              style={styles.avatarBtn}
-              onPress={() => {fnSubmit()}}
-            >
-              <Text style={styles.avatarBtnText}>평가 하지 않고 완료</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {fnSubmit()}}
+              onPress={() => {submitEndMatch()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>
@@ -350,7 +316,7 @@ const styles = StyleSheet.create({
   avatarDesc: {marginTop:20,},
   avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
 	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
-	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	avatarBtn: {width:innerWidth-40,height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	avatarBtn2: {backgroundColor:'#31B481'},
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
   starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
@@ -362,7 +328,9 @@ const styles = StyleSheet.create({
   btn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#353636',borderRadius:12,display:'flex',alignItems:"center",justifyContent:'center'},
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},
+  btn4: {backgroundColor:'#fff',borderWidth:1,borderColor:'#000'},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
+  btnText2: {color:'#353636'},
 
   // modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	// modalCont: {width:innerWidth,padding:20,paddingBottom:30,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-140)},	

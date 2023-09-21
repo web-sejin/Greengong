@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
 	filterLabelText: {fontSize:13,lineHeight:17,color:'#fff'},
 	listLi: {display:'flex',flexDirection:'row',padding:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
-	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden'},
+	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},
 	listImg: {borderRadius:12,},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoBox2: {width:innerWidth,paddingLeft:0,},

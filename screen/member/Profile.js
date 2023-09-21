@@ -46,17 +46,17 @@ const Profile = (props) => {
 			let responseJson = args.responseJson;
 			//console.log(args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('get_member_info', responseJson);
+				//console.log('get_member_info', responseJson);
         setPickture(responseJson.mb_img1);
 			}else{
         console.log('에러 : ', responseJson.result_text);
-				ToastMessage(responseJson.result_text);
+				//ToastMessage(responseJson.result_text);
 			}
 		});
   }
 
   const onAvatarChange = (image: ImageOrVideo) => {
-    console.log(image);
+    //console.log(image);
 		setVisible(false);
 		setPickture(image.path);
     // upload image to server here 

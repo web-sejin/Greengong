@@ -11,13 +11,17 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import {Avatar} from '../../components/Avatar';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MyCompany = ({navigation, route}) => {
+const MyCompany = (props) => {
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	//console.log("userInfo : ",userInfo);
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -43,12 +47,15 @@ const MyCompany = ({navigation, route}) => {
 	const [factAddr2, setFactAddr2] = useState('');
 	const [factAddrDt2, setFactAddrDt2] = useState('');
 	const [location, setLocation] = useState('');
+	const [location2, setLocation2] = useState('');
 	const [postcodeOn, setPostcodeOn] = useState(false);
 	const [postcodeOn2, setPostcodeOn2] = useState(false);
 	const [factActive, setFactActive] = useState();
 	const [my1, setMy1] = useState(false);
 	const [my2, setMy2] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [bcState, setBcState] = useState();
+	const [bcStateComment, setBcStateComment] = useState('');
 
   const isFocused = useIsFocused();
 	useEffect(() => {
@@ -61,51 +68,65 @@ const MyCompany = ({navigation, route}) => {
 				setModal4(false);
 				setModal5(false);
 				setModal6(false);
-				// setModal7(false);	
-        // setMbCompanyNumber('');
-				// setMbCompanyName('');
-				// setMbName('');
-				// setMbCompanyAddr('');
-        // setPickture('');
-				// setState(false);				
-				// setLocation('');
-				// setPostcodeOn(false);
-				// setFactName1('');
-				// setFactCode1('');
-				// setFactAddr1('');
-				// setFactAddrDt1('');
-				// setFactName2('');
-				// setFactCode2('');
-				// setFactAddr2('');
-				// setFactAddrDt2('');
-				// setFactActive();
-				setIsLoading(false);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			//getData();
-			getData2();
+			getData();
+			//getData2();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
 	const getData = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     await Api.send('GET', 'insert_fac', {is_api: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("insert_fac : ",responseJson);				
-        setIsLoading(false);
+				console.log("insert_fac : ",responseJson);
+				setMbCompanyNumber(responseJson.cert.bc_no);
+				setMbCompanyName(responseJson.cert.bc_com_name);
+				setMbName(responseJson.cert.bc_name);
+				setMbCompanyAddr(responseJson.cert.bc_local);
+				setPickture(responseJson.cert.bc_img);
+				setBcState(responseJson.cert.bc_status_org);
+				if(responseJson.cert.bc_status_org == 3){
+					setBcStateComment(responseJson.cert.bc_comment);
+				}else{
+					setBcStateComment('');
+				}
+
+				if(responseJson.fac_data[0]){
+					setMy1(true);
+					setFactName1(responseJson.fac_data[0].fc_name);
+					setFactCode1((responseJson.fac_data[0].fc_zip).toString());
+					setFactAddr1(responseJson.fac_data[0].fc_addr1);
+					setFactAddrDt1(responseJson.fac_data[0].fc_addr2);
+					if(responseJson.fac_data[0].fc_use == 1){
+						setFactActive('1');
+					}
+				}	
+				
+				if(responseJson.fac_data[1]){
+					setMy2(true);
+					setFactName2(responseJson.fac_data[1].fc_name);
+					setFactCode2((responseJson.fac_data[1].fc_zip).toString());
+					setFactAddr2(responseJson.fac_data[1].fc_addr1);
+					setFactAddrDt2(responseJson.fac_data[1].fc_addr2);
+					if(responseJson.fac_data[1].fc_use == 1){
+						setFactActive('2');
+					}
+				}
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
 			}
 		});
+		setIsLoading(true);
   }
 
 	const getData2 = async () => {
@@ -115,7 +136,7 @@ const MyCompany = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_member_info : ",responseJson);
+				//console.log("get_member_info : ",responseJson);
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
@@ -134,10 +155,18 @@ const MyCompany = ({navigation, route}) => {
 		Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        setLocation({
-          latitude,
-          longitude,
-        });
+				if(v == "1"){
+					setLocation({
+						latitude,
+						longitude,
+					});
+				}else{
+					setLocation2({
+						latitude,
+						longitude,
+					});
+				}
+				findMyAddr(latitude, longitude, v);
       },
       error => {
         console.log(error.code, error.message);
@@ -145,6 +174,7 @@ const MyCompany = ({navigation, route}) => {
       {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
     );
 	}
+
 
 	function chkFactoryInfo(v){
 		if(v == "1"){
@@ -221,6 +251,15 @@ const MyCompany = ({navigation, route}) => {
 		}
 
 		setModal3(false);
+	}
+
+	function resetCompany(){
+		setState(0);
+		setMbCompanyNumber('');
+		setMbCompanyName('');
+		setMbName('');
+		setMbCompanyAddr('');
+		setPickture();	
 	}
 
 	function submitRegist(){
@@ -308,10 +347,13 @@ const MyCompany = ({navigation, route}) => {
               {/* 사업자등록증 반려 */}
               {/* <Text style={styles.alertBoxText}>사업자등록증이 반려되었습니다.</Text> */}
             </View>
+
+						{bcState==3 ? (
             <View style={styles.inputAlert}>
               <AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
-              <Text style={styles.inputAlertText}>사유 : 정상적인 사업자 번호가 아닙니다.</Text>
+              <Text style={styles.inputAlertText}>사유 : {bcStateComment}</Text>
             </View>
+						) : null}
 
             {!state ? (
             <TouchableOpacity
@@ -332,7 +374,7 @@ const MyCompany = ({navigation, route}) => {
                 <TouchableOpacity 
                   style={styles.resetBtn}
                   activeOpacity={opacityVal}
-                  onPress={() => {setMbCompanyNumber()}}
+                  onPress={() => {resetCompany()}}
                 >
                   <AutoHeightImage width={13} source={require("../../assets/img/icon_reset.png")} style={styles.icon_reset} />
                   <Text style={styles.resetBtnText}>초기화</Text>
@@ -340,7 +382,7 @@ const MyCompany = ({navigation, route}) => {
               </View>
               <View style={[styles.typingInputBox]}>
                 <TextInput
-                  keyboardType='email-address'
+									keyboardType = 'numeric'
                   value={mbcompanyNumber}
                   onChangeText={(v) => {setMbCompanyNumber(v)}}
                   placeholder={'사업자 번호를 입력해 주세요.'}
@@ -401,6 +443,7 @@ const MyCompany = ({navigation, route}) => {
               </View>
               <View style={styles.compImgBox}>
                 <TouchableOpacity
+									style={styles.photoBoxBtn}
                   activeOpacity={opacityVal}						
                   onPress={() => {setModal4(true);}}
                 >
@@ -871,7 +914,7 @@ const MyCompany = ({navigation, route}) => {
 				</View>
 			</Modal>
 
-			{isLoading ? (
+			{!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>
@@ -935,8 +978,9 @@ const styles = StyleSheet.create({
 	addBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:19,color:'#8791A1',marginLeft:8},
 	modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},	
+	photoBoxBtn: {width:102,height:102,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:10,},
 	photoBox: {marginTop:10,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden'},
-	resetBtn: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:75,height:22,backgroundColor:'#31B481',borderRadius:12,},
+	resetBtn: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:75,height:24,backgroundColor:'#31B481',borderRadius:12,},
 	resetBtnText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:22,color:'#fff',marginLeft:5,},
 	timeBox: {position:'absolute',right:20,top:0,},
 	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:56,color:'#000'},
@@ -973,4 +1017,15 @@ const styles = StyleSheet.create({
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-export default MyCompany
+//export default MyCompany
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(MyCompany);

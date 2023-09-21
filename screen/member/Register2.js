@@ -988,7 +988,7 @@ const Register2 = ({navigation, route}) => {
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
-										keyboardType='email-address'
+										keyboardType = 'numeric'
 										value={mbcompanyNumber}
 										onChangeText={(v) => {setMbCompanyNumber(v)}}
 										placeholder={'사업자 번호를 입력해 주세요.'}
@@ -1046,8 +1046,9 @@ const Register2 = ({navigation, route}) => {
 							<View style={[styles.typingBox, styles.mgTop35]}>
 								<View style={styles.typingTitle}>
 									<Text style={styles.typingTitleText}>사업자등록증 사진</Text>
-								</View>
+								</View>								
 								<TouchableOpacity
+									style={styles.photoBoxBtn}
 									activeOpacity={opacityVal}						
 									onPress={() => {setModal4(true);}}
 								>
@@ -1531,8 +1532,9 @@ const styles = StyleSheet.create({
 	addBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:19,color:'#8791A1',marginLeft:8},
 	modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
 	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},	
+	photoBoxBtn: {width:102,height:102,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:10,},
 	photoBox: {marginTop:10,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden'},
-	resetBtn: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:75,height:22,backgroundColor:'#31B481',borderRadius:12,},
+	resetBtn: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',width:75,height:24,backgroundColor:'#31B481',borderRadius:12,},
 	resetBtnText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:22,color:'#fff',marginLeft:5,},
 	timeBox: {position:'absolute',right:20,top:21,},
 	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:19,color:'#000'},

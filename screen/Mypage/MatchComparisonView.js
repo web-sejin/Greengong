@@ -120,7 +120,7 @@ const MatchComparisonView = ({navigation, route}) => {
             </TouchableOpacity>
           </View>
           <View style={styles.matchPrice}>
-            <Text style={styles.matchPriceText}>가격</Text>
+            <Text style={styles.matchPriceText}>가격{itemInfo.mc_chat_permit}</Text>
             <Text style={styles.matchPriceText2}>{item.me_total_price}원</Text>
           </View>            
         </View>

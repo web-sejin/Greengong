@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Postcode from '@actbase/react-daum-postcode';
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
@@ -15,12 +16,22 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const Other = ({navigation, route}) => {
+  const otherIdx = route.params.idx;
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [visible3, setVisible3] = useState(false);
   const [radio, setRadio] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [profileImg, setProfileImg] = useState('');
+  const [nick, setNick] = useState('');
+  const [factName, setFactName] = useState('');
+  const [score, setScore] = useState('');
+  const [itemList, setItemList] = useState([]);
+  const [itemList2, setItemList2] = useState([]);
+  const [total1, setTotal1] = useState(0);
+  const [total2, setTotal2] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -34,101 +45,38 @@ const Other = ({navigation, route}) => {
         setRadio(1);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      getOtherData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '스크랩',
-			naviPage: 'UsedWrite1',
-			stateVal: '',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고자재',
-			naviPage: 'UsedWrite2',
-			stateVal: '나눔',
-		},
-		{
-			id: '58694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '중고기계/장비',
-			naviPage: 'UsedWrite3',
-			stateVal: '입찰',
-		},
-		{
-			id: '68694a0f-3da1-471f-bd96-145571e29d72',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: '폐기물',
-			naviPage: 'UsedWrite4',
-			stateVal: '',
-		},
-	];  
-
-	const DATA2 = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '거의 사용하지 않은 스크랩 거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '거의 사용하지 않은 스크랩',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-		},
-	];
-
-  const dataLen = DATA.length;
-  const dataLen2 = DATA2.length;
+  const getOtherData = async () => {
+    setIsLoading(false);
+    await Api.send('GET', 'other_member', {is_api: 1, mb_idx:otherIdx}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("other_member : ",responseJson);	
+        setProfileImg(responseJson.mb_img);
+        setNick(responseJson.mb_nick);
+        setFactName(responseJson.fc_name);
+        setScore(responseJson.mb_score);
+        setItemList(responseJson.pd_latest);
+        setItemList2(responseJson.mc_latest);
+        setTotal1(responseJson.product_total);
+        setTotal2(responseJson.match_total);
+			}else{
+				//setItemList([]);				
+				console.log('결과 출력 실패!',responseJson);
+			}
+		});
+		setIsLoading(true);
+  }
 
   const ModalOn = () => {
     setVisible(true);
@@ -146,11 +94,15 @@ const Other = ({navigation, route}) => {
           <View style={styles.otherWrap}>
             <View style={styles.otherBoxLeft}>
               <View style={styles.otherProfile}>
-                <AutoHeightImage width={69} source={require("../../assets/img/sample1.jpg")} />  
+                {profileImg ? (
+                  <AutoHeightImage width={69} source={{uri: profileImg}} />  
+                ):(
+                  <AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />  
+                )}
               </View>
               <View style={styles.otherBoxInfo}>
-                <Text style={styles.otherBoxInfoText}>참좋은공장</Text>
-                <Text style={styles.otherBoxInfoText2}>넥센공장</Text>
+                <Text style={styles.otherBoxInfoText}>{nick}</Text>
+                <Text style={styles.otherBoxInfoText2}>{factName}</Text>
               </View>
             </View>
             {/* <View style={styles.otherBoxRight}>
@@ -160,72 +112,69 @@ const Other = ({navigation, route}) => {
           </View>
           <View style={styles.myDealResultBox}>
             <Text style={styles.myDealResultBoxText}>거래평가점수</Text>
-            <Text style={styles.myDealResultBoxText2}>4점</Text>
+            <Text style={styles.myDealResultBoxText2}>{score}점</Text>
           </View>
         </View>
 
         <View style={[styles.borderTop, styles.borderBot]}>
           <View style={styles.otherItem}>
-            <Text style={styles.otherItemText}>판매상품 ({dataLen}개)</Text>
+            <Text style={styles.otherItemText}>판매상품 ({total1}개)</Text>
             <TouchableOpacity
               style={styles.moreBtn}
               activeOpacity={opacityVal}
               onPress={()=>{
-                navigation.navigate('OtherUsed', {})
+                navigation.navigate('OtherUsed', {idx:otherIdx})
               }}
             >
               <Text style={styles.moreBtnText}>더보기</Text>
               <AutoHeightImage width={5} source={require("../../assets/img/icon_arrow2.png")} style={styles.moreBtnArr} />
             </TouchableOpacity>
           </View>
-          {dataLen > 0 ? (
-            DATA.map((item, index) => {
+          {total1 > 0 ? (
+            itemList.map((item, index) => {
               return(
               <TouchableOpacity 
                 key={index}
                 style={[styles.listLi]}
                 activeOpacity={opacityVal}
-                onPress={() => {
-                  navigation.push('UsedView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
-                }}
+                onPress={() => {navigation.push('UsedView', {idx:item.pd_idx})}}
               >
                 <>
                 <View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
-                  <AutoHeightImage width={131} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+                  {item.image ? (
+                  <View style={styles.pdImage}>
+                    <AutoHeightImage width={131} source={{uri: item.image}} style={styles.listImg} />
+                  </View>
+                  ) : null}
                   <View style={styles.listInfoBox}>
                     <View style={styles.listInfoTitle}>
-                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-                        {item.title}
-                      </Text>
+                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.pd_name}</Text>
                     </View>
                     <View style={styles.listInfoDesc}>
-                      <Text style={styles.listInfoDescText}>{item.desc}</Text>
+                    <Text style={styles.listInfoDescText}>{item.pd_loc} · {item.pd_date}</Text>
                     </View>
                     <View style={styles.listInfoCate}>
-                      <Text style={styles.listInfoCateText}>{item.cate}</Text>
+                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.pd_summary}</Text>
                     </View>
                     <View style={styles.listInfoCnt}>
                       <View style={styles.listInfoCntBox}>
                         <AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
                       </View>
                       <View style={styles.listInfoCntBox}>
                         <AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.pd_chat_cnt}</Text>
                       </View>
                       <View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
                         <AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.pd_like_cnt}</Text>
                       </View>
                     </View>
                     <View style={styles.listInfoPriceBox}>
-                      {index == 0 ? (
+                      {item.is_free != 1 && item.pd_status_org == 1 ? (
                       <View style={[styles.listInfoPriceArea]}>
-                        <View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
-                          <Text style={styles.listInfoPriceStateText}>예약중</Text>
-                        </View>
                         <View style={styles.listInfoPrice}>
-                          <Text style={styles.listInfoPriceText}>200,000,000원</Text>
+                          <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
                         </View>
                       </View>
                       )
@@ -233,7 +182,7 @@ const Other = ({navigation, route}) => {
                       null
                       }
 
-                      {index == 1 ? (
+                      {item.is_free == 1 && item.pd_status_org == 1 ? (
                       <View style={[styles.listInfoPriceArea]}>
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState2]}>
                           <Text style={styles.listInfoPriceStateText}>나눔</Text>
@@ -244,16 +193,37 @@ const Other = ({navigation, route}) => {
                       null
                       }
 
-                      {index >= 2 ? (
+                      {item.pd_status_org == 2 ? (
                       <View style={[styles.listInfoPriceArea]}>
-                        <View style={styles.listInfoPrice}>
-                          <Text style={styles.listInfoPriceText}>200,000,000원</Text>
+                        <View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
+                          <Text style={styles.listInfoPriceStateText}>예약중</Text>
                         </View>
+                        {item.is_free != 1 ? (
+                        <View style={styles.listInfoPrice}>
+                          <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+                        </View>
+                        ) : null }
                       </View>
                       )
                       :
                       null
                       }
+
+                      {item.pd_status_org == 3 ? (
+                      <View style={[styles.listInfoPriceArea]}>
+                        <View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
+                          <Text style={styles.listInfoPriceStateText}>판매완료</Text>
+                        </View>
+                        {item.is_free != 1 ? (
+                        <View style={styles.listInfoPrice}>
+                          <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+                        </View>
+                        ) : null }
+                      </View>
+                      )
+                      :
+                      null
+                      }					
                     </View>
                   </View>
                 </View>
@@ -271,56 +241,54 @@ const Other = ({navigation, route}) => {
 
         <View style={[styles.borderTop]}>
           <View style={styles.otherItem}>
-            <Text style={styles.otherItemText}>매칭 ({dataLen2}개)</Text>
+            <Text style={styles.otherItemText}>매칭 ({total2}개)</Text>
             <TouchableOpacity
               style={styles.moreBtn}
               activeOpacity={opacityVal}              
-              onPress={()=>{
-                navigation.navigate('OtherMatch', {})
-              }}
+              onPress={()=>{navigation.navigate('OtherMatch', {idx:otherIdx})}}
             >
               <Text style={styles.moreBtnText}>더보기</Text>
               <AutoHeightImage width={5} source={require("../../assets/img/icon_arrow2.png")} style={styles.moreBtnArr} />
             </TouchableOpacity>
           </View>
-          {dataLen2 > 0 ? (
-            DATA2.map((item, index) => {
+          {total2 > 0 ? (
+            itemList2.map((item, index) => {
               return(
               <TouchableOpacity 
                 key={index}
                 style={[styles.listLi]}
                 activeOpacity={opacityVal}
-                onPress={() => {
-                  navigation.push('MatchView', {category:item.category, naviPage:item.naviPage, stateVal:item.stateVal})
-                }}
+                onPress={() => {navigation.push('MatchView', {idx:item.mc_idx})}}
               >
                 <>
                 <View style={[styles.listLiBorder, index==0 ? styles.listLiBorderNot : null]}>
-                  <AutoHeightImage width={131} source={require("../../assets/img/sample1.jpg")} style={styles.listImg} />
+                  {item.image ? (
+                  <View style={styles.pdImage}>
+                    <AutoHeightImage width={131} source={{uri: item.image}} style={styles.listImg} />
+                  </View>
+                  ) : null}
                   <View style={styles.listInfoBox}>
                     <View style={styles.listInfoTitle}>
-                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-                        {item.title}
-                      </Text>
+                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>{item.mc_name}</Text>
                     </View>
                     <View style={styles.listInfoDesc}>
-                      <Text style={styles.listInfoDescText}>{item.desc}</Text>
+                      <Text style={styles.listInfoDescText}>{item.mc_loc} · {item.mc_date}</Text>
                     </View>
                     <View style={styles.listInfoCate}>
-                      <Text style={styles.listInfoCateText}>{item.cate}</Text>
+                      <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoCateText}>{item.mc_summary}</Text>
                     </View>
                     <View style={styles.listInfoCnt}>
                       <View style={styles.listInfoCntBox}>
                         <AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.score}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
                       </View>
                       <View style={styles.listInfoCntBox}>
                         <AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.review}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
                       </View>
                       <View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
                         <AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-                        <Text style={styles.listInfoCntBoxText}>{item.like}</Text>
+                        <Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
                       </View>
                     </View>
                   </View>
@@ -545,6 +513,7 @@ const styles = StyleSheet.create({
   listLi: {paddingHorizontal:20,},
 	listLiBorder: {flexDirection:'row',paddingVertical:20,borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	listLiBorderNot: {borderTopWidth:0,},
+  pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},
 	listImg: {borderRadius:12},
 	listInfoBox: {width:(innerWidth - 131),paddingLeft:15,},
 	listInfoBox2: {width:(innerWidth - 99)},
@@ -563,6 +532,7 @@ const styles = StyleSheet.create({
 	listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,borderRadius:12,marginRight:8,},
 	listInfoPriceState1: {backgroundColor:'#31B481'},
 	listInfoPriceState2: {backgroundColor:'#F58C40'},
+  listInfoPriceState3: {width:64,backgroundColor:'#353636'},
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},

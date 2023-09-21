@@ -90,7 +90,7 @@ const UsedBuyList = ({navigation, route}) => {
 		}
 	}
   const getList = ({item, index}) => (     
-    <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
+    <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
           <View style={styles.compInfo}>
@@ -128,11 +128,7 @@ const UsedBuyList = ({navigation, route}) => {
         {item.so_score > 0 ? (
           <TouchableOpacity
             style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
-            activeOpacity={opacityVal}
-            onPress={()=>{
-              setPdIdx(item.pd_idx);
-              setVisible(true);
-            }}
+            activeOpacity={1}
           >
             <Text style={[styles.btnText, styles.btnText2]}>거래평가를 완료했습니다.</Text>
           </TouchableOpacity>
@@ -181,31 +177,25 @@ const UsedBuyList = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'구매내역'} />
-      {isLoading ? (
-        <FlatList
-          data={buyList}
-          renderItem={(getList)}
-          keyExtractor={(item, index) => index.toString()}
-          onEndReachedThreshold={0.6}
-          onEndReached={moreData}
-          ListEmptyComponent={
-            isLoading ? (
-              <View style={styles.notData}>
-                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-                <Text style={styles.notDataText}>구매한 상품이 없습니다.</Text>
-              </View>
-            ):(
-              <View style={[styles.indicator]}>
-                <ActivityIndicator size="large" />
-              </View>
-            )
-          }
-        />
-      ):(
-        <View style={[styles.indicator]}>
-          <ActivityIndicator size="large" />
-        </View>
-      )}
+      <FlatList
+        data={buyList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+        onEndReached={moreData}
+        ListEmptyComponent={
+          isLoading ? (
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>구매한 상품이 없습니다.</Text>
+            </View>
+          ):(
+            <View style={[styles.indicator]}>
+              <ActivityIndicator size="large" />
+            </View>
+          )
+        }
+      />
 
       <Modal
         visible={visible}

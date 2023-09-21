@@ -584,6 +584,7 @@ const MatchView = (props) => {
               </View>
             </View>
           </ScrollView>
+          
           <View style={[styles.nextFix]}>
             <View style={styles.nextFixFlex}>
               {itemInfo.mc_file ? (
