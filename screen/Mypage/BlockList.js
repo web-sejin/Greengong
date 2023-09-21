@@ -38,6 +38,7 @@ const BlockList = ({navigation, route}) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			setNowPage(1);
 			getData();
 		}
 

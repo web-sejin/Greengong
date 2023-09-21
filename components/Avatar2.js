@@ -44,9 +44,9 @@ export const Avatar2 = (props: AvatarProps) => {
 
   const openCamera = () => {
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
+      // width: 300,
+      // height: 400,
+      // cropping: true,
     })
       .then(image => {
         console.log(image.path);

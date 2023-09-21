@@ -126,7 +126,7 @@ const MatchReq = ({navigation, route}) => {
         ) : null}
 
         {item.mc_status_org == 2 ? (
-        <View style={styles.listInfoState}>
+        <View style={[styles.listInfoState,styles.listInfoState2]}>
           <Text style={[styles.listInfoStateText, styles.listInfoStateText2]}>{item.mc_status}</Text>
         </View>
         ) : null}
@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
   listInfoState: {alignItems:'center',justifyContent:'center',marginTop:8,width:64,height:24,backgroundColor:'#797979',borderRadius:12,},
+	listInfoState2: {backgroundColor:'#31B481'},
   listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
   listInfoStateText2: {backgroundColor:'#31B481'},
   completeBox: {width:innerWidth,marginTop:15,paddingTop:10,borderTopWidth:1,borderColor:'#E3E3E4'},

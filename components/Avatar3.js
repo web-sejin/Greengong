@@ -31,9 +31,9 @@ export const Avatar3 = (props: AvatarProps) => {
   const open = () => setVisible(true);
   const chooseImage = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
+      // width: 300,
+      // height: 400,
+      // cropping: true,
     })
       .then(image => {
         console.log(image.path);

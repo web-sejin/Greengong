@@ -1,17 +1,13 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
-
-import {connect} from 'react-redux';
-import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
-import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -21,8 +17,7 @@ const opacityVal = 0.8;
 const UsedBuyList = ({navigation, route}) => {
   const {params} = route;
 	const [routeLoad, setRouteLoad] = useState(false);
-	const [pageSt, setPageSt] = useState(false);
-  const [mbId, setMbId] = useState();
+	const [pageSt, setPageSt] = useState(false);  
   const [visible, setVisible] = useState(false);
   const [visible2, setVisible2] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +25,8 @@ const UsedBuyList = ({navigation, route}) => {
 	const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [initLoading, setInitLoading] = useState(false);
+  const [pdIdx, setPdIdx] = useState();
+  const [score, setScore] = useState(3);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -37,16 +34,16 @@ const UsedBuyList = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
+        setPdIdx();
         setVisible(false);
         setVisible2(false);
-        setBuyList([]);
-        setNowPage(1);
-        setTotalPage(1);
+        setScore(3);
 			}
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-      getData();
+      setNowPage(1);
+			getData();
 		}
 
 		return () => isSubscribed = false;
@@ -61,101 +58,239 @@ const UsedBuyList = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('responseJson : ',responseJson.data);
+				console.log('list_buy : ',responseJson);
 				setBuyList(responseJson.data);
-        //setNowPage();
+        setTotalPage(responseJson.total_page);  
 			}else{
 				setBuyList([]);
 				setNowPage(1);
-				console.log('결과 출력 실패!', resultItem.result_text);
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
 
 		setIsLoading(true);
 	}
+  const moreData = async () => {
+		if(totalPage > nowPage){
+			await Api.send('GET', 'list_buy', {is_api: 1, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = buyList.concat(responseJson.data);				
+					setBuyList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
+  const getList = ({item, index}) => (     
+    <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
+      <View style={[styles.compBtn]}>
+        <View style={[styles.compWrap, styles.compWrapFst]}>
+          <View style={styles.compInfo}>
+            <View style={styles.compInfoDate}>
+              <Text style={styles.compInfoDateText}>{item.mb_nick}</Text>
+            </View>
+            <View style={styles.compInfoName}>
+              <Text style={styles.compInfoNameText}>[{item.c1_name}] {item.pd_name}</Text>
+            </View>
+            <View style={styles.compInfoLoc}>
+              <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+              <Text style={styles.compInfoLocText}>중3동</Text>
+            </View>
+          </View>
+          {item.pd_image ? (
+          <TouchableOpacity 
+            style={styles.compThumb}
+            activeOpacity={opacityVal}
+            onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
+          >
+            <AutoHeightImage width={63} source={{uri: item.pd_image}} />
+          </TouchableOpacity>
+          ) : null}          
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>판매가</Text>
+          <Text style={styles.matchPriceText2}>{String(item.pd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>입찰가</Text>
+          <Text style={styles.matchPriceText2}>{String(item.bd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
+        </View>
+      </View>
+      <View style={styles.btnBox}>
+        {item.so_score > 0 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setPdIdx(item.pd_idx);
+              setVisible(true);
+            }}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>거래평가를 완료했습니다.</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setPdIdx(item.pd_idx);
+              setVisible(true);
+            }}
+          >
+            <Text style={styles.btnText}>거래평가 작성</Text>
+          </TouchableOpacity>
+        )}
+      </View>  
+    </View>
+	);
+
+  function submitEndProduct(){
+    const formData = {
+			is_api:1,
+      page_code:'product',
+      article_idx: pdIdx,
+      so_score: score,
+		}; 
+
+    Api.send('POST', 'save_score', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        setVisible(false);
+        setNowPage(1);
+			  getData();
+        setPdIdx();
+        setScore(3);
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+				//ToastMessage(responseJson.result_text);
+			}
+		});
+  }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header navigation={navigation} headertitle={'구매내역'} />
-			<ScrollView>
-        <View>
-          <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
-            <View style={[styles.compBtn]}>
-              <View style={[styles.compWrap, styles.compWrapFst]}>
-                <View style={styles.compInfo}>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>참좋은공장</Text>
-                  </View>
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>[스크랩] 스크랩 싸게 팝니다.</Text>
-                  </View>
-                  <View style={styles.compInfoLoc}>
-                    <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                    <Text style={styles.compInfoLocText}>중3동</Text>
-                  </View>
-                </View>
-                <TouchableOpacity 
-                  style={styles.compThumb}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{
-                    navigation.navigate('Other', {});
-                  }}
-                >
-                  <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
-                </TouchableOpacity>
+      {isLoading ? (
+        <FlatList
+          data={buyList}
+          renderItem={(getList)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
+          ListEmptyComponent={
+            isLoading ? (
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>구매한 상품이 없습니다.</Text>
               </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>판매가</Text>
-                <Text style={styles.matchPriceText2}>10,000원</Text>
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
               </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>입찰가</Text>
-                <Text style={styles.matchPriceText2}>100,000원</Text>
-              </View>
-            </View>
-            <View style={styles.btnBox}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn2, styles.btn3]}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  
-                }}
-              >
-                <Text style={styles.btnText}>거래평가 작성</Text>
-              </TouchableOpacity>
-            </View>  
-          </View>
-          <View style={[styles.matchCompleteMb, styles.borderTop]}>
-            <View style={[styles.compBtn]}>
-              <View style={styles.compWrap}>
-                <View style={styles.compInfo}>
-                  <View style={styles.compInfoDate}>
-                    <Text style={styles.compInfoDateText}>참좋은공장</Text>
-                  </View>
-                  <View style={styles.compInfoName}>
-                    <Text style={styles.compInfoNameText}>[스크랩] 스크랩 싸게 팝니다.</Text>
-                  </View>
-                  <View style={styles.compInfoLoc}>
-                    <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-                    <Text style={styles.compInfoLocText}>중3동</Text>
-                  </View>
-                </View>
-                <View style={styles.compThumb}>
-                  <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
-                </View>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>판매가</Text>
-                <Text style={styles.matchPriceText2}>100,000원</Text>
-              </View>
-              <View style={styles.matchPrice}>
-                <Text style={styles.matchPriceText}>거래평가점수</Text>
-                <Text style={styles.matchPriceText2}>2점</Text>
-              </View>
-            </View>
-          </View>
+            )
+          }
+        />
+      ):(
+        <View style={[styles.indicator]}>
+          <ActivityIndicator size="large" />
         </View>
-      </ScrollView>
+      )}
+
+      <Modal
+        visible={visible}
+				transparent={true}
+				onRequestClose={() => {setVisible(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVisible(false)}}
+				></Pressable>
+				<View style={[styles.modalCont, styles.modalCont2]}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>거래평가</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>발주완료 할 회원에게 별점으로 발주를</Text>
+            <Text style={styles.avatarDescText}>완료를 하여 주세요.</Text>
+          </View>
+          <View style={styles.starBox}>
+            <TouchableOpacity 
+              style={styles.star}
+              activeOpacity={opacityVal}
+              onPress={()=>{setScore(1)}}
+            >
+              {score > 0 ? (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_on.png")} />  
+              ) : (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_off.png")} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.star}
+              activeOpacity={opacityVal}
+              onPress={()=>{setScore(2)}}
+            >
+              {score > 1 ? (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_on.png")} />  
+              ) : (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_off.png")} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.star}
+              activeOpacity={opacityVal}
+              onPress={()=>{setScore(3)}}
+            >
+              {score > 2 ? (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_on.png")} />  
+              ) : (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_off.png")} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.star}
+              activeOpacity={opacityVal}
+              onPress={()=>{setScore(4)}}
+            >
+              {score > 3 ? (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_on.png")} />  
+              ) : (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_off.png")} />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.star}
+              activeOpacity={opacityVal}
+              onPress={()=>{setScore(5)}}
+            >
+              {score > 4 ? (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_on.png")} />  
+              ) : (
+              <AutoHeightImage width={32} source={require("../../assets/img/review_star_off.png")} />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+              onPress={() => {submitEndProduct()}}
+            >
+              <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+				</View>
+      </Modal>
 		</SafeAreaView>
 	)
 }
@@ -196,7 +331,7 @@ const styles = StyleSheet.create({
   avatarDesc: {marginTop:20,},
   avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
 	avatarBtnBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',marginTop:30,},
-	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	avatarBtn: {width:innerWidth-40,height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
 	avatarBtn2: {backgroundColor:'#31B481'},
 	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
   starBox: {display:'flex',flexDirection:'row',alignItems:"center",justifyContent:'center',marginTop:20},
@@ -208,7 +343,15 @@ const styles = StyleSheet.create({
   btn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#353636',borderRadius:12,display:'flex',alignItems:"center",justifyContent:'center'},
   btn2: {backgroundColor:'#31B481',},
   btn3: {width:innerWidth},
+  btn4: {backgroundColor:'#fff',borderWidth:1,borderColor:'#000'},
   btnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff'},
+  btnText2: {color:'#353636'},
+
+  notData: {height:widnowHeight-220,display:'flex',alignItems:'center',justifyContent:'center',},
+	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
+
+  indicator: {height:widnowHeight-185, display:'flex', alignItems:'center', justifyContent:'center'},
+  indicator2: {marginTop:62},
 })
 
 export default UsedBuyList

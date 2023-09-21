@@ -43,14 +43,19 @@ const Chat = (props) => {
 			setPageSt(!pageSt);
 
 			if(!initLoading){
-				getProductList();
-				//getMatchList();
-				setInitLoading(true);
+				if(tabState==1){
+					getProductList();
+				}else{
+					getMatchList();
+				}
 			}else if(params?.reload == 'on'){
-				getProductList();
-				setNowPage(1);      
-				//getMatchList();
-				setNowPage2(1);
+				if(tabState==1){
+					getProductList();
+					setNowPage(1);
+				}else{      
+					getMatchList();
+					setNowPage2(1);
+				}
 				delete params?.reload
 			}
 		}
@@ -59,7 +64,7 @@ const Chat = (props) => {
 	}, [isFocused]);
 
 	const getProductList = async () => {
-		setIsLoading(false);
+		//setIsLoading(false);
 		console.log("inputText : ",inputText);
 		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
@@ -67,7 +72,7 @@ const Chat = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log('list_chat_product_room : ',responseJson);
+				console.log('list_chat_product_room : ',responseJson);
 				setPrdList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{
@@ -79,7 +84,6 @@ const Chat = (props) => {
 		}); 
 		setIsLoading(true);
 	}
-	
 	const moreData = async () => {    
     if(totalPage > nowPage){
       await Api.send('GET', 'list_chat_product_room', {is_api: 1, page:nowPage+1, keyword: inputText}, (args)=>{
@@ -99,7 +103,6 @@ const Chat = (props) => {
       });
     }
 	}
-
 	const getList = ({item, index}) => (    
     <TouchableOpacity
 			style={[styles.chatLi, index == 0 ? styles.chatLi2 : null]}
@@ -150,7 +153,7 @@ const Chat = (props) => {
 	);
 
 	const getMatchList = async () => {
-		setIsLoading(false);
+		//setIsLoading(false);
 		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -167,9 +170,8 @@ const Chat = (props) => {
         //ToastMessage(responseJson.result_text);
 			}
 		});
-		setIsLoading(true);
+		//setIsLoading(true);
 	}
-
 	const moreData2 = async () => {    
     if(totalPage2 > nowPage2){
       await Api.send('GET', 'list_chat_match_room', {is_api: 1, page:nowPage2+1, keyword: inputText}, (args)=>{
@@ -189,7 +191,6 @@ const Chat = (props) => {
       });
     }
 	}
-
 	const getList2 = ({item, index}) => (    
     <TouchableOpacity
 			style={[styles.chatLi, index == 0 ? styles.chatLi2 : null]}
@@ -256,13 +257,13 @@ const Chat = (props) => {
     setNowPage2(1);
     if(v == 1){
       getProductList();
-      setTimeout(function(){
-        getMatchList([]);
+			setTimeout(function(){
+        setMatchList([]);
       },200);
     }else if(v == 2){
       getMatchList();
-      setTimeout(function(){
-        getProductList([]);
+			setTimeout(function(){
+        setPrdList([]);
       },200);
     }
   }
@@ -381,12 +382,6 @@ const Chat = (props) => {
 			)}
 	
 			<View style={{height:90}}></View>
-			
-			{/* {!isLoading ? (
-			<View style={[styles.indicator]}>
-				<ActivityIndicator size="large" />
-			</View>
-			) : null} */}
 		</SafeAreaView>
 	)
 }
@@ -399,7 +394,7 @@ const styles = StyleSheet.create({
 	headerBtn1: {display:'flex',flexDirection:'row',alignItems:'center',},
 	headerBtn1Text: {fontFamily:Font.NotoSansBold,fontSize:18,lineHeight:21,color:'#000',marginRight:5,},
 	schBox: {paddingHorizontal:20,position:'relative'},
-	schInput: {width:widnowWidth-40,height:44,backgroundColor:'#F2F2F2',borderRadius:12,paddingLeft:39,paddingRight:15,fontSize:14,},
+	schInput: {width:widnowWidth-40,height:44,backgroundColor:'#F2F2F2',borderRadius:12,paddingLeft:39,paddingRight:15,fontSize:14,color:'#000'},
 	schBtn: {width:34,height:44,display:'flex',alignItems:'center',justifyContent:'center',position:'absolute',left:5,top:0,},
 	tabBox: {display:'flex',flexDirection:'row',backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:'#E3E3E4',marginTop:5,},
   tabBtn: {width:(widnowWidth/2),height:45,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},

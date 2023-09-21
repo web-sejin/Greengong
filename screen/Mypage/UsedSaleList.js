@@ -177,7 +177,9 @@ const SaleList = ({navigation, route}) => {
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
-            <Text style={styles.listInfoPriceState}>{item.pd_status}</Text>
+            <View style={styles.listInfoPriceState}>
+              <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
+            </View>
             <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
           </View>
           {/* <View style={styles.listInfoDate}>
@@ -285,7 +287,9 @@ const SaleList = ({navigation, route}) => {
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
-            <Text style={styles.listInfoPriceState}>판매완료</Text>
+            <View style={styles.listInfoPriceState}>
+              <Text style={styles.listInfoPriceStateText}>판매완료</Text>
+            </View>
             <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
           </View>
           {/* <View style={styles.listInfoDate}>
@@ -637,7 +641,8 @@ const styles = StyleSheet.create({
   listInfoPriceWrap: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingTop:10,paddingBottom:30,borderTopWidth:1,
   borderColor:'#E3E3E4',},
   listInfoPrice: {display:'flex',flexDirection:'row',alignItems:'center',},
-  listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:53,height:24,backgroundColor:'#F58C40',borderRadius:12,fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:29,color:'#fff',textAlign:'center',position:'relative',top:-1,marginRight:10,},
+  listInfoPriceState: {display:'flex',alignItems:'center',justifyContent:'center',width:54,height:24,backgroundColor:'#F58C40',borderRadius:12,marginRight:8,},
+  listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
   listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#323232'},
   listInfoDate: {},
   listInfoDateText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#B5B5B5'},

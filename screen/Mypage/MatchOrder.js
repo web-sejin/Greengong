@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
@@ -17,9 +17,14 @@ const opacityVal = 0.8;
 const MatchOrder = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
-  const [mbId, setMbId] = useState();
-  const [score, setScore] = useState(3);
   const [visible, setVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [buyList, setBuyList] = useState([]);
+	const [nowPage, setNowPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [initLoading, setInitLoading] = useState(false);
+  const [mdIdx, setMcIdx] = useState();
+  const [score, setScore] = useState(3);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -27,23 +32,109 @@ const MatchOrder = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-        setMbId();
+        setMcIdx();
         setScore(3);
         setVisible(false);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+      setNowPage(1);
+			getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+  const getData = async () =>{
+		setIsLoading(false);
+
+		await Api.send('GET', 'order_list_match2', {is_api: 1, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('order_list_match2 : ',responseJson);
+				setBuyList(responseJson.data);
+        setTotalPage(responseJson.total_page);  
+			}else{
+				setBuyList([]);
+				setNowPage(1);
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+
+		setIsLoading(true);
+	}
+  const moreData = async () => {
+		if(totalPage > nowPage){
+			await Api.send('GET', 'order_list_match2', {is_api: 1, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = buyList.concat(responseJson.data);				
+					setBuyList(addItem);			
+					setNowPage(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
+  const getList = ({item, index}) => (     
+    <View style={[styles.matchCompleteMb, styles.matchCompleteMbFst, styles.borderBot]}>
+      <View style={[styles.compBtn]}>
+        <View style={[styles.compWrap, styles.compWrapFst]}>
+          <View style={styles.compInfo}>
+            <View style={styles.compInfoDate}>
+              <Text style={styles.compInfoDateText}>{item.mb_nick}</Text>
+            </View>
+            <View style={styles.compInfoName}>
+              <Text style={styles.compInfoNameText}>[{item.c1_name}] {item.pd_name}</Text>
+            </View>
+            <View style={styles.compInfoLoc}>
+              <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
+              <Text style={styles.compInfoLocText}>중3동</Text>
+            </View>
+          </View>
+          {item.pd_image ? (
+          <TouchableOpacity 
+            style={styles.compThumb}
+            activeOpacity={opacityVal}
+            onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
+          >
+            <AutoHeightImage width={63} source={{uri: item.pd_image}} />
+          </TouchableOpacity>
+          ) : null}          
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>판매가</Text>
+          <Text style={styles.matchPriceText2}>{String(item.pd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
+        </View>
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>입찰가</Text>
+          <Text style={styles.matchPriceText2}>{String(item.bd_price).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,')}원</Text>
+        </View>
+      </View>
+      <View style={styles.btnBox}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btn2, styles.btn3]}
+          activeOpacity={opacityVal}
+          onPress={()=>{
+            setPdIdx(item.pd_mb_idx);
+            setVisible(true);
+          }}
+        >
+          <Text style={styles.btnText}>거래평가 작성</Text>
+        </TouchableOpacity>
+      </View>  
+    </View>
+	);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>

@@ -434,8 +434,8 @@ const MatchComparisonView = ({navigation, route}) => {
               <View style={styles.listInfoDesc}>
                 <Text style={styles.listInfoDescText}>{itemInfo.mc_summary}</Text>
               </View>
-              <View style={styles.listInfoState}>
-                <Text style={[styles.listInfoStateText, itemInfo.mc_status_org==1 ? null : styles.listInfoStateText2]}>
+              <View style={[styles.listInfoState, itemInfo.mc_status_org==1 ? null : styles.listInfoState2]}>
+                <Text style={[styles.listInfoStateText]}>
                   {itemInfo.mc_status}
                 </Text>
               </View>
@@ -446,6 +446,8 @@ const MatchComparisonView = ({navigation, route}) => {
           data={itemList}
           renderItem={(getList)}
           keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
           ListHeaderComponent={
             <>          
             <View style={styles.borderTop}></View>
@@ -623,10 +625,10 @@ const styles = StyleSheet.create({
 	listInfoTitleText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:22,color:'#000'},
 	listInfoDesc: {marginTop:2},
 	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#888'},		
-  listInfoState: {display:'flex',flexDirection:'row',position:'absolute',top:-5,right:0,},
-  listInfoStateText: {display:'flex',alignItems:'center',justifyContent:'center',height:24,paddingHorizontal:10,backgroundColor:'#797979',
-  borderRadius:12,fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:29,color:'#fff',},
-  listInfoStateText2: {backgroundColor:'#31B481'},
+  listInfoState: {alignItems:'center',justifyContent:'center',position:'absolute',top:-5,right:0,width:64,height:24,backgroundColor:'#797979',borderRadius:12,},
+  listInfoState2: {backgroundColor:'#31B481'},
+  listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
+  listInfoStateText2: {},
   salesAlert: {paddingHorizontal:20,paddingTop:15,},
   alertBox: {width:innerWidth,padding:15,paddingLeft:45,backgroundColor:'#F3FAF8',borderRadius:12,position:'relative',},
 	icon_alert: {position:'absolute',left:15,top:15},
