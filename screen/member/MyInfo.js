@@ -37,18 +37,13 @@ const MyInfo = (props) => {
   const [timeStamp, setTimeStamp] = useState('');
   const [phoneIntervel, setPhoneInterval] = useState(false);
 	const [ransoo, setRansoo] = useState('');
+	const [oldHp, setOldHp] = useState('');
+	const [oldEmail, setOldEmail] = useState('');
+	const [oldNick, setOldNick] = useState('');
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
-		let isSubscribed = true;
-
-		if(userInfo){
-			console.log(userInfo);
-			setMbHp(userInfo?.mb_hp);
-			setMbEmail(userInfo?.mb_email);
-			setMbNickname(userInfo?.mb_nick);
-		}
-
+		let isSubscribed = true;		
 		if(!isFocused){
 			if(!pageSt){
 				setMbHp('');
@@ -64,18 +59,34 @@ const MyInfo = (props) => {
 				clearInterval(t1);
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
+			//console.log('userInfo : ',userInfo);			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getMyInfo();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	const getMyInfo = async () => {
+		await Api.send('GET', 'get_member_info', {'is_api': 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("get_member_info : ",responseJson);
+				setMbHp(responseJson.mb_hp);
+				setMbEmail(responseJson.mb_email);
+				setMbNickname(responseJson.mb_nick);
+				setOldHp(responseJson.mb_hp);
+				setOldEmail(responseJson.mb_email);
+				setOldNick(responseJson.mb_nick);
+			}else{
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
 
   const timer_start = () => {
 		tcounter = 180;
@@ -119,13 +130,13 @@ const MyInfo = (props) => {
 			return false;
 		}
 
-		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: 'join'}, (args)=>{
+		Api.send('GET', 'send_munja', {hp: mbHp, is_api: 1, mode: ''}, (args)=>{
 			let resultItem = args.resultItem;
 			let arrItems = args.arrItems;
 			let responseJson = args.responseJson;
-			console.log(args);
+			//console.log(args);
 			if(resultItem.result === 'Y' && responseJson){
-					console.log('출력확인..', responseJson);
+					console.log('send_munja', responseJson);
 					setRansoo(responseJson.ce_num);
 					setPhoneInterval(true);
 			}else if(responseJson.result === 'error'){
@@ -137,47 +148,33 @@ const MyInfo = (props) => {
 		});
 	}
 
-	const _authComplete = () => {		
+	const _authComplete = (v) => {		
 		//console.log(ransoo);
 		if(mbHp == "" || mbHp.length!=13){
 			ToastMessage('휴대폰 번호를 정확히 입력해 주세요.');
 			return false;
 		}
 
-		if(certNumber == ""){
-			ToastMessage('인증번호를 입력해 주세요.');
-			return false;
+		if(oldHp != mbHp || v == 'cert_chk'){
+			if(certNumber == ""){
+				ToastMessage('인증번호를 입력해 주세요.');
+				return false;
+			}
+		
+			if(!certNumberSt && tcounter <= 0){
+				ToastMessage('인증번호를 발송하지 않았거나\n인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
+				return false;
+			}
+
+			if(ransoo == certNumber){
+				ToastMessage('본인인증이 완료되었습니다.');
+				setCertNumberSt(true);
+				timer_stop();
+			 }else{
+				ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
+				return false;
+			 }
 		}
-
-		if(tcounter <= 0){
-			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
-			return false;
-		 }
-
-		 if(ransoo == certNumber){
-			//ToastMessage('본인인증이 완료되었습니다.');
-			setCertNumberSt(true);
-			timer_stop();
-
-			Api.send('POST', 'find_id', {is_api:1, mb_hp:mbHp}, (args)=>{
-				let resultItem = args.resultItem;
-				let responseJson = args.responseJson;
-	
-				if(responseJson.result === 'success'){
-					//console.log(responseJson);
-					setResultId(responseJson.mb_id);
-					setResultDate(responseJson.mb_regdate);
-					setVisible(true);
-				}else{
-					console.log('결과 출력 실패!', resultItem);
-					ToastMessage(responseJson.result_text);
-				}
-			});
-						
-		 }else{
-			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
-			return false;
-		 }
 	}
 
 	const timer_stop = () => {
@@ -259,12 +256,15 @@ const MyInfo = (props) => {
 			ToastMessage('휴대폰 번호를 입력해 주세요.');
 			return false;
 		}
-
-		// if(!certNumberSt){
-		// 	ToastMessage('인증번호 확인을 완료해 주세요.');
-		// 	return false;
-		// }
-
+		
+		if(oldHp != mbHp){
+			if(!certNumberSt){
+				Keyboard.dismiss();
+				ToastMessage('인증번호 확인을 완료해 주세요.');
+				return false;
+			}
+		}
+		
 		if(mbEmail == ""){
 			ToastMessage('이메일을 입력해 주세요.');
 			return false;
@@ -276,22 +276,56 @@ const MyInfo = (props) => {
 			return false;
 		}
 
-		// if(!mbEmailSt){
-		// 	ToastMessage('이메일 중복확인을 완료해 주세요.');
-		// 	return false;
-		// }
+		if(oldEmail != mbEmail){
+			if(!mbEmailSt){
+				ToastMessage('이메일 중복확인을 완료해 주세요.');
+				return false;
+			}
+		}
 
 		if(mbNickname == ""){
 			ToastMessage('닉네임을 입력해 주세요.');
 			return false;
 		}
 
-		// if(!mbNicknameSt){
-		// 	ToastMessage('닉네임 중복확인을 완료해 주세요.');
-		// 	return false;
-		// }
-		
-		_authComplete();
+		if(oldNick != mbNickname){
+			if(!mbNicknameSt){
+				ToastMessage('닉네임 중복확인을 완료해 주세요.');
+				return false;
+			}
+		}
+
+		let formData = {
+			is_api:1,				
+			mb_hp:mbHp,
+			mb_email:mbEmail,
+			mb_nick:mbNickname,
+			os:Platform.OS,
+		};
+
+		Api.send('POST', 'modify_personal', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('modify_personal : ',responseJson);
+				ToastMessage('수정이 완료되었습니다.');
+				setCertNumber('');
+				setCertNumberSt(false);
+				setMbEmailSt(false);
+				setMbNicknameSt(false);
+				setTimeStamp('');
+				setPhoneInterval(false);
+				setRansoo('');	
+				clearInterval(t1);
+				setOldHp(mbHp);
+				setOldEmail(mbEmail);
+				setOldNick(mbNickname);
+			}else{
+				console.log('결과 출력 실패!!', responseJson);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -349,7 +383,7 @@ const MyInfo = (props) => {
 								<TouchableOpacity 
 									style={styles.certChkBtn2}
 									activeOpacity={opacityVal}
-									onPress={() => {_authComplete()}}
+									onPress={() => {_authComplete('cert_chk')}}
 								>
 									<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
 								</TouchableOpacity>

@@ -356,7 +356,7 @@ const Room = (props) => {
 				}
 			}else{
 				//setItemList([]);				
-				console.log('결과 출력 실패! : ', responseJson.result_text);
+				console.log('결과 출력 실패! : ', responseJson);
 				ToastMessage(responseJson.result_text);
 			}
 		});
