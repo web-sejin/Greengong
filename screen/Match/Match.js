@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
 	gapBox: {height:80,},
-	notData: {display:'flex',alignItems:'center',padding:60,},
+	notData: {display:'flex',alignItems:'center',justifyContent:'center',height:widnowHeight-320},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 	writeBtn: {position:'absolute',right:20,bottom:100},
 	writeBtnBase: {height:46,backgroundColor:'#31B481',borderRadius:30,position:'absolute',right:20,bottom:100},

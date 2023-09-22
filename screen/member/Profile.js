@@ -10,6 +10,9 @@ import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import {Avatar3} from '../../components/Avatar3';
 
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
@@ -119,6 +122,8 @@ const Profile = (props) => {
                 >
                   <Text style={styles.mypageLinkListBtnText}>계정정보 설정</Text>
                 </TouchableOpacity>
+
+                {userInfo?.mb_is_sso != 1 ? (
                 <TouchableOpacity
                   style={styles.mypageLinkListBtn}
                   activeOpacity={opacityVal}
@@ -128,6 +133,7 @@ const Profile = (props) => {
                 >
                   <Text style={styles.mypageLinkListBtnText}>비밀번호 설정</Text>
                 </TouchableOpacity>
+                ):null}
               </View>
             </View>
 
@@ -248,4 +254,15 @@ const styles = StyleSheet.create({
   indicator: {width:widnowWidth,height:widnowHeight, display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,zIndex:10,backgroundColor:'rgba(0,0,0,0.5)'},
 })
 
-export default Profile
+//export default Profile
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(Profile);

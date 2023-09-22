@@ -35,6 +35,7 @@ const OtherUsed = ({navigation, route}) => {
   const [total1, setTotal1] = useState(0);
   const [total2, setTotal2] = useState(0);
   const [total3, setTotal3] = useState(0);
+  const [blockSt, setBlckSt] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -72,6 +73,7 @@ const OtherUsed = ({navigation, route}) => {
         setNick(responseJson.mb_nick);
         setFactName(responseJson.fc_name);
         setScore(responseJson.mb_score);
+        setBlckSt(responseJson.is_block);
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!',responseJson);
@@ -96,7 +98,7 @@ const OtherUsed = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			if(responseJson.result === 'success' && responseJson){
-				console.log('중고상품 리스트 ::: ',responseJson);	
+				//console.log('중고상품 리스트 ::: ',responseJson);	
         
         if(number == 0){
           setTotal1(responseJson.total_count);
@@ -258,6 +260,55 @@ const OtherUsed = ({navigation, route}) => {
     getData(v);
   }
 
+  //신고하기
+  const fnSingo = async () => {
+    const formData = {
+			is_api:1,				
+			reason_idx:radio,
+      page_code:'member',
+      article_idx:otherIdx
+		};
+
+    Api.send('POST', 'save_report', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('신고 성공 : ',responseJson);
+        setVisible2(false);
+        getOtherData();
+        ToastMessage("신고가 접수되었습니다.");
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+        setVisible2(false);        
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //차단하기
+  const fnBlock = async () => {
+    const formData = {
+			is_api:1,				
+			recv_idx:otherIdx
+		};
+
+    Api.send('POST', 'save_block', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('차단 성공 : ',responseJson);
+        setVisible3(false);
+        getOtherData();
+        ToastMessage(responseJson.result_text);
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -379,7 +430,11 @@ const OtherUsed = ({navigation, route}) => {
 								setVisible(false)                
 						}}
 						>
-							<Text style={styles.modalCont2BtnText}>차단하기</Text>
+							{blockSt==0 ? (
+							  <Text style={styles.modalCont2BtnText}>차단하기</Text>
+              ) : (
+                <Text style={styles.modalCont2BtnText}>차단해제</Text>
+              )}
 						</TouchableOpacity>
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.delete]}
@@ -491,9 +546,7 @@ const OtherUsed = ({navigation, route}) => {
 					<TouchableOpacity 
 						style={styles.nextBtn}
 						activeOpacity={opacityVal}
-						onPress={() => {
-												
-					}}
+						onPress={() => {fnSingo()}}
 					>
 						<Text style={styles.nextBtnText}>신고하기</Text>
 					</TouchableOpacity>
@@ -510,13 +563,26 @@ const OtherUsed = ({navigation, route}) => {
 					onPress={() => {setVisible3(false)}}
 				></Pressable>
 				<View style={[styles.modalCont3]}>
-					<View style={styles.avatarTitle}>
-            <Text style={styles.avatarTitleText}>상대방 차단</Text>
-          </View>
-          <View style={styles.avatarDesc}>
-            <Text style={styles.avatarDescText}>상대방을 차단하면 상대방의 글과 채팅 메세지를 보낼 수 없습니다.</Text>
-						<Text style={[styles.avatarDescText, styles.avatarDescText2]}>차단하시겠습니까?</Text>
-          </View>
+          {blockSt==0 ? (
+            <>
+            <View style={styles.avatarTitle}>
+              <Text style={styles.avatarTitleText}>상대방 차단</Text>
+            </View>
+            <View style={styles.avatarDesc}>
+              <Text style={styles.avatarDescText}>상대방을 차단하면 상대방의 글과 채팅 메세지를 보낼 수 없습니다.</Text>
+              <Text style={[styles.avatarDescText, styles.avatarDescText2]}>차단하시겠습니까?</Text>
+            </View>
+            </>
+          ):(
+            <>
+            <View style={styles.avatarTitle}>
+              <Text style={styles.avatarTitleText}>차단해제</Text>
+            </View>
+            <View style={styles.avatarDesc}>
+              <Text style={[styles.avatarDescText, styles.avatarDescText2]}>차단해제를 하시겠습니까?</Text>
+            </View>
+            </>
+          )}
           <View style={styles.avatarBtnBox}>
             <TouchableOpacity 
               style={styles.avatarBtn}
@@ -526,7 +592,7 @@ const OtherUsed = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
-              onPress={() => {}}
+              onPress={() => {fnBlock()}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
             </TouchableOpacity>

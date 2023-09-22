@@ -28,6 +28,7 @@ import SplashScreen from 'react-native-splash-screen';
 import store from '../redux/configureStore';
 import {Provider} from 'react-redux';
 import { Provider as PaperProvider } from 'react-native-paper';
+import messaging from '@react-native-firebase/messaging';
 
 import Font from '../assets/common/Font';
 import Intro from './Intro';
@@ -324,6 +325,136 @@ const StackNavigator = () => {
 
 const Main = () => {  
   usePermissions(CALL_PERMISSIONS_NOTI);
+  if (Platform.OS === 'ios') { PushNotificationIOS.setApplicationIconBadgeNumber(0); }
+  useEffect(() => {
+   
+    messaging().onMessage((remoteMessage) => {
+      Toast.show({
+        type: 'info', //success | error | info
+        position: 'top',
+        text1: remoteMessage.notification.title,
+        text2: remoteMessage.notification.body,
+        visibilityTime: 3000,
+       // autoHide: remoteMessage.data.intent === 'SellerReg' ? false : true,    // true | false
+        topOffset: Platform.OS === 'ios' ? 66 + getStatusBarHeight() : 10,
+        style: { backgroundColor: 'red' },
+        bottomOffset: 100,
+        onShow: () => {},
+        onHide: () => {},
+        onPress: () => {
+          // if (remoteMessage.data.intent === 'NoticeView') {
+          //   navigation.navigate('NoticeView', {
+          //     wr_id: remoteMessage.data.content_idx,
+              
+          //   });
+          //   Toast.hide();
+          // }else if(remoteMessage.data.intent === 'EventView'){
+          //     navigation.navigate('EventView', {
+          //         wr_id: remoteMessage.data.content_idx,
+                  
+          //     });
+          //     Toast.hide();
+          // }else if(remoteMessage.data.intent === 'PartnersView'){
+          //     navigation.navigate('PartnersView', {
+          //         wr_id: remoteMessage.data.content_idx,
+                  
+          //     });
+          //     Toast.hide();
+          // }else if(remoteMessage.data.intent === 'TrainersView'){
+          //     navigation.navigate('TrainersView', {
+          //         wr_id: remoteMessage.data.content_idx,
+                  
+          //     });
+          //     Toast.hide();
+          // }else if(remoteMessage.data.intent === 'ShopView'){
+          //     navigation.navigate('ShopView', {
+          //         it_id: remoteMessage.data.content_idx,
+                  
+          //     });
+          //     Toast.hide();
+          // }
+        },
+      });
+      console.log('실행중 메시지:::',remoteMessage)
+
+    });
+    // 포그라운드
+    messaging().onNotificationOpenedApp((remoteMessage) => {
+      console.log('onNotificationOpenedApp', remoteMessage);
+      // if (remoteMessage.data !== null) {
+      //     console.log('포그라운드 메시지:::',remoteMessage)
+      //     if (remoteMessage.data.intent === 'NoticeView') {
+      //         navigation.navigate('NoticeView', {
+      //           wr_id: remoteMessage.data.content_idx,
+                
+      //         });
+
+      //     }else if(remoteMessage.data.intent === 'EventView'){
+      //         navigation.navigate('EventView', {
+      //             wr_id: remoteMessage.data.content_idx,
+                  
+      //         });
+      //     }else if(remoteMessage.data.intent === 'PartnersView'){
+      //         navigation.navigate('PartnersView', {
+      //             wr_id: remoteMessage.data.content_idx,
+                  
+      //         });
+      //     }else if(remoteMessage.data.intent === 'TrainersView'){
+      //         navigation.navigate('TrainersView', {
+      //             wr_id: remoteMessage.data.content_idx,
+                  
+      //         });
+      //     }else if(remoteMessage.data.intent === 'ShopView'){
+      //         navigation.navigate('ShopView', {
+      //             it_id: remoteMessage.data.content_idx,
+                  
+      //         });
+      //     }
+          
+         
+      // }
+    });
+    // 백그라운드
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        // console.log('getInitialNotification', remoteMessage);
+        console.log('백그라운드 메시지:::',remoteMessage)
+        // if (remoteMessage?.data !== null) {
+        //   if (remoteMessage.data.intent === 'NoticeView') {
+        //       navigation.navigate('NoticeView', {
+        //         wr_id: remoteMessage.data.content_idx,
+                
+        //       });
+        //   }else if(remoteMessage.data.intent === 'EventView'){
+        //       navigation.navigate('EventView', {
+        //           wr_id: remoteMessage.data.content_idx,
+                  
+        //       });
+        //   }else if(remoteMessage.data.intent === 'PartnersView'){
+        //       navigation.navigate('PartnersView', {
+        //           wr_id: remoteMessage.data.content_idx,
+                  
+        //       });
+        //   }else if(remoteMessage.data.intent === 'TrainersView'){
+        //       navigation.navigate('TrainersView', {
+        //           wr_id: remoteMessage.data.content_idx,
+                  
+        //       });
+        //   }else if(remoteMessage.data.intent === 'ShopView'){
+        //       navigation.navigate('ShopView', {
+        //           it_id: remoteMessage.data.content_idx,
+                  
+        //       });
+        //   }
+          
+
+        // }
+      });
+      //const unsubscribe = await dynamicLinks().onLink(handleDynamicLink);
+      //return () => unsubscribe();
+
+  }, []);
 
   const toastConfig = {
 		custom_type: (internalState) => (

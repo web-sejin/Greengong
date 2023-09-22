@@ -38,10 +38,12 @@ const MyCompany = (props) => {
 	const [mbCompanyAddr, setMbCompanyAddr] = useState('');	
   const [picture, setPickture] = useState('');	
   const [state, setState] = useState(0);
-  const [factName1, setFactName1] = useState('');
+  const [fcIdx1, setFcIdx1] = useState('');
+	const [factName1, setFactName1] = useState('');
 	const [factCode1, setFactCode1] = useState('');
 	const [factAddr1, setFactAddr1] = useState('');
 	const [factAddrDt1, setFactAddrDt1] = useState('');
+	const [fcIdx2, setFcIdx2] = useState('');
 	const [factName2, setFactName2] = useState('');
 	const [factCode2, setFactCode2] = useState('');
 	const [factAddr2, setFactAddr2] = useState('');
@@ -87,7 +89,7 @@ const MyCompany = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("insert_fac : ",responseJson);
+				console.log("insert_fac : ",responseJson);
 				if(responseJson.cert.bc_no){
 					setState(1);
 				}
@@ -105,6 +107,7 @@ const MyCompany = (props) => {
 
 				if(responseJson.fac_data[0]){
 					setMy1(true);
+					setFcIdx1(responseJson.fac_data[0].fc_idx);
 					setFactName1(responseJson.fac_data[0].fc_name);
 					setFactCode1((responseJson.fac_data[0].fc_zip).toString());
 					setFactAddr1(responseJson.fac_data[0].fc_addr1);
@@ -116,6 +119,7 @@ const MyCompany = (props) => {
 				
 				if(responseJson.fac_data[1]){
 					setMy2(true);
+					setFcIdx2(responseJson.fac_data[1].fc_idx);
 					setFactName2(responseJson.fac_data[1].fc_name);
 					setFactCode2((responseJson.fac_data[1].fc_zip).toString());
 					setFactAddr2(responseJson.fac_data[1].fc_addr1);
@@ -353,11 +357,13 @@ const MyCompany = (props) => {
 		let formData = {
 			is_api:1,
 			os:Platform.OS,
+			fac1_idx:fcIdx1,
 			fac1_name:factName1, 
 			fac1_zip:factCode1, 
 			fac1_addr1:factAddr1, 
 			fac1_addr2:factAddrDt1, 
 			fac2_name:factName2, 
+			fac2_idx:fcIdx2,
 			fac2_zip:factCode2, 
 			fac2_addr1:factAddr2, 
 			fac2_addr2:factAddrDt2, 
@@ -374,17 +380,21 @@ const MyCompany = (props) => {
 			formData.bc_img= { 'uri': picture, 'type': 'image/png', 'name': 'bc.png'}
 		}
 
-		// Api.send('POST', 'modify_fac', formData2, (args)=>{
-		// 	let resultItem = args.resultItem;
-		// 	let responseJson = args.responseJson;
+		console.log('formData : ',formData);
 
-		// 	if(responseJson.result === 'success'){
-		// 		console.log('성공 : ',responseJson);				
-		// 	}else{
-		// 		console.log('결과 출력 실패!', resultItem);
-		// 		ToastMessage(responseJson.result_text);
-		// 	}
-		// });
+		Api.send('POST', 'modify_fac', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);				
+				ToastMessage('수정이 완료되었습니다.');
+				getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
 	}	
 
 	return (

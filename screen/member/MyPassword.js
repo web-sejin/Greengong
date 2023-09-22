@@ -8,13 +8,19 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
+
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Api from '../../Api';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MyPassword = ({navigation, route}) => {
+const MyPassword = (props) => {
+	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;  
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [pw, setPw] = useState('');
@@ -26,16 +32,8 @@ const MyPassword = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setPw('');
-        setPw2('');
 			}
 		}else{
-			//console.log("isFocused");
-			if(route.params){
-				//console.log("route on!!");
-			}else{
-				//console.log("route off!!");
-			}
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -44,7 +42,43 @@ const MyPassword = ({navigation, route}) => {
 	}, [isFocused]);
 
   function _submit(){
+		console.log("userInfo : ",userInfo);
 
+		if(pw == ""){
+			ToastMessage('비밀번호를 입력해 주세요.');
+			return false;
+		}
+
+		const pwChk = pwd_check(pw);
+		if(!pwChk || pw.length < 6){
+			ToastMessage('비밀번호는 6자 이상 영문,숫자,특수문자를 조합해서 입력해 주세요.');
+			return false;
+		}
+
+		if(pw2 == ""){
+			ToastMessage('비밀번호를 한 번 더 입력해 주세요.');
+			return false;
+		}
+
+		if(pw != pw2){
+			ToastMessage('비밀번호가 일치하지 않습니다.\n다시 입력해 주세요.');
+			return false;
+		}
+
+		Api.send('POST', 'change_pass', {pass:pw}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+				setPw('');
+				setPw2('');
+				ToastMessage("비밀번호가 변경되었습니다.");				
+			}else{
+				console.log('결과 출력 실패!', responseJson);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (
@@ -136,4 +170,15 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 })
 
-export default MyPassword
+//export default MyPassword
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
+		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
+	})
+)(MyPassword);

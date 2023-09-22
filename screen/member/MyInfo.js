@@ -44,9 +44,9 @@ const MyInfo = (props) => {
 
 		if(userInfo){
 			console.log(userInfo);
-			setMbHp(userInfo.mb_hp);
-			setMbEmail(userInfo.mb_email);
-			setMbNickname(userInfo.mb_nick);
+			setMbHp(userInfo?.mb_hp);
+			setMbEmail(userInfo?.mb_email);
+			setMbNickname(userInfo?.mb_nick);
 		}
 
 		if(!isFocused){
