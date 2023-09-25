@@ -31,6 +31,8 @@ const Chat = (props) => {
 	const [nowPage2, setNowPage2] = useState(1);
   const [totalPage2, setTotalPage2] = useState(1);
 	const [initLoading, setInitLoading] = useState(false);
+	const [roomAry, setRoomAry] = useState([]);
+	const [roomChg, setRoomChg] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -65,7 +67,7 @@ const Chat = (props) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-	const getProductList = async () => {
+	const getProductList = async (v) => {
 		//setIsLoading(false);
 		console.log("inputText : ",inputText);
 		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
@@ -77,6 +79,17 @@ const Chat = (props) => {
 				//console.log('list_chat_product_room : ',responseJson);
 				setPrdList(responseJson.data);
 				setTotalPage(responseJson.total_page);
+
+				const crIdxAry = [];
+				(responseJson.data).map((item, index) => {
+					const roomName = 'product_'+item.cr_idx;
+					crIdxAry.push(roomName);
+					setRoomAry(crIdxAry);													
+
+					if(v != 'realtime' && index+1==responseJson.total_count){
+						setRoomChg(true);
+					}
+				});
 			}else{
 				setPrdList([]);
 				setNowPage(1);
@@ -154,7 +167,7 @@ const Chat = (props) => {
 		</TouchableOpacity>
 	);
 
-	const getMatchList = async () => {
+	const getMatchList = async (v) => {
 		//setIsLoading(false);
 		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
@@ -165,6 +178,16 @@ const Chat = (props) => {
 				//console.log('list_chat_match_room : ',responseJson);
 				setMatchList(responseJson.data);
 				setTotalPage2(responseJson.total_page);
+
+				const crIdxAry = [];
+				(responseJson.data).map((item, index) => {					
+					const roomName = 'match_'+item.cr_idx;
+					crIdxAry.push(roomName);
+					setRoomAry(crIdxAry);
+					if(v != 'realtime' && index+1==responseJson.total_count){
+						setRoomChg(true);
+					}
+				})
 			}else{
 				setMatchList([]);
 				setNowPage2(1);
@@ -271,27 +294,29 @@ const Chat = (props) => {
   }
 
 	//const ref = firestore().collection('chat').doc('chatList').collection('product_12');
-	const roomAry = ['product_9', 'product_11', 'product_12', 'product_13'];
+	//const roomAry = ['product_9', 'product_11', 'product_12', 'product_13'];
 	//const ref = firestore().collection('chat').doc('chatList').collection('product_12');
 	useEffect(() => {
-		for(var i=0; i<roomAry.length; i++){
-			var roomRef = firestore().collection('chat').doc('chatList').collection(roomAry[i]);
-			roomRef.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {								
-				console.log(i);
-				console.log("querySnapshot : ",querySnapshot);
-				getProductList('realtime');
-				if(i+1 == roomAry.length){
-					//getProductList('realtime');
-				}
-			})
+		if(roomChg){
+			for(var i=0; i<roomAry.length; i++){
+				var roomRef = firestore().collection('chat').doc('chatList').collection(roomAry[i]);
+				roomRef.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {								
+					//console.log(i);
+					//console.log("querySnapshot : ",querySnapshot);
+					console.log(roomAry);
+					if(tabState==1){
+						getProductList('realtime');
+					}else{
+						getMatchList('realtime');
+					}
+					if(i+1 == roomAry.length){
+						//getProductList('realtime');
+					}
+				})
+			}
 		}
-		// ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {
-    //   console.log("querySnapshot : ",querySnapshot)
-    //   querySnapshot.forEach((doc, index) => {
-		// 		console.log("doc id : ",doc.id);
-    //   });
-    // });
-	}, []);
+		setRoomChg(false);
+	}, [roomChg]);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
