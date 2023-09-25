@@ -7,7 +7,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import {initializeApp} from "@react-native-firebase/app";
 import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
-import {getStorage} from "@react-native-firebase/storage";
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -58,7 +57,7 @@ const Room = (props) => {
 	if(!roomName || roomName==''){
 		roomName = 'test';
 	}
-	const ref = firestore().collection(roomName);
+	const ref = firestore().collection('chat').doc('chatList').collection(roomName);
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
@@ -214,8 +213,10 @@ const Room = (props) => {
 	//파이어스토어 데이터 삭제
 	const fireRemove = async (doc_id) => {
 		try {
-			//console.log(doc_id);
-			await ref.doc(doc_id).delete();
+			console.log('doc_id : ',doc_id);			
+			//ref = firestore().collection('chat').doc('chatList').collection(roomName);
+			//await ref.doc(doc_id).delete();
+			await firestore().collection('chat').doc('chatList').collection(roomName).doc(doc_id).delete();
 			//alert("삭제완료")                
 		} catch (error) {
 			console.log("error : ",error)
@@ -294,7 +295,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_chat_room_product : ",responseJson);
+				//console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -310,7 +311,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_chat_room_match : ",responseJson);
+				//console.log("get_chat_room_match : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{		
@@ -327,7 +328,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("in_chat : ",responseJson);
+				//console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;

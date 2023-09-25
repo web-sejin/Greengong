@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
+import {initializeApp} from "@react-native-firebase/app";
+import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
 
 import Api from '../../Api';
 import {connect} from 'react-redux';
@@ -72,7 +74,7 @@ const Chat = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_chat_product_room : ',responseJson);
+				//console.log('list_chat_product_room : ',responseJson);
 				setPrdList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{
@@ -160,7 +162,7 @@ const Chat = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_chat_match_room : ',responseJson);
+				//console.log('list_chat_match_room : ',responseJson);
 				setMatchList(responseJson.data);
 				setTotalPage2(responseJson.total_page);
 			}else{
@@ -267,6 +269,29 @@ const Chat = (props) => {
       },200);
     }
   }
+
+	const ref = firestore().collection('chat').doc('chatList');
+	useEffect(() => {
+		//console.log("ref : ",ref);
+		return ref.onSnapshot(querySnapshot => {
+			console.log("querySnapshot : ",querySnapshot);
+		})
+    // return ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {      
+    //   console.log("querySnapshot : ",querySnapshot)
+    //   querySnapshot.forEach((doc, index) => {
+    //     const {content, complete, datetime, mb_idx, imgUrl} = doc.data();							
+		// 		const dateSplit = datetime.split(' ')[0];	
+
+		// 		const formData = {
+		// 			is_api:1,				
+		// 			recv_idx:recv_idx,
+		// 			page_code:page_code,
+		// 			page_idx:page_idx,
+		// 			msg_key:doc.id,
+		// 		};	
+    //   });
+    // });
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
