@@ -130,7 +130,7 @@ const Chat = (props) => {
 				</View>
 				<View style={styles.chatBoxInfo}>
 					<View style={styles.chatBoxName}>
-						<Text style={styles.chatBoxNameText}>{item.mb_nick}</Text>
+						<Text style={styles.chatBoxNameText}>{item.mb_nick}/{item.cr_idx}</Text>
 					</View>
 					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
@@ -270,25 +270,25 @@ const Chat = (props) => {
     }
   }
 
-	const ref = firestore().collection('chat').doc('chatList');
+	//const ref = firestore().collection('chat').doc('chatList').collection('product_12');
+	const roomAry = ['product_9', 'product_11', 'product_12', 'product_13'];
+	//const ref = firestore().collection('chat').doc('chatList').collection('product_12');
 	useEffect(() => {
-		//console.log("ref : ",ref);
-		return ref.onSnapshot(querySnapshot => {
-			console.log("querySnapshot : ",querySnapshot);
-		})
-    // return ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {      
+		for(var i=0; i<roomAry.length; i++){
+			var roomRef = firestore().collection('chat').doc('chatList').collection(roomAry[i]);
+			roomRef.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {								
+				console.log(i);
+				console.log("querySnapshot : ",querySnapshot);
+				getProductList('realtime');
+				if(i+1 == roomAry.length){
+					//getProductList('realtime');
+				}
+			})
+		}
+		// ref.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {
     //   console.log("querySnapshot : ",querySnapshot)
     //   querySnapshot.forEach((doc, index) => {
-    //     const {content, complete, datetime, mb_idx, imgUrl} = doc.data();							
-		// 		const dateSplit = datetime.split(' ')[0];	
-
-		// 		const formData = {
-		// 			is_api:1,				
-		// 			recv_idx:recv_idx,
-		// 			page_code:page_code,
-		// 			page_idx:page_idx,
-		// 			msg_key:doc.id,
-		// 		};	
+		// 		console.log("doc id : ",doc.id);
     //   });
     // });
 	}, []);
@@ -309,7 +309,6 @@ const Chat = (props) => {
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
 				</TouchableOpacity>
 			</View>
-						
 			<View style={styles.schBox}>
 				<View style={styles.faqListWrap}>					
 					<TextInput

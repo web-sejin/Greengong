@@ -213,10 +213,8 @@ const Room = (props) => {
 	//파이어스토어 데이터 삭제
 	const fireRemove = async (doc_id) => {
 		try {
-			console.log('doc_id : ',doc_id);			
-			//ref = firestore().collection('chat').doc('chatList').collection(roomName);
-			//await ref.doc(doc_id).delete();
-			await firestore().collection('chat').doc('chatList').collection(roomName).doc(doc_id).delete();
+			console.log(doc_id);
+			await ref.doc(doc_id).delete();
 			//alert("삭제완료")                
 		} catch (error) {
 			console.log("error : ",error)
@@ -295,7 +293,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_chat_room_product : ",responseJson);
+				console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -311,7 +309,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_chat_room_match : ",responseJson);
+				console.log("get_chat_room_match : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{		
@@ -328,7 +326,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("in_chat : ",responseJson);
+				console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;

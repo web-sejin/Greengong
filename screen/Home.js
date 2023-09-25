@@ -107,7 +107,7 @@ const Home = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson);
+				//console.log("list_product : ",responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 			}else{
