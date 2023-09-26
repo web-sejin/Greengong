@@ -9,6 +9,7 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import UsedLike from './UsedLike';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -150,7 +151,7 @@ const UsedLikeView = ({navigation, route}) => {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'관심목록'} />
       {!isLoading ? (
       <FlatList

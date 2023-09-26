@@ -13,6 +13,7 @@ import Header from '../../components/Header';
 import {Avatar} from '../../components/Avatar';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -398,7 +399,7 @@ const MyCompany = (props) => {
 	}	
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'공장 및 인증 정보 설정'} />
 			<KeyboardAwareScrollView>
         <View style={styles.registArea}>

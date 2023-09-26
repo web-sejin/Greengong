@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
 import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -329,7 +330,7 @@ const MyInfo = (props) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'계정정보 설정'} />
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>

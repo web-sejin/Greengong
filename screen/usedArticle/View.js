@@ -5,6 +5,7 @@ import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Swiper from 'react-native-swiper'
+import BitSwiper from 'react-native-bit-swiper';
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -32,6 +33,7 @@ const UsedView = (props) => {
   const [visible3, setVisible3] = useState(false);
   const [visible4, setVisible4] = useState(false);
   const [visible5, setVisible5] = useState(false);
+  const [visible6, setVisible6] = useState(false);
   const [toastModal, setToastModal] = useState(false);
   const [toastText, setToastText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +45,8 @@ const UsedView = (props) => {
   const [prdMbIdx, setPrdMbIdx] = useState();
   const [radio, setRadio] = useState(1);
   const [radioList, setRadioList] = useState([]);
+  const [swpCurr, setSwpCurr] = useState(0);
+  const [popImgUrl, setPopImgUrl] = useState('');
 
 	const isFocused = useIsFocused();
 	
@@ -121,7 +125,7 @@ const UsedView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("getRadioList : ",responseJson);
+				//console.log("getRadioList : ",responseJson);
         setRadioList(responseJson.data);
 			}else{
 				console.log(responseJson.result_text);
@@ -139,6 +143,7 @@ const UsedView = (props) => {
         setVisible3(false);
         setVisible4(false);
         setVisible5(false);
+        setVisible6(false);
         setToastModal(false);
         setToastText('');
 			}
@@ -384,7 +389,7 @@ const UsedView = (props) => {
       chatDeal();
     }
   }
-
+console.log("!!!!!!!!!");
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -397,35 +402,61 @@ const UsedView = (props) => {
         <>
         <ScrollView ref={scrollRef}>
           {swp.length > 0 ? (
-          <Swiper 
-            style={styles.swiper} 
-            showsButtons={true}
-            nextButton={
-              <View style={[styles.swiperNavi, styles.swiperNext]}>
-                <AutoHeightImage width={35} source={require("../../assets/img/swipe_next.png")} />
-              </View>
-            }
-            prevButton={
-              <View style={[styles.swiperNavi, styles.swiperPrev]}>
-                <AutoHeightImage width={35} source={require("../../assets/img/swipe_prev.png")} />
-              </View>
-            }
-            showsPagination={true}
-            paginationStyle={styles.swiperDotBox}
-            dot={<View style={styles.swiperDot} />}
-            activeDot={<View style={[styles.swiperDot, styles.swiperActiveDot]} />}
-          >
-            {/* <View style={styles.swiperSlider}>            
-              <AutoHeightImage width={widnowWidth} source={require("../../assets/img/view_img.jpg")} />
-            </View> */}
-            {swp.map((item, index) => {
-              return(
-                <View key={index} style={styles.swiperSlider}>
-                  <AutoHeightImage width={widnowWidth} source={{uri: item.pf_name}} />
-                </View>
-              )
-            })}
-          </Swiper>
+            <>
+              <BitSwiper
+                items={swp}
+                paginateStyle={{marginTop: -20,}}
+                paginateDotStyle={styles.swiperDot}
+                paginateActiveDotStyle={[styles.swiperDot, styles.swiperActiveDot]}
+                onItemIndexChanging={(curr) => {console.log(curr)}}
+                onItemRender={(item, index) => (
+                  <TouchableOpacity
+                    key={index} 
+                    style={styles.swiperSlider}
+                    activeOpacity={1}
+                    onPress={()=> {
+                      setVisible6(true);
+                      setPopImgUrl(item.pf_name);
+                    }}
+                  >
+                    <AutoHeightImage width={widnowWidth} source={{uri: item.pf_name}} />
+                  </TouchableOpacity>
+                )}
+              />
+              
+              {/* <Swiper 
+                style={styles.swiper} 
+                showsButtons={true}
+                nextButton={
+                  <View style={[styles.swiperNavi, styles.swiperNext]}>
+                    <AutoHeightImage width={35} source={require("../../assets/img/swipe_next.png")} />
+                  </View>
+                }
+                prevButton={
+                  <View style={[styles.swiperNavi, styles.swiperPrev]}>
+                    <AutoHeightImage width={35} source={require("../../assets/img/swipe_prev.png")} />
+                  </View>
+                }
+                showsPagination={true}
+                paginationStyle={styles.swiperDotBox}
+                dot={<View style={styles.swiperDot} />}
+                activeDot={<View style={[styles.swiperDot, styles.swiperActiveDot]} />}
+                onIndexChanged={(curr)=>{setSwpCurr(curr)}}
+              >
+                {swp.map((item, index) => {
+                  return(
+                    <TouchableOpacity 
+                      key={index} 
+                      style={styles.swiperSlider}
+                      activeOpacity={1}
+                      onPress={()=> {setVisible6(true)}}
+                    >
+                      <AutoHeightImage width={widnowWidth} source={{uri: item.pf_name}} />
+                    </TouchableOpacity>
+                  )
+                })}
+              </Swiper> */}
+            </>
           ) : null}
           
           <View style={[styles.viewBox1, styles.borderBot]}>
@@ -961,10 +992,31 @@ const UsedView = (props) => {
 			</Modal>
 
       <Modal
+        visible={visible6}
+				transparent={true}
+				onRequestClose={() => {setVisible6(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setVisible6(false)}}
+				></Pressable>
+        <TouchableOpacity
+          style={styles.swiperOff}
+          activeOpacity={opacityVal}
+          onPress={() => setVisible6(false)}
+        >
+          <AutoHeightImage width={30} source={require("../../assets/img/icon_delete2.png")} />
+        </TouchableOpacity>
+				<View style={styles.swiperModal}>
+         <AutoHeightImage width={innerWidth} source={{uri: popImgUrl}} style={styles.swiperModalImg} />
+        </View>
+      </Modal>
+
+      <Modal
         visible={toastModal}
 				animationType={"slide"}
 				transparent={true}
-      >
+      >        
 				<View style={styles.toastModal}>
 					<View
 						style={{
@@ -1126,6 +1178,10 @@ const styles = StyleSheet.create({
   circleOn: {backgroundColor:'#31B481',borderColor:'#31B481'},
 
   borderTop2: {borderTopWidth:1,borderTopColor:'#E3E3E4'},
+
+  swiperModal: {width:widnowWidth,height:widnowHeight,padding:20,position:'absolute',left:0,top:0,alignItems:'center',justifyContent:'center'},
+  swiperModalImg: {position:'relative',top:-10},
+  swiperOff: {position:'absolute',top:10,right:10,zIndex:10,},
 })
 
 //export default UsedView

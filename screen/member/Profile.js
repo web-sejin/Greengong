@@ -12,6 +12,7 @@ import {Avatar3} from '../../components/Avatar3';
 
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -87,7 +88,7 @@ const Profile = (props) => {
   };
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'프로필 설정'} />
 			<ScrollView>
         <View style={styles.profileBox}>

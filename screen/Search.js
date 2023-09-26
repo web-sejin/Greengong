@@ -8,6 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
 import Header from '../components/Header';
+import PushChk from "../components/Push";
 
 import Api from '../Api';
 import {connect} from 'react-redux';
@@ -305,7 +306,7 @@ const SearchList = ({navigation, route}) => {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'검색'} />
 			<View style={styles.faqList}>
 				<View style={styles.faqSch}>

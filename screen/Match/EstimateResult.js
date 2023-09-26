@@ -8,6 +8,7 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -62,7 +63,7 @@ const EstimateResult = ({navigation, route}) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'예상견적서'} backType={'close'} />
 			<ScrollView>
         <View style={styles.estResult}>

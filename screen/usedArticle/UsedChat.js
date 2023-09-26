@@ -8,6 +8,7 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -123,7 +124,7 @@ const UsedChat = ({navigation, route}) => {
 
   //api 받아오면 FlatList로 변경해야 할 듯
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'채팅목록'} />
         {isLoading ? (
           <FlatList

@@ -9,6 +9,7 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-community/async-storage';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -171,7 +172,7 @@ const MatchComparison = (props) => {
 	);
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'비교내역'} />
 			{isLoading ? (
 				<FlatList

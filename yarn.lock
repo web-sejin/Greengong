@@ -6054,7 +6054,7 @@ prompts@^2.0.1, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@15.8.1, prop-types@^15.5.10, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@*, prop-types@15.8.1, prop-types@^15.5.10, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -6147,6 +6147,13 @@ react-native-auto-height-image@3.2.4:
   integrity sha512-PTVzLuYY4Q5IDAk0QmnSNK12VnUPlt+ZiEJUlo5JUiHverR5Lg386iHK7D2bVkTNo7SCahIPlWzdSuX5Col3XQ==
   dependencies:
     prop-types "^15.7.2"
+
+react-native-bit-swiper@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-bit-swiper/-/react-native-bit-swiper-1.1.0.tgz#535ea6ee001c13d46c57b77a82dd80455d268f78"
+  integrity sha512-n9dqwOG+4mtg7AhuuRdyYoofrJ8C/myXe8RoTl/F48APpjhA4ySNcWrzvn8qxl7m3wPyoPaCYNafnDjTId8qKA==
+  dependencies:
+    prop-types "^15.6.1"
 
 react-native-calendars@1.1300.0:
   version "1.1300.0"

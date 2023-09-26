@@ -10,6 +10,7 @@ import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '.
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -262,7 +263,7 @@ const Find_pw = ({navigation, route}) => {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'비밀번호 찾기'} />
 			<ScrollView>				
 				<View style={styles.registArea}>

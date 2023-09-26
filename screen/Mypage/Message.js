@@ -12,6 +12,7 @@ import Header from '../../components/Header';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -97,7 +98,7 @@ const Message = ({navigation, route}) => {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'자주 쓰는 메세지'} />
       
 			<ScrollView>

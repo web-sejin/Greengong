@@ -9,6 +9,7 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
 import { getProfileData } from 'react-native-calendars/src/Profiler';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -310,7 +311,7 @@ const OtherUsed = ({navigation, route}) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header 
         navigation={navigation} 
         headertitle={'다른 회원 상품'} 

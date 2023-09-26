@@ -6,6 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
 import Api from '../../Api';
 import AsyncStorage from '@react-native-community/async-storage';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -118,7 +119,6 @@ const Match = (props) => {
 				console.log('결과 출력 실패!', responseJson);
 			}
 		});
-
 		setIsLoading(true);
 	}
 
@@ -343,6 +343,7 @@ const Match = (props) => {
 
 	const onRefresh = () => {
 		if(!refreshing) {
+			setRefreshing(true);
 			getItemList();
 			setTimeout(() => {
 				setRefreshing(false);

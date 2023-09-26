@@ -28,6 +28,7 @@
     "react": "17.0.2",
     "react-native": "0.68.2",
     "react-native-auto-height-image": "3.2.4",
+    "react-native-bit-swiper": "1.1.0",
     "react-native-calendars": "1.1300.0",
     "react-native-document-picker": "9.0.1",
     "react-native-elements": "3.4.3",

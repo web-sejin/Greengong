@@ -9,6 +9,7 @@ import ToastMessage from "../../components/ToastMessage"
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -100,7 +101,6 @@ const Mypage = (props) => {
 			>
 				<Text style={{color:'#000',padding:30}}>로그인</Text>
 			</TouchableOpacity> */}
-
 			<View style={styles.header}>		
 				<Text style={styles.headerTitle}>마이페이지</Text>
 				<TouchableOpacity

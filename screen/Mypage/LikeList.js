@@ -12,6 +12,7 @@ import Header from '../../components/Header';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -138,7 +139,7 @@ const LikeList = ({navigation, route}) => {
 	}
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'관심 사용자 관리'} />
 			{!isLoading ? (
 				<FlatList

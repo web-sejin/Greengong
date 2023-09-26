@@ -12,6 +12,7 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import {Avatar2} from '../../components/Avatar2';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -702,7 +703,7 @@ const MatchModify = ({navigation, route}) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'매칭 글수정'} />
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>

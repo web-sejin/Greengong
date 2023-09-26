@@ -8,6 +8,7 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/HeaderView';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -260,7 +261,7 @@ const OtherMatch = ({navigation, route}) => {
   } 
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header 
         navigation={navigation} 
         headertitle={'다른 회원 매칭'} 

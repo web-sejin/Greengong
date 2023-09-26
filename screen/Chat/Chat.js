@@ -10,6 +10,7 @@ import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
 import Api from '../../Api';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -303,7 +304,7 @@ const Chat = (props) => {
 				roomRef.orderBy('datetime', 'desc').limit(1).onSnapshot(querySnapshot => {								
 					//console.log(i);
 					//console.log("querySnapshot : ",querySnapshot);
-					console.log(roomAry);
+					//console.log(roomAry);
 					if(tabState==1){
 						getProductList('realtime');
 					}else{

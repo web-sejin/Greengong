@@ -15,6 +15,7 @@ import Header from '../../components/HeaderView';
 import Api from '../../Api';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -160,22 +161,27 @@ const Room = (props) => {
 				};
 
 				if(content != ''){ formData.ch_msg = content; }
-				if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
-
-				Api.send('POST', 'send_chat', formData, (args)=>{
-					let resultItem = args.resultItem;
-					let responseJson = args.responseJson;
-		
-					if(responseJson.result === 'success'){
-						//console.log('send_chat : ',responseJson);
-						getRoomData();
-						fireRemove(doc.id);
-						setImg({});						
-					}else{
-						console.log('결과 출력 실패!!!', resultItem.result_text);
-						//ToastMessage(responseJson.result_text);
-					}
-				});				
+				//if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
+				
+				if(userInfo?.mb_idx == recv_idx){
+					Api.send('POST', 'send_chat', formData, (args)=>{
+						let resultItem = args.resultItem;
+						let responseJson = args.responseJson;
+			
+						if(responseJson.result === 'success'){
+							//console.log('send_chat : ',responseJson);
+							getRoomData();
+							fireRemove(doc.id);
+							setImg({});
+						}else{
+							console.log('결과 출력 실패!!!', responseJson);
+							//ToastMessage(responseJson.result_text);
+						}
+					});				
+				}else{
+					getRoomData();
+					setImg({});
+				}
 
         list.push({
           id: doc.id,
@@ -213,7 +219,7 @@ const Room = (props) => {
 	//파이어스토어 데이터 삭제
 	const fireRemove = async (doc_id) => {
 		try {
-			console.log(doc_id);
+			//console.log(doc_id);
 			await ref.doc(doc_id).delete();
 			//alert("삭제완료")                
 		} catch (error) {
@@ -249,7 +255,7 @@ const Room = (props) => {
       //cropping: true,
     })
 		.then(image => {
-			console.log(image);
+			//console.log(image);
 			setImg(image);
 			imageUpload(image.path);
 		})
@@ -293,7 +299,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_chat_room_product : ",responseJson);
+				//console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -309,7 +315,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("get_chat_room_match : ",responseJson);
+				//console.log("get_chat_room_match : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{		
@@ -326,7 +332,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("in_chat : ",responseJson);
+				//console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				const dbList = responseJson.data;
@@ -573,7 +579,7 @@ const Room = (props) => {
 												<View 
 													key={item2.ch_idx}
 													style={[styles.myMessage, prevContinue]}
-												>
+												>													
 													<View style={styles.myMessageTextDate}>
 														<Text style={styles.myMessageDate}>{item2.ch_date}</Text>
 													</View>
@@ -612,7 +618,7 @@ const Room = (props) => {
 															<TouchableOpacity 
 																style={[styles.otMessageTextBox, styles.myMessageTextBoxImg]}
 																activeOpacity={opacityVal}
-															onPress={()=>{ImageCropPicker(item2.ch_file)}}
+																onPress={()=>{ImageCropPicker(item2.ch_file)}}
 															>
 																<AutoHeightImage width={112} source={{uri: item2.ch_file}} />
 															</TouchableOpacity>
@@ -970,7 +976,7 @@ const Room = (props) => {
 									onPress={()=>{fnMsgSelect(item.bs_content)}}
 								>
 									<Text style={styles.freUseBtnText}>{item.bs_subject}</Text>
-									<AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} />
+									{/* <AutoHeightImage width={3} source={require("../../assets/img/icon_dot.png")} /> */}
 								</TouchableOpacity>
 								)
 							})}

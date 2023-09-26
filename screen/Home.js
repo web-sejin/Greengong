@@ -7,6 +7,7 @@ import Font from "../assets/common/Font"
 import Api from '../Api';
 import AsyncStorage from '@react-native-community/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import PushChk from "../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -101,8 +102,7 @@ const Home = (props) => {
 
 	//중고 리스트
 	const getItemList = async () =>{
-		setIsLoading(false);
-		setRefreshing(true);
+		setIsLoading(false);		
 		await Api.send('GET', 'list_product', {'is_api': 1, c1_idx:filterAry, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -121,7 +121,6 @@ const Home = (props) => {
 		});
 
 		setIsLoading(true);
-		setRefreshing(false);
 	}
 
 	//중고 리스트 무한 스크롤
@@ -407,6 +406,7 @@ const Home = (props) => {
 
 	const onRefresh = () => {
 		if(!refreshing) {
+			setRefreshing(true);
 			getItemList();
 			setTimeout(() => {
 				setRefreshing(false);

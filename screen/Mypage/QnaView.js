@@ -9,6 +9,7 @@ import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 import Api from '../../Api';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -67,7 +68,7 @@ const QnaView = ({navigation, route}) => {
   const sampleText = '시스템 점검 안내입니다.\n\n내용글입니다.';
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'1:1문의'} />
       {isLoading ? (
 			<ScrollView>

@@ -8,7 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
-
+import PushChk from "../../components/Push";
 
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
@@ -127,7 +127,7 @@ const MessageModify = ({navigation, route}) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'자주 쓰는 메세지'} />			
 			<KeyboardAwareScrollView>
         <View style={styles.registArea}>

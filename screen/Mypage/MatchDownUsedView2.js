@@ -8,6 +8,7 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -120,7 +121,7 @@ const MatchDownUsedView2 = ({navigation, route}) => {
 	);
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={pageTitle} />
       <View style={[styles.listLi, usedState != 1 ? styles.listLi2 : null]}>
         <>

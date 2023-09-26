@@ -12,6 +12,7 @@ import Header from '../../components/Header';
 
 import Api from '../../Api';
 import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
+import PushChk from "../../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -424,7 +425,7 @@ const Estimate = ({navigation, route}) => {
   }
 
 	return (
-		<SafeAreaView style={styles.safeAreaView}>
+		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'예상 견적서 등록'} backType={'close'} />
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>					
