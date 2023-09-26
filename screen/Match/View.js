@@ -434,7 +434,7 @@ const MatchView = (props) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
-        headertitle={itemInfo.mc_name} 
+        headertitle={itemInfo.c1_name} 
         ModalEvent={ModalOn} 
       />
 

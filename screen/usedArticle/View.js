@@ -389,7 +389,7 @@ const UsedView = (props) => {
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
         navigation={navigation} 
-        headertitle={itemInfo.pd_name} 
+        headertitle={itemInfo.c1_name} 
         ModalEvent={ModalOn}        
       />
 

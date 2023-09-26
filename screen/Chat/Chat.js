@@ -309,9 +309,6 @@ const Chat = (props) => {
 					}else{
 						getMatchList('realtime');
 					}
-					if(i+1 == roomAry.length){
-						//getProductList('realtime');
-					}
 				})
 			}
 		}

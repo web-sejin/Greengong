@@ -48,6 +48,7 @@ const Match = (props) => {
 	const [myFac, setMyFac] = useState({});
 	const [myFacOn, setMyFacOn] = useState('');
 	const [initLoading, setInitLoading] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(()=>{
@@ -110,6 +111,7 @@ const Match = (props) => {
 				//console.log('list_match', responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
+				setNowPage(1);
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -338,6 +340,15 @@ const Match = (props) => {
 			}
 		});
 	}
+
+	const onRefresh = () => {
+		if(!refreshing) {
+			getItemList();
+			setTimeout(() => {
+				setRefreshing(false);
+			}, 2000);
+		}
+	}
 	
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
@@ -369,6 +380,8 @@ const Match = (props) => {
 					onScroll={onScroll}					
 					onEndReachedThreshold={0.8}
 					onEndReached={moreData}
+					refreshing={refreshing}
+					onRefresh={onRefresh}
 					ListHeaderComponent={
 						<>						
 						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
@@ -383,17 +396,22 @@ const Match = (props) => {
 							</View>
 							<View style={styles.schFilterBox}>
 								{filterLen > 0 ? (
-									<View style={styles.filterLabelBox}>
+									<ScrollView horizontal={true} style={styles.filterLabelBox}>
 										{filterList2.map((item, index) => {
 											if(item.isChecked){
 												return(
-												<View key={index} style={styles.filterLabel}>
+												<TouchableOpacity 
+													key={index} 
+													style={styles.filterLabel}
+													activeOpacity={opacityVal}
+													onPress={()=>{setVisible3(true)}}
+												>
 													<Text style={styles.filterLabelText}>{item.txt}</Text>
-												</View>
+												</TouchableOpacity>
 												)
 											}
 										})}
-									</View>
+									</ScrollView>
 								) : (
 									<TouchableOpacity 
 										style={styles.schFilterBtn1} 
