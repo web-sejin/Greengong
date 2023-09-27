@@ -278,6 +278,7 @@ const Chat = (props) => {
 	}
 
 	function fnTab(v){
+		setIsLoading(false);
 		setTabState(v);
     setNowPage(1);
     setNowPage2(1);

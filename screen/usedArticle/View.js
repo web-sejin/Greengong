@@ -40,6 +40,7 @@ const UsedView = (props) => {
   const [itemInfo, setItemInfo] = useState({});
   const [swp, setSwp] = useState({});
   const [latest, setLatest] = useState({});
+  const [latestCnt, setLatestCnt] = useState(0);
   const [naviPage, setNaviPage] = useState('');
   const [myInfo, setMyInfo] = useState({});
   const [prdMbIdx, setPrdMbIdx] = useState();
@@ -74,6 +75,7 @@ const UsedView = (props) => {
 				setItemInfo(responseJson);
         setSwp(responseJson.pf_data);
         setLatest(responseJson.mb_latest);
+        setLatestCnt(responseJson.mb_latest_total);
         setZzim(responseJson.is_scrap);
         setPrdMbIdx(responseJson.pd_mb_idx);
 
@@ -389,7 +391,7 @@ const UsedView = (props) => {
       chatDeal();
     }
   }
-console.log("!!!!!!!!!");
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<Header 
@@ -403,6 +405,7 @@ console.log("!!!!!!!!!");
         <ScrollView ref={scrollRef}>
           {swp.length > 0 ? (
             <>
+            <View style={styles.swiper}>
               <BitSwiper
                 items={swp}
                 paginateStyle={{marginTop: -20,}}
@@ -423,7 +426,7 @@ console.log("!!!!!!!!!");
                   </TouchableOpacity>
                 )}
               />
-              
+            </View>
               {/* <Swiper 
                 style={styles.swiper} 
                 showsButtons={true}
@@ -459,7 +462,7 @@ console.log("!!!!!!!!!");
             </>
           ) : null}
           
-          <View style={[styles.viewBox1, styles.borderBot]}>
+          <View style={[styles.viewBox1, latestCnt > 0 ? styles.borderBot : null]}>
             <View style={styles.profileBox}>
               <TouchableOpacity
                 style={styles.otherProfile}
@@ -571,12 +574,12 @@ console.log("!!!!!!!!!");
             </View>
           </View>
           
+          {latestCnt > 0 ? (
           <View style={[styles.viewBox2, styles.borderTop]}>
             <View style={styles.otherItemTit}>
               <Text style={styles.otherItemTitText}>{itemInfo.mb_nick}님의 다른 판매상품</Text>
             </View>
-
-            {latest.length > 0 ? (
+            
             <View style={styles.otherItemList}>
               {latest.map((item2, index2) => {
                 return(
@@ -683,9 +686,9 @@ console.log("!!!!!!!!!");
                 </TouchableOpacity>
                 )
               })}
-            </View>
-            ) : null}
+            </View>            
           </View>
+          ) : null}
         </ScrollView>
         <View style={[styles.nextFix]}>
           <View style={styles.nextFixFlex}>
@@ -1050,7 +1053,7 @@ const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},
   borderTop: {borderTopWidth:6,borderTopColor:'#F1F4F9'},
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E1E8F0'},
-  swiper: {height:220,},
+  swiper: {height:220,position:'relative'},
   swiperSlider: {height:220,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',},
   nextFix: {height:105,paddingHorizontal:20,paddingTop:15,backgroundColor:'#F3FAF8'},
   nextFixFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
@@ -1071,7 +1074,9 @@ const styles = StyleSheet.create({
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},
   swiperActiveDot: {opacity:1,},
-  swiperNavi: {marginTop:-5},
+  swiperNavi: {/*marginTop:-5*/position:'absolute',top:92,},
+  swiperPrev: {left:10},
+  swiperNext: {right:10},
   viewBox1: {paddingHorizontal:20,},
   profileBox: {paddingTop:25,paddingBottom:30,borderBottomWidth:1,borderBottomColor:'#E9EEF6',display:'flex',flexDirection:'row',position:'relative',},
   otherProfile: {width:58,height:58,borderRadius:50,overflow:'hidden'},

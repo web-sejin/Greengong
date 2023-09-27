@@ -98,10 +98,7 @@ const PushChk = (props) => {
       ></Pressable>
       <View style={styles.modalCont}>
         <View style={styles.avatarDesc}>
-          <Text style={styles.avatarDescText}>
-          상품제목 회원닉네임2님이 회원닉네임1님에 대해서 거래 평가를 보내셨습니다.
-          확인하시고 거래 평가를 남겨 주세요.
-          </Text>
+          <Text style={styles.avatarDescText}>{content}</Text>
         </View>
         <View style={styles.avatarBtnBox}>
           <TouchableOpacity 

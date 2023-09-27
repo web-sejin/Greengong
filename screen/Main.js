@@ -233,8 +233,10 @@ const TabNavigator = ({ navigation }) => {
       screenOptions={{headerShown: false}}
       tabBar={ (props) => <TabBarMenu {...props} /> }
     >
-      <Tab.Screen name="Home" component={Home} options={{}} initialParams={{isSubmit: true}} />
-      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{isSubmit: true}} />
+      {/* <Tab.Screen name="Home" component={Home} options={{}} initialParams={{isSubmit: true}} />
+      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{isSubmit: true}} /> */}
+      <Tab.Screen name="Home" component={Home} options={{}} />
+      <Tab.Screen name="Match" component={Match} options={{}} />
       <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on'}} />
       <Tab.Screen name="Mypage" component={Mypage} options={{}} />
     </Tab.Navigator>
