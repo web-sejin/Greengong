@@ -276,6 +276,16 @@ const Login = (props) => {
 							<Text style={styles.snsBtnText}>카카오 로그인</Text>
 						</TouchableOpacity>
 					</View>
+					<View style={styles.snsBtnBox}>
+						<TouchableOpacity 
+							style={[styles.snsBtn, styles.snsBtn2]}
+							activeOpacity={opacityVal}
+							onPress={() => {}}
+						>
+							<AutoHeightImage width={18} source={require("../../assets/img/apple_logo.png")} style={styles.appleLogo} />
+							<Text style={[styles.snsBtnText, styles.snsBtnText2]}>애플 로그인</Text>
+						</TouchableOpacity>
+					</View>
 					<View style={styles.loginFindBox}>
 						<TouchableOpacity
 							style={styles.loginFindBtn}
@@ -338,8 +348,11 @@ const styles = StyleSheet.create({
 	loginBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:50,color:'#fff'},
 	snsBtnBox: {marginTop:15,},
 	snsBtn: {width:innerWidth,height:50,backgroundColor:'#FFE812',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'},
+	snsBtn2: {backgroundColor:'#000'},
 	kakaoLogo: {position:'absolute',left:20,top:16,},
+	appleLogo: {position:'absolute',left:20,top:13,},
 	snsBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:50,color:'#3C1E1E'},
+	snsBtnText2: {color:'#fff'},
 	loginFindBox: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:15,},
 	loginFindBtn: {width:(innerWidth/3),heiht:40,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'},
 	loginFindBtnText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:40,color:'#000'},

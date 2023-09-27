@@ -161,9 +161,9 @@ const Room = (props) => {
 				};
 
 				if(content != ''){ formData.ch_msg = content; }
-				//if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
+				if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
 				
-				if(userInfo?.mb_idx == recv_idx){
+				if(userInfo?.mb_idx !== recv_idx){
 					Api.send('POST', 'send_chat', formData, (args)=>{
 						let resultItem = args.resultItem;
 						let responseJson = args.responseJson;
@@ -174,7 +174,7 @@ const Room = (props) => {
 							fireRemove(doc.id);
 							setImg({});
 						}else{
-							console.log('결과 출력 실패!!!', responseJson);
+							console.log('send_chat 실패!!!', responseJson);
 							//ToastMessage(responseJson.result_text);
 						}
 					});				
