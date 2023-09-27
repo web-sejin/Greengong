@@ -148,6 +148,10 @@ const Mypage = (props) => {
 										<AutoHeightImage width={13} source={require("../../assets/img/kakao_login2.png")} />
 										<Text style={styles.mypage1InfoKakaoStText}>카카오 로그인</Text>
 									</View>
+									// <View style={[styles.mypage1InfoAppleSt]}>
+									// 	<AutoHeightImage width={9} source={require("../../assets/img/apple_logo.png")} />
+									// 	<Text style={styles.mypage1InfoAppleStText}>애플 로그인</Text>
+									// </View>
 									) : null}
 								</View>
 							</View>
@@ -484,6 +488,8 @@ const styles = StyleSheet.create({
 	mypage1InfoEmailText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#323232'},
 	mypage1InfoKakaoSt: {width:120,height:24,backgroundColor:'#FFE812',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:10,},
 	mypage1InfoKakaoStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:16,color:'#3C1E1E',marginLeft:7,},
+	mypage1InfoAppleSt: {width:120,height:24,backgroundColor:'#000',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:10,},
+	mypage1InfoAppleStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:16,color:'#fff',marginLeft:7,},
 	mypage1InfoBtn: {width:75,height:26,backgroundColor:'#F2F2F2',borderRadius:13,display:'flex',alignItems:'center',justifyContent:'center'},
 	mypage1InfoBtnText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#737373'},
 	myDealResultBox: {paddingVertical:11,paddingHorizontal:30,backgroundColor:'#F3FAF8',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:20,},
