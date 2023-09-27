@@ -70,7 +70,7 @@ const Chat = (props) => {
 
 	const getProductList = async (v) => {
 		//setIsLoading(false);
-		console.log("inputText : ",inputText);
+		//console.log("inputText : ",inputText);
 		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -144,7 +144,7 @@ const Chat = (props) => {
 				</View>
 				<View style={styles.chatBoxInfo}>
 					<View style={styles.chatBoxName}>
-						<Text style={styles.chatBoxNameText}>{item.mb_nick}/{item.cr_idx}</Text>
+						<Text style={styles.chatBoxNameText}>{item.mb_nick}</Text>
 					</View>
 					<View style={styles.chatBoxLoc}>					
 						<AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />

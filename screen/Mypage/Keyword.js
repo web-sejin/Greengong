@@ -53,7 +53,7 @@ const Keyword = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(responseJson);
+				//console.log(responseJson);
         setKeywordList(responseJson.data);
         setTotalCnt(responseJson.total);
 			}else{
@@ -77,7 +77,7 @@ const Keyword = ({navigation, route}) => {
       let responseJson = args.responseJson;
 
       if(responseJson.result === 'success'){
-        console.log('성공 : ',responseJson);
+        //console.log('성공 : ',responseJson);
         getData();
       }else{
         console.log('결과 출력 실패!', resultItem);
@@ -135,6 +135,8 @@ const Keyword = ({navigation, route}) => {
                   placeholder={"키워드를 등록해 주세요."}
                   style={[styles.input]}
                   placeholderTextColor={"#8791A1"}
+                  returnKyeType='done'
+							    onSubmitEditing={_submit}
                 />
               </View>
             </View>

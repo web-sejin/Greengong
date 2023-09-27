@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Swiper from 'react-native-swiper'
 import BitSwiper from 'react-native-bit-swiper';
 import DocumentPicker from 'react-native-document-picker'
+import RNFetchBlob from "rn-fetch-blob";
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -95,7 +96,7 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("view_match : ",responseJson);
+				console.log("view_match : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.mf_data);
         setZzim(responseJson.is_scrap);
@@ -292,6 +293,7 @@ const MatchView = (props) => {
 
 			if(responseJson.result === 'success'){
 				//console.log('성공 : ',responseJson);
+        fileDown({url:itemInfo.mc_file, name:itemInfo.mc_file_org});
         setIndCatorSt(false);        
         ToastMessage('도면이 메일로 전송되었습니다.');
 			}else{
@@ -434,6 +436,16 @@ const MatchView = (props) => {
 				console.log('결과 출력 실패! : ', resultItem.result_text);
 			}
 		});
+  }
+
+  const fileDown = async (file: File) => {
+    await RNFetchBlob.config({
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path: `${RNFetchBlob.fs.dirs.DownloadDir}/${file.name}`,
+      },
+    }).fetch('GET', file.url);
   }
 
 	return (
@@ -1038,7 +1050,7 @@ const styles = StyleSheet.create({
   swiperNavi: {marginTop:-5},
   viewBox1: {paddingHorizontal:20,},
   profileBox: {paddingTop:25,paddingBottom:30,borderBottomWidth:1,borderBottomColor:'#E9EEF6',display:'flex',flexDirection:'row',position:'relative',},
-  otherProfile: {width:58,height:58,borderRadius:50,overflow:'hidden'},
+  otherProfile: {width:58,height:58,borderRadius:50,overflow:'hidden',alignItems:'center',justifyContent:'center'},
   profileBoxInfo: {width:(innerWidth-58),paddingLeft:10,},
   profileName: {},
   profileNameText: {fontFamily:Font.NotoSansBold,fontSize:18,lineHeight:22,color:'#000'},

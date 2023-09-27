@@ -7,7 +7,6 @@ import Font from "../assets/common/Font"
 import Api from '../Api';
 import AsyncStorage from '@react-native-community/async-storage';
 import messaging from '@react-native-firebase/messaging';
-import PushChk from "../components/Push";
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
