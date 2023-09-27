@@ -115,6 +115,7 @@ const opacityVal = 0.8;
 
 const TabBarMenu = (props) => {
   const {state, navigation, optionsNum} = props;
+  //console.log("state : ",state);
   const screenName = state.routes[state.index].name;  
 
   //console.log("screenName : ",screenName);

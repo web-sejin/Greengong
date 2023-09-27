@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import {initializeApp} from "@react-native-firebase/app";
 import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
@@ -74,8 +75,10 @@ const Room = (props) => {
 				setVisible7(false);
 				setToastModal(false);
 				setToastText('');
-				setRadio(1);
+				setRadio(1);				
 			}
+			AsyncStorage.removeItem('roomPage');
+			AsyncStorage.removeItem('roomIdx');			
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);			
@@ -334,6 +337,9 @@ const Room = (props) => {
 			if(responseJson.result === 'success' && responseJson){
 				//console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
+
+				AsyncStorage.setItem("roomPage", 'on');
+				AsyncStorage.setItem("roomIdx", (responseJson.cr_idx).toString());
 
 				const dbList = responseJson.data;
 				let TestDbList = [];

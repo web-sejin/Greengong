@@ -71,6 +71,9 @@ const Home = (props) => {
 				AsyncStorage.removeItem('mainReload');
 			}
 		});
+
+		AsyncStorage.removeItem('roomPage');
+		AsyncStorage.removeItem('roomIdx');
 	},[isFocused]);
 
 	//회원 정보
