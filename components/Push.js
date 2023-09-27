@@ -23,29 +23,35 @@ const PushChk = (props) => {
   function PusgAlert(remoteMessage){
     let navi = remoteMessage.data.intent;
     let navi_idx = '';
-    const contentIdx = JSON.parse(remoteMessage.data.content_idx);        
+    let contentIdx = '';
+
+    if(remoteMessage.data.content_idx){
+      contentIdx = JSON.parse(remoteMessage.data.content_idx);        
+    }
 
     setNaviIntent(navi);
     setContent(remoteMessage.data.body);    
     
-    if(currentNavi == 'ChatRoom'){
-      if(navi != 'ChatRoom'){
-        setPushVisible(true);
-        if(navi == 'UsedView'){
-          setNaviProp({idx:contentIdx.pd_idx});
-        }else if(navi == 'ChatRoom'){
-          const roomName = contentIdx.page_code+'_'+contentIdx.cr_idx;
-          setNaviProp({pd_idx:contentIdx.cr_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName,});
-        }
-      }
-
-    }else{
+    if((currentNavi == 'ChatRoom' && navi != 'ChatRoom') || currentNavi != 'ChatRoom'){
       setPushVisible(true);
       if(navi == 'UsedView'){
+        //등록한 키워드의 중고 상품을 등록 했을 때
+        //중고 상품 입찰 승인이 되었을 때
+        //중고 상품 입찰 요청 건에 대해서 거절 했을 때
+        console.log('contentIdx : ',contentIdx.pd_idx);
         setNaviProp({idx:contentIdx.pd_idx});
-      }else if(navi == 'ChatRoom'){        
+
+      }else if(navi == 'MatchView'){
+        //등록한 키워드의 매칭을 등록 했을 때
+        //매칭 도면 다운로드 권한이 도착 했을 때
+        setNaviProp({idx:contentIdx.mc_idx});
+
+      }else if(navi == 'ChatRoom'){
+        //채팅 메시지가 전송 되었을 때
         const roomName = contentIdx.page_code+'_'+contentIdx.cr_idx;
         setNaviProp({pd_idx:contentIdx.cr_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName,});
+      }else if(navi == 'QnaView'){
+        setNaviProp({bd_idx:contentIdx.bd_idx});
       }
     }
   }

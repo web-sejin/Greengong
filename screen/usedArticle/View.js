@@ -65,6 +65,7 @@ const UsedView = (props) => {
 
   const getData = async () => {
     setIsLoading(false);
+    console.log('idx : ',idx);
     await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx, page_name:'view'}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -96,7 +97,7 @@ const UsedView = (props) => {
         }        
 			}else{
 				//setItemList([]);				
-				console.log('결과 출력 실패!');
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
     

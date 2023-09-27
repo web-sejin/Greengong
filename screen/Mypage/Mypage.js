@@ -182,6 +182,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage1.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>판매내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -192,6 +193,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={29} source={require("../../assets/img/icon_mypage2.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>구매내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -202,6 +204,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage3.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>입찰내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -230,6 +233,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={25} source={require("../../assets/img/icon_mypage5.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>요청내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -240,6 +244,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={31} source={require("../../assets/img/icon_mypage6.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>비교내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -250,6 +255,7 @@ const Mypage = (props) => {
 								<AutoHeightImage width={22} source={require("../../assets/img/icon_mypage7.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>발주내역</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkBoxBtn}
 								activeOpacity={opacityVal}
@@ -321,6 +327,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>고객센터</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
@@ -330,6 +337,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>공지사항</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
@@ -339,6 +347,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>서비스 이용약관</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
@@ -348,6 +357,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>개인정보 처리방침</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
@@ -357,6 +367,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>위치기반 서비스</Text>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
@@ -364,6 +375,7 @@ const Mypage = (props) => {
 							>
 								<Text style={styles.mypageLinkListBtnText}>로그아웃</Text>
 							</TouchableOpacity>
+							
 							<TouchableOpacity
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
