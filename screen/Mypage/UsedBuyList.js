@@ -63,7 +63,7 @@ const UsedBuyList = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_buy : ',responseJson);
+				//console.log('list_buy : ',responseJson);
 				setBuyList(responseJson.data);
         setTotalPage(responseJson.total_page);  
 			}else{
@@ -141,7 +141,7 @@ const UsedBuyList = (props) => {
           <TouchableOpacity
             style={[styles.btn, styles.btn2, styles.btn3]}
             activeOpacity={opacityVal}
-            onPress={()=>{
+            onPress={()=>{              
               setPdIdx(item.pd_idx);
               setVisible(true);
             }}
@@ -160,6 +160,8 @@ const UsedBuyList = (props) => {
       article_idx: pdIdx,
       so_score: score,
 		}; 
+
+    //console.log(formData);
 
     Api.send('POST', 'save_score', formData, (args)=>{
 			let resultItem = args.resultItem;

@@ -59,6 +59,7 @@ const MyCompany = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [bcState, setBcState] = useState();
 	const [bcStateComment, setBcStateComment] = useState('');
+	const [isCert, setIsCert] = useState();
 
   const isFocused = useIsFocused();
 	useEffect(() => {
@@ -100,6 +101,7 @@ const MyCompany = (props) => {
 				setMbCompanyAddr(responseJson.cert.bc_local);
 				setPickture(responseJson.cert.bc_img);
 				setBcState(responseJson.cert.bc_status_org);
+				setIsCert(responseJson.is_cert);
 				if(responseJson.cert.bc_status_org == 3){
 					setBcStateComment(responseJson.cert.bc_comment);
 				}else{
@@ -131,7 +133,7 @@ const MyCompany = (props) => {
 				}
 			}else{
 				//setItemList([]);				
-				console.log('결과 출력 실패!');
+				console.log('결과 출력 실패!', responseJson);
 			}
 		});
 		setIsLoading(true);
@@ -468,16 +470,24 @@ const MyCompany = (props) => {
               <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
               
               {/* 공장및인증정보설정,미등록 */}
-              {/* <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text> */}
+							{isCert==0 ? (
+              <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text>
+							) : null }
+
+							{/* 사업자등록증 관리자인증중 */}
+							{bcState==1 ? (
+              <Text style={styles.alertBoxText}>사업자등록증 인증중입니다.</Text>
+							) : null }
               
               {/* 사업자등록번호 정상 등록되어 있을 때 */}
+							{bcState==2 ? (
               <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text>
-
-              {/* 사업자등록증 관리자인증중 */}
-              {/* <Text style={styles.alertBoxText}>사업자등록증 인증중입니다.</Text> */}
+							) : null }              
 
               {/* 사업자등록증 반려 */}
-              {/* <Text style={styles.alertBoxText}>사업자등록증이 반려되었습니다.</Text> */}
+							{bcState==3 ? (
+              <Text style={styles.alertBoxText}>사업자등록증이 반려되었습니다.</Text>
+							) : null } 
             </View>
 
 						{bcState==3 ? (

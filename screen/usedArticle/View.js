@@ -98,6 +98,7 @@ const UsedView = (props) => {
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!', responseJson);
+        navigation.navigate('Home', {isSubmit: true});
 			}
 		});
     
@@ -338,11 +339,17 @@ const UsedView = (props) => {
     if(userInfo?.mb_idx == itemInfo.pd_mb_idx){
       ToastMessage("자신의 게시물은 입찰할 수 없습니다.");
     }else{
-      if(itemInfo.is_bidding == 1){
-        setVisible2(true);
+      if(userInfo?.bc_status_org == 1){
+        ToastMessage('사업자등록증이 대기상태입니다.');
+      }else if(userInfo?.bc_status_org == 3){
+        ToastMessage('사업자등록증이 반려상태입니다.');
       }else{
-        navigation.navigate('Bid', {idx:idx});
-      }     
+        if(itemInfo.is_bidding == 1){
+          setVisible2(true);
+        }else{
+          navigation.navigate('Bid', {idx:idx});
+        }
+      }
     }
   }
 
@@ -776,7 +783,7 @@ const UsedView = (props) => {
 							<Text style={styles.modalCont2BtnText}>수정하기</Text>
 						</TouchableOpacity>
             
-            {itemInfo.pd_status_org == 3 ? null : (     
+            {itemInfo.pd_status_org == 2 || itemInfo.pd_status_org == 3 ? null : (     
             <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.modify]}
 							activeOpacity={opacityVal}

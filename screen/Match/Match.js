@@ -7,6 +7,9 @@ import Font from "../../assets/common/Font"
 import Api from '../../Api';
 import AsyncStorage from '@react-native-community/async-storage';
 import PushChk from "../../components/Push";
+import ToastMessage from "../../components/ToastMessage";
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -313,7 +316,7 @@ const Match = (props) => {
 	}
 
 	//공장 변경
-	const changeFac = async (idx) => {
+	const changeFac = async (idx, v) => {
 		let formData = {
 			is_api:1,				
 			fc_idx:idx,
@@ -331,7 +334,8 @@ const Match = (props) => {
 				setMyFac(responseJson.data);
 
 				const fcUse = (responseJson.data).find(item=> item.fc_use==1);
-				const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				//const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				const fcUseText = '공장'+v+"("+fcUse.fc_dong+")";
 				setMyFacOn(fcUseText);				
 
 				getItemList();				
@@ -349,6 +353,16 @@ const Match = (props) => {
 				setRefreshing(false);
 			}, 2000);
 		}
+	}
+
+	const writeChk = () => {
+		if(userInfo?.bc_status_org == 1){
+			ToastMessage('사업자등록증이 대기상태입니다.');
+		}else if(userInfo?.bc_status_org == 3){
+			ToastMessage('사업자등록증이 반려상태입니다.');
+		}else{
+			setVisible2(true);
+		}		
 	}
 	
 	return (
@@ -460,7 +474,7 @@ const Match = (props) => {
 			>
 				<TouchableOpacity 
 					activeOpacity={opacityVal}
-					onPress={()=>{setVisible2(true)}}
+					onPress={()=>{writeChk()}}
 				>
 					<Animated.View
 						style={{
@@ -505,7 +519,7 @@ const Match = (props) => {
 									key = {index}
 									style={styles.myfactoryBtn}
 									activeOpacity={opacityVal}
-									onPress={()=>{changeFac(item.fc_idx)}}
+									onPress={()=>{changeFac(item.fc_idx, (index+1))}}
 								>
 									<Text style={[styles.myfactoryBtnText, item.fc_use == 1 ? styles.myfactoryBtnTextOn : null]}>
 											{item.fc_name}({item.fc_dong})
@@ -740,4 +754,13 @@ const styles = StyleSheet.create({
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-export default Match
+//export default Match
+export default connect(
+	({ User }) => ({
+		userInfo: User.userInfo, //회원정보
+	}),
+	(dispatch) => ({
+		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
+		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+	})
+)(Match);

@@ -49,7 +49,7 @@ const PushChk = (props) => {
           setPushVisible(true);
           const roomName = contentIdx.page_code+'_'+contentIdx.cr_idx;
           
-          if(contentIdx.page_code = 'product'){
+          if(contentIdx.page_code == 'product'){
             setNaviProp({pd_idx:contentIdx.pd_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName, cr_idx:contentIdx.cr_idx});
           }else{
             setNaviProp({pd_idx:contentIdx.mc_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName, cr_idx:contentIdx.cr_idx});

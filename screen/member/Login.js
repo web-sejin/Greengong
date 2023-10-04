@@ -143,6 +143,7 @@ const Login = (props) => {
       setKakaoResult(JSON.stringify(token));
     } catch(err) {
       console.log("error : ",err);
+			Alert.alert('e');
       //setIndi(false);
     }
   };
@@ -276,6 +277,8 @@ const Login = (props) => {
 							<Text style={styles.snsBtnText}>카카오 로그인</Text>
 						</TouchableOpacity>
 					</View>
+
+					{Platform.OS === 'ios' ? (
 					<View style={styles.snsBtnBox}>
 						<TouchableOpacity 
 							style={[styles.snsBtn, styles.snsBtn2]}
@@ -286,6 +289,8 @@ const Login = (props) => {
 							<Text style={[styles.snsBtnText, styles.snsBtnText2]}>애플 로그인</Text>
 						</TouchableOpacity>
 					</View>
+					) : null}
+					
 					<View style={styles.loginFindBox}>
 						<TouchableOpacity
 							style={styles.loginFindBtn}
