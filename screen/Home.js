@@ -111,7 +111,7 @@ const Home = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("list_product : ",responseJson);
+				console.log("list_product : ",responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 				setNowPage(1);
@@ -447,6 +447,7 @@ const Home = (props) => {
 				onEndReached={moreData}
 				refreshing={refreshing}
 				onRefresh={onRefresh}
+				disableVirtualization={false}
 				ListHeaderComponent={
 					<>						
 					<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>

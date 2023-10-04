@@ -265,7 +265,8 @@ const MatchComplete = ({navigation, route}) => {
         renderItem={(getList)}
         keyExtractor={(item, index) => index.toString()}
         onEndReachedThreshold={0.6}
-        //onEndReached={moreData}
+        onEndReached={moreData}
+        disableVirtualization={false}
         ListHeaderComponent={
           <>
           <View style={[styles.salesAlert, styles.borderBot]}>

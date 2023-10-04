@@ -108,6 +108,7 @@ const Keyword = ({navigation, route}) => {
 
         if(responseJson.result === 'success'){
           console.log('성공 : ',responseJson);
+          setKeywords('');
           getData();
         }else{
           console.log('결과 출력 실패!', resultItem);

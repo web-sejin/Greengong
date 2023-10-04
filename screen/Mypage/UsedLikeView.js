@@ -160,6 +160,7 @@ const UsedLikeView = ({navigation, route}) => {
         keyExtractor={(item, index) => index.toString()}
         onEndReachedThreshold={0.6}
 				onEndReached={moreData}
+        disableVirtualization={false}
         ListHeaderComponent={
           <View style={[styles.listLi, styles.listLi2, styles.listLi3, styles.borderBot]}>
             <>

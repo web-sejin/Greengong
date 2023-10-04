@@ -393,6 +393,7 @@ const Chat = (props) => {
 					onEndReachedThreshold={0.6}
 					onEndReached={moreData}
 					style={styles.flatList}
+					disableVirtualization={false}
 					ListEmptyComponent={					
 						isLoading ? (
 							<View style={styles.notData}>

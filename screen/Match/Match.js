@@ -383,6 +383,7 @@ const Match = (props) => {
 					onEndReached={moreData}
 					refreshing={refreshing}
 					onRefresh={onRefresh}
+					disableVirtualization={false}
 					ListHeaderComponent={
 						<>						
 						<KeyboardAvoidingView style={[styles.schBox, styles.borderBot]}>
