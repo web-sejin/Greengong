@@ -54,7 +54,7 @@ const Message = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(responseJson);
+				console.log('list_text : ',responseJson);
         setMsgList(responseJson.data);
         setTotalCnt(responseJson.total_count);
 			}else{

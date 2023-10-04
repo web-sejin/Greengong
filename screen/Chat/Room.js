@@ -719,7 +719,7 @@ const Room = (props) => {
 							onPress={()=>{setVisible4(true)}}
 						>
 							<AutoHeightImage width={50} source={require("../../assets/img/chat_btn3.png")} />
-							<Text style={styles.msgOptBtnText}>전화{userInfo?.mb_idx }</Text>
+							<Text style={styles.msgOptBtnText}>전화</Text>
 						</TouchableOpacity>
 						) : null}
 						<TouchableOpacity

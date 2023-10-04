@@ -58,7 +58,7 @@ const QnaList = ({navigation, route}) => {
       <View style={[styles.noticeWrap]}>
         <View style={styles.noticeListCont}>
           <View style={styles.noticeTit}>
-            <Text style={styles.noticeTitText}>{item.bd_title}//{item.bd_idx}</Text>
+            <Text style={styles.noticeTitText}>{item.bd_title}</Text>
           </View>
           <View style={styles.noticeDate}>
 						{item.answer == '답변대기' ? (
