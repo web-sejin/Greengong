@@ -87,14 +87,14 @@ const Home = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log(responseJson);
+				console.log(responseJson);
         setMyInfo(responseJson);
 				setMyFac(responseJson.fac_info);
 				
 				if(responseJson.fac_info[0].fc_use == 1){
 					setMyFacOn("공장1("+responseJson.fac_info[0].fc_dong+")");
 				}else if(responseJson.fac_info[1].fc_use == 1){
-					setMyFacOn("공장2("+responseJson.fac_info[0].fc_dong+")");
+					setMyFacOn("공장2("+responseJson.fac_info[1].fc_dong+")");
 				}
 				// const fcUse = (responseJson.fac_info).find(item=> item.fc_use==1);
 				// const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
@@ -393,13 +393,15 @@ const Home = (props) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){				
+				console.log('choice_fac : ',responseJson);
 				setItemList([]);
 				setNowPage(1);
 				setVisible(false);
 				setMyFac(responseJson.data);
 
 				const fcUse = (responseJson.data).find(item=> item.fc_use==1);				
-				//const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";							
+				//const fcUseText = fcUse.fc_name+"("+fcUse.fc_dong+")";
+				console.log('fcUse : ',fcUse);						
 				const fcUseText = '공장'+v+"("+fcUse.fc_dong+")";
 				setMyFacOn(fcUseText);	
 
@@ -441,6 +443,7 @@ const Home = (props) => {
 					<Text style={styles.headerBtn1Text}>{myFacOn}</Text>
 					<AutoHeightImage width={18} source={require("../assets/img/icon_arrow.png")} />
 				</TouchableOpacity>
+
 				<TouchableOpacity 
 					style={styles.headerBtn2}
 					activeOpacity={opacityVal}
