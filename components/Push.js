@@ -32,7 +32,7 @@ const PushChk = (props) => {
 
     setNaviIntent(navi);
     setContent(remoteMessage.data.body);            
-console.log('navi : ', navi)
+
     if(navi == 'ChatRoom'){
       //채팅 메시지가 전송 되었을 때
       let room_page = '';
@@ -47,8 +47,13 @@ console.log('navi : ', navi)
         room_idx = result;
         if(room_idx != contentIdx.cr_idx){
           setPushVisible(true);
-          const roomName = contentIdx.page_code+'_'+contentIdx.cr_idx;                
-          setNaviProp({pd_idx:contentIdx.pd_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName, cr_idx:contentIdx.cr_idx});
+          const roomName = contentIdx.page_code+'_'+contentIdx.cr_idx;
+          
+          if(contentIdx.page_code = 'product'){
+            setNaviProp({pd_idx:contentIdx.pd_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName, cr_idx:contentIdx.cr_idx});
+          }else{
+            setNaviProp({pd_idx:contentIdx.mc_idx, page_code:contentIdx.page_code, recv_idx:contentIdx.recv_idx, roomName:roomName, cr_idx:contentIdx.cr_idx});
+          }
         }
       });
             
@@ -79,7 +84,7 @@ console.log('navi : ', navi)
   useEffect(() => {
    //포그라운드 상태
     messaging().onMessage((remoteMessage) => {
-      //console.log('실행중 메시지 !!! ::: ',remoteMessage);
+      console.log('포그라운드 ::: ',remoteMessage);
       if(remoteMessage){
         if(!state){
           PusgAlert(remoteMessage);
@@ -90,7 +95,8 @@ console.log('navi : ', navi)
 
     //백그라운드 상태
     messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log('onNotificationOpenedApp', remoteMessage);
+      //console.log('onNotificationOpenedApp', remoteMessage);
+      console.log('백그라운드 ::: ', remoteMessage);
       if(remoteMessage){
         PusgAlert(remoteMessage);
       }
@@ -99,7 +105,7 @@ console.log('navi : ', navi)
     //종료상태
     messaging().getInitialNotification().then((remoteMessage) => {
       // console.log('getInitialNotification', remoteMessage);
-      console.log('백그라운드 메시지:::',remoteMessage)
+      console.log('종료상태 ::: ',remoteMessage)
       if(remoteMessage){
         PusgAlert(remoteMessage);
       }

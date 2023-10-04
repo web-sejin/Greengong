@@ -65,18 +65,16 @@ const Room = (props) => {
 		let isSubscribed = true;
 
 		if(!isFocused){
-			if(!pageSt){
-				setVisible(false);
-				setVisible2(false);
-				setVisible3(false);
-				setVisible4(false);
-				setVisible5(false);
-				setVisible6(false);
-				setVisible7(false);
-				setToastModal(false);
-				setToastText('');
-				setRadio(1);				
-			}
+			setVisible(false);
+			setVisible2(false);
+			setVisible3(false);
+			setVisible4(false);
+			setVisible5(false);
+			setVisible6(false);
+			setVisible7(false);
+			setToastModal(false);
+			setToastText('');
+			setRadio(1);	
 			AsyncStorage.removeItem('roomPage');
 			AsyncStorage.removeItem('roomIdx');			
 		}else{
@@ -329,6 +327,9 @@ const Room = (props) => {
 
 	//방 정보
 	const getRoomData = async () => {
+		console.log('recv_idx : ',recv_idx);
+		console.log('page_code : ',page_code);
+		console.log('page_idx : ',page_idx);
 		await Api.send('GET', 'in_chat', {is_api: 1, recv_idx:recv_idx, page_code:page_code, page_idx:page_idx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
