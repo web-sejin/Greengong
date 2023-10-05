@@ -809,7 +809,7 @@ const SnsRegister2 = ({navigation, route}) => {
 					<Text style={styles.headerTitle}>공장 및 인증 정보 설정</Text>
 					</>
 				</View>
-				<KeyboardAwareScrollView>
+				<KeyboardAwareScrollView keyboardShouldPersistTaps="always">
 					<View style={styles.registArea}>
 						<View style={[styles.registBox, styles.registBox3]}>
 							<View style={styles.alertBox}>
