@@ -472,6 +472,8 @@ const MatchWrite = ({navigation, route}) => {
 		// 	calcPrice = (price).split(',').join('');
 		// }
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,				
 			mc_name:subject,
@@ -513,10 +515,12 @@ const MatchWrite = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);				
+				console.log('성공 : ',responseJson);
+				setIsLoading(true);
 				navigation.navigate('Match', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});
@@ -1150,7 +1154,7 @@ const MatchWrite = ({navigation, route}) => {
 				</View>
       </Modal>
 
-			{isLoading ? (
+			{!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>

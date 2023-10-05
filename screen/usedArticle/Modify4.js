@@ -402,6 +402,8 @@ const Modify4 = ({navigation, route}) => {
 
 		if(content == ""){ ToastMessage('내용을 입력해 주세요.'); return false; }
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,
       pd_idx:idx,		
@@ -508,6 +510,7 @@ const Modify4 = ({navigation, route}) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);				
+				setIsLoading(true);
 				if(route.params.returnNavi){
 					navigation.navigate(route.params.returnNavi);
 				}else{
@@ -515,6 +518,7 @@ const Modify4 = ({navigation, route}) => {
 				}
 			}else{
 				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});

@@ -512,6 +512,8 @@ const MatchModify = ({navigation, route}) => {
 			calcCnt = (cnt).split(',').join('');
 		}
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,				
 			mc_idx:idx,
@@ -630,10 +632,12 @@ const MatchModify = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);				
+				console.log('성공 : ',responseJson);
+				setIsLoading(true);
 				navigation.navigate('Match', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', responseJson);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});

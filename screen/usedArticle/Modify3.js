@@ -367,6 +367,8 @@ const Modify3 = ({navigation, route}) => {
 
 		let resPrice = (price).split(',').join('');
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,
 			pd_idx:idx,	
@@ -475,6 +477,7 @@ const Modify3 = ({navigation, route}) => {
 
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);				
+				setIsLoading(true);
 				if(route.params.returnNavi){
 					navigation.navigate(route.params.returnNavi, {isSubmit: true});
 				}else{
@@ -482,6 +485,7 @@ const Modify3 = ({navigation, route}) => {
 				}
 			}else{
 				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});
