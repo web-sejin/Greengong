@@ -323,7 +323,7 @@ const MatchModify = ({navigation, route}) => {
 			const res = await DocumentPicker.pick({
 				type: [DocumentPicker.types.allFiles],
 			})
-			console.log(res[0]);
+			//console.log('res :::::::::::::::: ',res[0]);
 			setFloorFile(res[0].name);
 			setFloorFileType(res[0].type);
 			setFloorFileUri(res[0].uri);
@@ -354,7 +354,7 @@ const MatchModify = ({navigation, route}) => {
 		setFloorFile('');
 		setFloorFileType('');
 		setFloorFileUri('');
-		console.log('?');
+		//console.log('?');
 	}
 
 	function writeUpdate(){
@@ -535,6 +535,8 @@ const MatchModify = ({navigation, route}) => {
 			mc_price:price
 		};
 
+		//console.log(floorFileType);
+
 		if(floorFile != ''){ 
 			formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; 
 		}
@@ -620,7 +622,8 @@ const MatchModify = ({navigation, route}) => {
 			formData.mf_file_del_9_idx = del10Idx;
 		}
 
-		console.log("formData : ",formData);
+		//console.log('useInfo : ',useInfo);
+		//console.log("formData : ",formData);
 
 		Api.send('POST', 'modify_match', formData, (args)=>{
 			let resultItem = args.resultItem;
@@ -676,9 +679,11 @@ const MatchModify = ({navigation, route}) => {
         
 				let totalComma = String(responseJson.mc_total).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
         setCnt(totalComma);
-        
-        if(responseJson.mc_file_org){
+        console.log(responseJson.mc_file);
+        if(responseJson.mc_file_org){					
           setFloorFile(responseJson.mc_file_org);
+					setFloorFileType('application/zip');
+					setFloorFileUri(responseJson.mc_file);
         }
 
         setCall(responseJson.mc_option1)
@@ -845,7 +850,7 @@ const MatchModify = ({navigation, route}) => {
 							: (
 							<View style={[styles.typingBox, styles.mgTop35]}>
 								<View style={styles.typingTitle}>
-									<Text style={styles.typingTitleText}>재료1{matt1}</Text>
+									<Text style={styles.typingTitleText}>재료1</Text>
 								</View>
 								<View style={[styles.typingInputBox]}>									
 									<RNPickerSelect
