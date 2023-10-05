@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, TouchableWithoutFeedback} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -332,113 +332,115 @@ const MyInfo = (props) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'계정정보 설정'} />
-			<KeyboardAwareScrollView>
-				<View style={styles.registArea}>
-					<View style={[styles.registBox, styles.registBox2, styles.borderBot]}>
-						<View style={styles.alertBox}>
-							<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-							<Text style={styles.alertBoxText}>등록된 휴대폰 번호로 거래를 하실 수 있습니다.</Text>
-						</View>
+			<KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<View style={styles.registArea}>
+						<View style={[styles.registBox, styles.registBox2, styles.borderBot]}>
+							<View style={styles.alertBox}>
+								<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+								<Text style={styles.alertBoxText}>등록된 휴대폰 번호로 거래를 하실 수 있습니다.</Text>
+							</View>
 
-						<View style={[styles.typingBox, styles.mgTop30]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>휴대폰 번호</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={mbHp}
-									keyboardType = 'numeric'
-									onChangeText={(v) => {
-										const phone = phoneFormat(v);
-										setMbHp(phone);
-										setCertNumber('');
-										setCertNumberSt(false);
-									}}
-									placeholder={"휴대폰번호를 입력해 주세요."}
-									style={[styles.input, styles.input2]}
-									placeholderTextColor={"#8791A1"}
-									maxLength={13}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {_sendSmsButton()}}
-								>
-									<Text style={styles.certChkBtnText}>인증번호</Text>
-								</TouchableOpacity>
-							</View>
-							<View style={[styles.typingInputBox]}>
-								<TextInput
-									value={certNumber}
-									keyboardType = 'numeric'
-									onChangeText={(v) => {setCertNumber(v)}}
-									placeholder={"인증번호 입력"}
-									style={[styles.input]}
-									placeholderTextColor={"#8791A1"}
-								/>
-								<View style={styles.timeBox}>
-									<Text style={styles.timeBoxText}>
-										{timeStamp}
-									</Text>
+							<View style={[styles.typingBox, styles.mgTop30]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>휴대폰 번호</Text>
 								</View>
-								<TouchableOpacity 
-									style={styles.certChkBtn2}
-									activeOpacity={opacityVal}
-									onPress={() => {_authComplete('cert_chk')}}
-								>
-									<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
-								</TouchableOpacity>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={mbHp}
+										keyboardType = 'numeric'
+										onChangeText={(v) => {
+											const phone = phoneFormat(v);
+											setMbHp(phone);
+											setCertNumber('');
+											setCertNumberSt(false);
+										}}
+										placeholder={"휴대폰번호를 입력해 주세요."}
+										style={[styles.input, styles.input2]}
+										placeholderTextColor={"#8791A1"}
+										maxLength={13}
+									/>
+									<TouchableOpacity 
+										style={styles.certChkBtn}
+										activeOpacity={opacityVal}
+										onPress={() => {_sendSmsButton()}}
+									>
+										<Text style={styles.certChkBtnText}>인증번호</Text>
+									</TouchableOpacity>
+								</View>
+								<View style={[styles.typingInputBox]}>
+									<TextInput
+										value={certNumber}
+										keyboardType = 'numeric'
+										onChangeText={(v) => {setCertNumber(v)}}
+										placeholder={"인증번호 입력"}
+										style={[styles.input]}
+										placeholderTextColor={"#8791A1"}
+									/>
+									<View style={styles.timeBox}>
+										<Text style={styles.timeBoxText}>
+											{timeStamp}
+										</Text>
+									</View>
+									<TouchableOpacity 
+										style={styles.certChkBtn2}
+										activeOpacity={opacityVal}
+										onPress={() => {_authComplete('cert_chk')}}
+									>
+										<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</View>
+
+						<View style={[styles.registBox, styles.borderTop, styles.paddBot13]}>
+							<View style={[styles.typingBox]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>이메일</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										keyboardType='email-address'
+										value={mbEmail}
+										onChangeText={(v) => {setMbEmail(v)}}
+										placeholder={'이메일을 입력해 주세요.'}
+										placeholderTextColor="#C5C5C6"
+										style={[styles.input, styles.input2]}
+									/>
+									<TouchableOpacity 
+										style={styles.certChkBtn}
+										activeOpacity={opacityVal}
+										onPress={() => {emailChk()}}
+									>
+										<Text style={styles.certChkBtnText}>중복확인</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+
+							<View style={[styles.typingBox, styles.mgTop35]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>닉네임</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={mbNickname}									
+										onChangeText={(v) => {setMbNickname(v)}}
+										placeholder={"닉네임을 입력해 주세요."}
+										style={[styles.input, styles.input2]}
+										placeholderTextColor={"#8791A1"}
+									/>
+									<TouchableOpacity 
+										style={styles.certChkBtn}
+										activeOpacity={opacityVal}
+										onPress={() => {nickChk()}}
+									>
+										<Text style={styles.certChkBtnText}>중복확인</Text>
+									</TouchableOpacity>
+								</View>
 							</View>
 						</View>
 					</View>
-
-					<View style={[styles.registBox, styles.borderTop, styles.paddBot13]}>
-						<View style={[styles.typingBox]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>이메일</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									keyboardType='email-address'
-									value={mbEmail}
-									onChangeText={(v) => {setMbEmail(v)}}
-									placeholder={'이메일을 입력해 주세요.'}
-									placeholderTextColor="#C5C5C6"
-									style={[styles.input, styles.input2]}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {emailChk()}}
-								>
-									<Text style={styles.certChkBtnText}>중복확인</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-
-						<View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>닉네임</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={mbNickname}									
-									onChangeText={(v) => {setMbNickname(v)}}
-									placeholder={"닉네임을 입력해 주세요."}
-									style={[styles.input, styles.input2]}
-									placeholderTextColor={"#8791A1"}
-								/>
-								<TouchableOpacity 
-									style={styles.certChkBtn}
-									activeOpacity={opacityVal}
-									onPress={() => {nickChk()}}
-								>
-									<Text style={styles.certChkBtnText}>중복확인</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</View>
-				</View>
+				</TouchableWithoutFeedback>
 			</KeyboardAwareScrollView>
 			<View style={styles.nextFix}>
 				<TouchableOpacity 

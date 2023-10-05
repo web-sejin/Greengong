@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, TouchableWithoutFeedback} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -117,82 +117,87 @@ const Keyword = ({navigation, route}) => {
         }
       });
     }
+    Keyboard.dismiss();
   }
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'키워드 등록'} />			               
-      <ScrollView>        
-        <View style={styles.registArea}>
-          <View style={[styles.registBox]}>
-            <View style={[styles.typingBox]}>
-              <View style={styles.typingTitle}>
-                <Text style={styles.typingTitleText}>키워드 (최대 10개 등록 가능)</Text>
-              </View>
-              <View style={[styles.typingInputBox]}>
-                <TextInput
-                  value={keywords}
-                  onChangeText={(v) => {setKeywords(v)}}
-                  placeholder={"키워드를 등록해 주세요."}
-                  style={[styles.input]}
-                  placeholderTextColor={"#8791A1"}
-                  returnKyeType='done'
-							    onSubmitEditing={_submit}
-                />
+      <KeyboardAwareScrollView keyboardShouldPersistTaps="always">        
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <>
+            <View style={styles.registArea}>
+              <View style={[styles.registBox]}>
+                <View style={[styles.typingBox]}>
+                  <View style={styles.typingTitle}>
+                    <Text style={styles.typingTitleText}>키워드 (최대 10개 등록 가능)</Text>
+                  </View>
+                  <View style={[styles.typingInputBox]}>
+                    <TextInput
+                      value={keywords}
+                      onChangeText={(v) => {setKeywords(v)}}
+                      placeholder={"키워드를 등록해 주세요."}
+                      style={[styles.input]}
+                      placeholderTextColor={"#8791A1"}
+                      returnKyeType='done'
+                      onSubmitEditing={_submit}
+                    />
+                  </View>
+                </View>
+                <TouchableOpacity 
+                  style={styles.certChkBtn2}
+                  activeOpacity={opacityVal}
+                  onPress={() => {_submit()}}
+                >
+                  <Text style={styles.certChkBtnText2}>등록</Text>
+                </TouchableOpacity>
+
+                <View style={[styles.alertBox, styles.mgTop30]}>
+                  <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
+                  <Text style={styles.alertBoxText}>관심 키워드 등록을 통해서 관련 상품이나 매칭이 등록되면 알림을 보내드립니다.</Text>
+                </View>            
               </View>
             </View>
-            <TouchableOpacity 
-              style={styles.certChkBtn2}
-              activeOpacity={opacityVal}
-              onPress={() => {_submit()}}
-            >
-              <Text style={styles.certChkBtnText2}>등록</Text>
-            </TouchableOpacity>
-
-            <View style={[styles.alertBox, styles.mgTop30]}>
-              <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-              <Text style={styles.alertBoxText}>관심 키워드 등록을 통해서 관련 상품이나 매칭이 등록되면 알림을 보내드립니다.</Text>
-            </View>            
-          </View>
-        </View>
-        {totalCnt > 0 ? (
-        <View style={styles.keywordList}>
-          {keywordList.map((item, index) => {
-            return(
-              <View 
-                key={item.al_idx}
-                style={[styles.keywordLi, index==0 ? styles.keywordLiFst : null]}
-              >
-                <Text style={styles.keywordLiText}>{index+1}. {item.al_msg}</Text>
-                <TouchableOpacity
-                  activeOpacity={opacityVal}
-                  onPress={()=>{deleteKeyword(item.al_idx)}}
-                >
+            {totalCnt > 0 ? (
+            <View style={styles.keywordList}>
+              {keywordList.map((item, index) => {
+                return(
+                  <View 
+                    key={item.al_idx}
+                    style={[styles.keywordLi, index==0 ? styles.keywordLiFst : null]}
+                  >
+                    <Text style={styles.keywordLiText}>{index+1}. {item.al_msg}</Text>
+                    <TouchableOpacity
+                      activeOpacity={opacityVal}
+                      onPress={()=>{deleteKeyword(item.al_idx)}}
+                    >
+                      <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
+                    </TouchableOpacity>
+                  </View>
+                )
+              })}
+              {/* <View style={styles.keywordLi}>
+                <Text style={styles.keywordLiText}>2. 쌉니다</Text>
+                <TouchableOpacity>
                   <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
                 </TouchableOpacity>
               </View>
-            )
-          })}
-          {/* <View style={styles.keywordLi}>
-            <Text style={styles.keywordLiText}>2. 쌉니다</Text>
-            <TouchableOpacity>
-              <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.keywordLi}>
-            <Text style={styles.keywordLiText}>3. 마트</Text>
-            <TouchableOpacity>
-              <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
-            </TouchableOpacity>
-          </View> */}
-        </View>
-        ) : (
-        <View style={styles.notData}>
-          <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-          <Text style={styles.notDataText}>등록된 키워드가 없습니다.</Text>
-        </View>
-        )}
-      </ScrollView>
+              <View style={styles.keywordLi}>
+                <Text style={styles.keywordLiText}>3. 마트</Text>
+                <TouchableOpacity>
+                  <AutoHeightImage width={21} source={require("../../assets/img/write_btn_off2.png")} />
+                </TouchableOpacity>
+              </View> */}
+            </View>
+            ) : (
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>등록된 키워드가 없습니다.</Text>
+            </View>
+            )}
+          </>
+        </TouchableWithoutFeedback>
+      </KeyboardAwareScrollView>
 		</SafeAreaView>
 	)
 }

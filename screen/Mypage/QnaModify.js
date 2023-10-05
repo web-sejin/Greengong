@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, TouchableWithoutFeedback} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -23,7 +23,7 @@ const QnaModify = (props) => {
 	const [pageSt, setPageSt] = useState(false);
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
-	const [isLoading, setIsLoading] = useState(true); 
+	const [isLoading, setIsLoading] = useState(false); 
 	const [visible, setVisible] = useState(false);
 
 	const isFocused = useIsFocused();
@@ -84,7 +84,7 @@ const QnaModify = (props) => {
       return false;
     }
 
-		setIsLoading(true);
+		setIsLoading(false);
 
 		let formData = {
 			is_api:1,			
@@ -102,14 +102,15 @@ const QnaModify = (props) => {
 				//navigation.navigate('QnaView', {bd_idx:idx});
 				navigation.navigate('QnaList', {isSubmit: true});
 			}else{
-				console.log('결과 출력 실패!', resultItem);
-				setIsLoading(false);
+				console.log('결과 출력 실패!', resultItem);				
 				ToastMessage(responseJson.result_text);
 			}
 		});
+		setIsLoading(true);
   }
 
 	const fnDelete = async () => {
+		setIsLoading(false);
 		let formData = {
 			is_api:1,			
 			bd_idx:idx,	
@@ -125,7 +126,7 @@ const QnaModify = (props) => {
 				navigation.navigate('QnaList', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
-				setIsLoading(false);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});
@@ -134,70 +135,72 @@ const QnaModify = (props) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'1:1 문의'} />			
-			<KeyboardAwareScrollView>
-        <View style={styles.registArea}>
-					<View style={[styles.registBox]}>
-            <View style={[styles.typingBox]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>제목</Text>
+			<KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<View style={styles.registArea}>
+						<View style={[styles.registBox]}>
+							<View style={[styles.typingBox]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>제목</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={subject}
+										onChangeText={(v) => {setSubject(v)}}
+										placeholder={'제목을 입력해 주세요.'}
+										placeholderTextColor="#8791A1"
+										style={[styles.input]}
+									/>
+								</View>
 							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={subject}
-									onChangeText={(v) => {setSubject(v)}}
-									placeholder={'제목을 입력해 주세요.'}
-									placeholderTextColor="#8791A1"
-									style={[styles.input]}
-								/>
+							<View style={[styles.typingBox, styles.mgTop35]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>내용</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={content}
+										onChangeText={(v) => {
+											setContent(v);
+										}}
+										placeholder={'내용을 입력해 주세요.'}
+										placeholderTextColor="#8791A1"
+										multiline={true}
+										style={[styles.input, styles.textarea]}
+									/>
+								</View>
 							</View>
-						</View>
-            <View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>내용</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={content}
-									onChangeText={(v) => {
-										setContent(v);
+							<View style={[styles.btnList, styles.mgTop35]}>              
+								<TouchableOpacity
+									style={[styles.btn, styles.btn2]}
+									activeOpacity={opacityVal}
+									onPress={()=>{
+										_submit();
 									}}
-									placeholder={'내용을 입력해 주세요.'}
-									placeholderTextColor="#8791A1"
-									multiline={true}
-									style={[styles.input, styles.textarea]}
-								/>
+								>
+									<Text style={styles.btnText}>수정</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={[styles.btn, styles.btn3]}
+									activeOpacity={opacityVal}
+									onPress={()=>{setVisible(true)}}
+								>
+									<Text style={styles.btnText}>삭제</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={styles.btn}
+									activeOpacity={opacityVal}
+									onPress={()=>{
+										//navigation.navigate('QnaList');
+										navigation.goBack();
+									}}
+								>
+									<Text style={styles.btnText}>리스트</Text>
+								</TouchableOpacity>
 							</View>
 						</View>
-            <View style={[styles.btnList, styles.mgTop35]}>              
-              <TouchableOpacity
-                style={[styles.btn, styles.btn2]}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  _submit();
-                }}
-              >
-                <Text style={styles.btnText}>수정</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn3]}
-                activeOpacity={opacityVal}
-                onPress={()=>{setVisible(true)}}
-              >
-                <Text style={styles.btnText}>삭제</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btn}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  //navigation.navigate('QnaList');
-									navigation.goBack();
-                }}
-              >
-                <Text style={styles.btnText}>리스트</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+					</View>
+				</TouchableWithoutFeedback>
       </KeyboardAwareScrollView>			
 
 			<Modal
@@ -234,7 +237,7 @@ const QnaModify = (props) => {
 				</View>
       </Modal>
 
-			{isLoading ? (
+			{!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>

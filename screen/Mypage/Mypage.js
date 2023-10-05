@@ -66,7 +66,7 @@ const Mypage = (props) => {
 		formData.append('mb_idx', userInfo?.mb_idx);
 		const logout =  await member_logout(formData);
 		console.log("logout : ",logout);
-
+		setVisible(false);
 		ToastMessage('로그아웃처리 되었습니다.');
 		navigation.reset({
 			routes: [{ name: 'Login'}],

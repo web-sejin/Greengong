@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, TouchableWithoutFeedback} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -86,66 +86,68 @@ const MessageWrite = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'자주 쓰는 메세지'} />			
-			<KeyboardAwareScrollView>
-        <View style={styles.registArea}>
-					<View style={[styles.registBox]}>
-            <View style={[styles.typingBox]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>제목</Text>
+			<KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<View style={styles.registArea}>
+						<View style={[styles.registBox]}>
+							<View style={[styles.typingBox]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>제목</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={subject}
+										onChangeText={(v) => {setSubject(v)}}
+										placeholder={'제목을 입력해 주세요.'}
+										placeholderTextColor="#8791A1"
+										style={[styles.input]}
+									/>
+								</View>
 							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={subject}
-									onChangeText={(v) => {setSubject(v)}}
-									placeholder={'제목을 입력해 주세요.'}
-									placeholderTextColor="#8791A1"
-									style={[styles.input]}
-								/>
-							</View>
-						</View>
-            <View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>내용</Text>
-							</View>
-							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={content}
-									onChangeText={(v) => {
-										setContent(v);
-									}}
-									maxLength={100}
-									placeholder={'내용을 입력해 주세요.'}
-									placeholderTextColor="#8791A1"
-									multiline={true}
-									style={[styles.input, styles.textarea]}
-								/>	
-								<View style={styles.textCnt}>
-									<Text style={styles.textCntText}>{contLen}/100</Text>
+							<View style={[styles.typingBox, styles.mgTop35]}>
+								<View style={styles.typingTitle}>
+									<Text style={styles.typingTitleText}>내용</Text>
+								</View>
+								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
+									<TextInput
+										value={content}
+										onChangeText={(v) => {
+											setContent(v);
+										}}
+										maxLength={100}
+										placeholder={'내용을 입력해 주세요.'}
+										placeholderTextColor="#8791A1"
+										multiline={true}
+										style={[styles.input, styles.textarea]}
+									/>	
+									<View style={styles.textCnt}>
+										<Text style={styles.textCntText}>{contLen}/100</Text>
+									</View>							
 								</View>							
-							</View>							
+							</View>
+							<View style={[styles.btnList, styles.mgTop35]}>
+								<TouchableOpacity
+									style={styles.btn}
+									activeOpacity={opacityVal}
+									onPress={()=>{
+										navigation.navigate('Message');
+									}}
+								>
+									<Text style={styles.btnText}>리스트</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={[styles.btn, styles.btn2]}
+									activeOpacity={opacityVal}
+									onPress={()=>{
+										_submit();
+									}}
+								>
+									<Text style={styles.btnText}>확인</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-            <View style={[styles.btnList, styles.mgTop35]}>
-              <TouchableOpacity
-                style={styles.btn}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  navigation.navigate('Message');
-                }}
-              >
-                <Text style={styles.btnText}>리스트</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btn, styles.btn2]}
-                activeOpacity={opacityVal}
-                onPress={()=>{
-                  _submit();
-                }}
-              >
-                <Text style={styles.btnText}>확인</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+					</View>
+				</TouchableWithoutFeedback>
       </KeyboardAwareScrollView>
 
 			{isLoading ? (

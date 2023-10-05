@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, Platform} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, Platform, TouchableWithoutFeedback} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -55,6 +55,7 @@ const Login = (props) => {
 	}, [isFocused]);
 
 	const _sendLogin = async () => {		
+		console.log('aaaaaaaaaaaaaaaa');
 		if(!email || email == ""){
 			ToastMessage('이메일을 입력해 주세요.');
 			return false;
@@ -222,110 +223,112 @@ const Login = (props) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
-			<KeyboardAwareScrollView>
-				<View style={styles.loginBox}>
-					<View style={styles.logo}>
-						<AutoHeightImage width={78} source={require("../../assets/img/logo.png")} />
-					</View>
-					<View style={styles.loginDesc}>
-						<Text style={styles.loginDescText}>투명한 산업 거래</Text>
-						<Text style={[styles.loginDescText, styles.loginDescText2]}>모두가 만족하는 모두를 위한거래,</Text>
-						<Text style={[styles.loginDescText, styles.loginDescText2, styles.loginDescTextBold]}>지금 시작해보세요!</Text>
-					</View>				
-					<View style={styles.loginIptBox}>
-					<Text style={styles.loginIptBoxText}>이메일</Text>
-						<TextInput
-							keyboardType='email-address'
-							value={email}
-							onChangeText={(v) => {setEmail(v)}}
-							placeholder={'이메일 입력'}
-							placeholderTextColor="#C5C5C6"
-							style={[styles.input]}
-							returnKyeType='done'
-							onSubmitEditing={_sendLogin}
-						/>
-					</View>
-					<View style={[styles.loginIptBox, styles.loginIptBox2]}>
-						<Text style={styles.loginIptBoxText}>비밀번호</Text>
-						<TextInput
-							secureTextEntry={true}
-							value={pw}
-							onChangeText={(v) => {setPw(v)}}
-							placeholder={'비밀번호 입력'}
-							placeholderTextColor="#C5C5C6"
-							style={[styles.input]}
-							returnKyeType='done'
-							onSubmitEditing={_sendLogin}
-						/>
-					</View>
-					<View style={styles.loginBtnBox}>
-						<TouchableOpacity 
-							style={styles.loginBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {_sendLogin()}}
-						>
-							<Text style={styles.loginBtnText}>로그인</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.snsBtnBox}>
-						<TouchableOpacity 
-							style={styles.snsBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {signInWithKakao()}}
-						>
-							<AutoHeightImage width={21} source={require("../../assets/img/kakao_login.png")} style={styles.kakaoLogo} />
-							<Text style={styles.snsBtnText}>카카오 로그인</Text>
-						</TouchableOpacity>
-					</View>
+			<KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+					<View style={styles.loginBox}>
+						<View style={styles.logo}>
+							<AutoHeightImage width={78} source={require("../../assets/img/logo.png")} />
+						</View>
+						<View style={styles.loginDesc}>
+							<Text style={styles.loginDescText}>투명한 산업 거래</Text>
+							<Text style={[styles.loginDescText, styles.loginDescText2]}>모두가 만족하는 모두를 위한거래,</Text>
+							<Text style={[styles.loginDescText, styles.loginDescText2, styles.loginDescTextBold]}>지금 시작해보세요!</Text>
+						</View>				
+						<View style={styles.loginIptBox}>
+						<Text style={styles.loginIptBoxText}>이메일</Text>
+							<TextInput
+								keyboardType='email-address'
+								value={email}
+								onChangeText={(v) => {setEmail(v)}}
+								placeholder={'이메일 입력'}
+								placeholderTextColor="#C5C5C6"
+								style={[styles.input]}
+								returnKyeType='done'
+								onSubmitEditing={_sendLogin}
+							/>
+						</View>
+						<View style={[styles.loginIptBox, styles.loginIptBox2]}>
+							<Text style={styles.loginIptBoxText}>비밀번호</Text>
+							<TextInput
+								secureTextEntry={true}
+								value={pw}
+								onChangeText={(v) => {setPw(v)}}
+								placeholder={'비밀번호 입력'}
+								placeholderTextColor="#C5C5C6"
+								style={[styles.input]}
+								returnKyeType='done'
+								onSubmitEditing={_sendLogin}
+							/>
+						</View>
+						<View style={styles.loginBtnBox}>
+							<TouchableOpacity 
+								style={styles.loginBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {_sendLogin()}}
+							>
+								<Text style={styles.loginBtnText}>로그인</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={styles.snsBtnBox}>
+							<TouchableOpacity 
+								style={styles.snsBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {signInWithKakao()}}
+							>
+								<AutoHeightImage width={21} source={require("../../assets/img/kakao_login.png")} style={styles.kakaoLogo} />
+								<Text style={styles.snsBtnText}>카카오 로그인</Text>
+							</TouchableOpacity>
+						</View>
 
-					{Platform.OS === 'ios' ? (
-					<View style={styles.snsBtnBox}>
-						<TouchableOpacity 
-							style={[styles.snsBtn, styles.snsBtn2]}
-							activeOpacity={opacityVal}
-							onPress={() => {}}
-						>
-							<AutoHeightImage width={18} source={require("../../assets/img/apple_logo.png")} style={styles.appleLogo} />
-							<Text style={[styles.snsBtnText, styles.snsBtnText2]}>애플 로그인</Text>
-						</TouchableOpacity>
+						{Platform.OS === 'ios' ? (
+						<View style={styles.snsBtnBox}>
+							<TouchableOpacity 
+								style={[styles.snsBtn, styles.snsBtn2]}
+								activeOpacity={opacityVal}
+								onPress={() => {}}
+							>
+								<AutoHeightImage width={18} source={require("../../assets/img/apple_logo.png")} style={styles.appleLogo} />
+								<Text style={[styles.snsBtnText, styles.snsBtnText2]}>애플 로그인</Text>
+							</TouchableOpacity>
+						</View>
+						) : null}
+						
+						<View style={styles.loginFindBox}>
+							<TouchableOpacity
+								style={styles.loginFindBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {
+									setPageSt(true);
+									navigation.navigate('Register', {appToken: appToken});
+								}}
+							>
+								<Text style={styles.loginFindBtnText}>회원가입</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.loginFindBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {
+									setPageSt(true);
+									navigation.navigate('Findid', {appToken: appToken})
+								}}
+							>
+								<Text style={styles.loginFindBtnText}>아이디 찾기</Text>
+								<View style={[styles.btnBar, styles.btnBar1]}></View>
+								<View style={[styles.btnBar, styles.btnBar2]}></View>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.loginFindBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {
+									setPageSt(true);
+									navigation.navigate('Findpw', {appToken: appToken})
+								}}
+							>
+								<Text style={styles.loginFindBtnText}>비밀번호 찾기</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
-					) : null}
-					
-					<View style={styles.loginFindBox}>
-						<TouchableOpacity
-							style={styles.loginFindBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {
-								setPageSt(true);
-								navigation.navigate('Register', {appToken: appToken});
-							}}
-						>
-							<Text style={styles.loginFindBtnText}>회원가입</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.loginFindBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {
-								setPageSt(true);
-								navigation.navigate('Findid', {appToken: appToken})
-							}}
-						>
-							<Text style={styles.loginFindBtnText}>아이디 찾기</Text>
-							<View style={[styles.btnBar, styles.btnBar1]}></View>
-							<View style={[styles.btnBar, styles.btnBar2]}></View>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.loginFindBtn}
-							activeOpacity={opacityVal}
-							onPress={() => {
-								setPageSt(true);
-								navigation.navigate('Findpw', {appToken: appToken})
-							}}
-						>
-							<Text style={styles.loginFindBtnText}>비밀번호 찾기</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
+				</TouchableWithoutFeedback>
 			</KeyboardAwareScrollView>
 			{indi ? (
 			<View style={[styles.indicator]}>
