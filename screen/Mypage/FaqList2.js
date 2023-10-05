@@ -117,7 +117,42 @@ const FaqList2 = ({navigation, route}) => {
 		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'고객센터'} />			
 
-			{isLoading ? (
+			<View style={styles.faqList}>
+				<View style={styles.faqListWrap}>
+					<View style={styles.faqSch}>
+						<View style={styles.faqSchBox}>
+							<TextInput
+								value={schText}
+								onChangeText={(v) => {setSchText(v)}}
+								//placeholder={''}
+								placeholderTextColor="#8791A1"
+								style={[styles.input]}
+								returnKyeType='done'
+								onSubmitEditing={_submit}
+							/>
+							<TouchableOpacity 
+								style={styles.faqSchBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {_submit()}}
+							>                
+								<AutoHeightImage width={16} source={require("../../assets/img/icon_search.png")} />
+							</TouchableOpacity>
+						</View>
+						<TouchableOpacity 
+							style={styles.faqSchCancel}
+							activeOpacity={opacityVal}
+							onPress={() => {
+								//navigation.navigate('FaqList');
+								navigation.goBack()
+							}}
+						>
+							<Text style={styles.faqSchCancelText}>취소</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</View>
+
+			{isLoading ? (						
 			<FlatList
 				data={itemList}
 				renderItem={(getList)}
@@ -125,44 +160,6 @@ const FaqList2 = ({navigation, route}) => {
 				onEndReachedThreshold={0.6}
 				onEndReached={moreData}
 				disableVirtualization={false}
-				ListHeaderComponent={
-					<>
-					<View style={styles.faqList}>
-						<View style={styles.faqListWrap}>
-							<View style={styles.faqSch}>
-								<View style={styles.faqSchBox}>
-									<TextInput
-										value={schText}
-										onChangeText={(v) => {setSchText(v)}}
-										//placeholder={''}
-										placeholderTextColor="#8791A1"
-										style={[styles.input]}
-									/>
-									<TouchableOpacity 
-										style={styles.faqSchBtn}
-										activeOpacity={opacityVal}
-										onPress={() => {
-											_submit();
-										}}
-									>                
-										<AutoHeightImage width={16} source={require("../../assets/img/icon_search.png")} />
-									</TouchableOpacity>
-								</View>
-								<TouchableOpacity 
-									style={styles.faqSchCancel}
-									activeOpacity={opacityVal}
-									onPress={() => {
-										//navigation.navigate('FaqList');
-										navigation.goBack()
-									}}
-								>
-									<Text style={styles.faqSchCancelText}>취소</Text>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</View>
-					</>
-				}
 				ListEmptyComponent={
 					<View style={styles.notData}>
 						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
