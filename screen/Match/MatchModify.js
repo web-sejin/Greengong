@@ -644,7 +644,7 @@ const MatchModify = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("modify : ",responseJson);
+				console.log("modify : ",responseJson);
 				const imgList = responseJson.mf_data;
 				if(imgList.length > 0){
 					let selectCon = fileList.map((item,index) => {					
@@ -677,8 +677,8 @@ const MatchModify = ({navigation, route}) => {
 				let totalComma = String(responseJson.mc_total).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
         setCnt(totalComma);
         
-        if(responseJson.mc_file){
-          setFloorFile(responseJson.mc_file);
+        if(responseJson.mc_file_org){
+          setFloorFile(responseJson.mc_file_org);
         }
 
         setCall(responseJson.mc_option1)
