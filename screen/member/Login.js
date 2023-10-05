@@ -54,8 +54,7 @@ const Login = (props) => {
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-	const _sendLogin = async () => {		
-		console.log('aaaaaaaaaaaaaaaa');
+	const _sendLogin = async () => {				
 		if(!email || email == ""){
 			ToastMessage('이메일을 입력해 주세요.');
 			return false;
@@ -144,7 +143,6 @@ const Login = (props) => {
       setKakaoResult(JSON.stringify(token));
     } catch(err) {
       console.log("error : ",err);
-			Alert.alert('e');
       //setIndi(false);
     }
   };
