@@ -59,7 +59,7 @@ const Write4 = ({navigation, route}) => {
   const [period, setPeriod] = useState(''); //입찰기간
   const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
@@ -315,6 +315,8 @@ const Write4 = ({navigation, route}) => {
 
 		if(content == ""){ ToastMessage('내용을 입력해 주세요.'); return false; }
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,				
 			pd_name:subject,
@@ -348,10 +350,12 @@ const Write4 = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);				
+				console.log('성공 : ',responseJson);
+				setIsLoading(true);
 				navigation.navigate('Home', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});
@@ -707,6 +711,12 @@ const Write4 = ({navigation, route}) => {
 					/>
 				</View>
       </Modal>
+
+			{!isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -757,6 +767,7 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 	inputUnit: {position:'absolute',top:0,right:20,},
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:56,color:'#000'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default Write4

@@ -525,7 +525,7 @@ const Modify4 = ({navigation, route}) => {
 	}
 
   const getData = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -565,7 +565,7 @@ const Modify4 = ({navigation, route}) => {
 				setPayMethod(responseJson.pd_method);
 				setContent(responseJson.pd_contents);
 
-        setIsLoading(false);
+        setIsLoading(true);
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
@@ -923,6 +923,12 @@ const Modify4 = ({navigation, route}) => {
 					/>
 				</View>
       </Modal>
+			
+			{!isLoading ? (
+			<View style={[styles.indicator]}>
+				<ActivityIndicator size="large" />
+			</View>
+			) : null}
 		</SafeAreaView>
 	)
 }
@@ -973,6 +979,7 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 	inputUnit: {position:'absolute',top:0,right:20,},
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:56,color:'#000'},
+	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
 export default Modify4

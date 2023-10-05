@@ -62,7 +62,7 @@ const Write1 = ({navigation, route}) => {
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
 	const [period, setPeriod] = useState(''); //입찰기간
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
@@ -358,6 +358,8 @@ const Write1 = ({navigation, route}) => {
 
 		let resPrice = (price).split(',').join('');
 
+		setIsLoading(false);
+
 		const formData = {
 			is_api:1,				
 			pd_name:subject,
@@ -395,10 +397,12 @@ const Write1 = ({navigation, route}) => {
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				console.log('성공 : ',responseJson);				
+				console.log('성공 : ',responseJson);
+				setIsLoading(true);				
 				navigation.navigate('Home', {isSubmit: true});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
+				setIsLoading(true);
 				ToastMessage(responseJson.result_text);
 			}
 		});
@@ -854,7 +858,7 @@ const Write1 = ({navigation, route}) => {
 				</View>
       </Modal>
 
-			{isLoading ? (
+			{!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>

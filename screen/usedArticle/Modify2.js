@@ -612,7 +612,7 @@ const Modify2 = ({navigation, route}) => {
 	}
 
   const getData = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -665,7 +665,7 @@ const Modify2 = ({navigation, route}) => {
         setSize5(responseJson.pd_length);
 				setPeriod((responseJson.pd_bidding_day).toString());
 
-        setIsLoading(false);
+        setIsLoading(true);
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!');
@@ -1247,7 +1247,7 @@ const Modify2 = ({navigation, route}) => {
 				</View>
       </Modal>
 
-      {isLoading ? (
+      {!isLoading ? (
 			<View style={[styles.indicator]}>
 				<ActivityIndicator size="large" />
 			</View>
