@@ -46,7 +46,7 @@ const Mypage = (props) => {
 			}
 		}
 
-		return () => isSubscribed = false;
+		return () => isSubscribed = false;		
 	}, [isFocused]);
 
 	//회원정보 조회
@@ -123,7 +123,13 @@ const Mypage = (props) => {
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alert4.png")} />
 					{recentNotice != '' ? (
-						<Text style={styles.notApprovalText}>{recentNotice}</Text>
+						<Text 
+							style={styles.notApprovalText}
+							numberOfLines={1}
+							ellipsizeMode='tail'
+						>
+							{recentNotice}
+						</Text>
 					) : (
 						<Text style={styles.notApprovalText}>등록된 공지사항이 없습니다.</Text>
 					)}
@@ -475,7 +481,7 @@ const styles = StyleSheet.create({
 	headerTitle: {fontFamily:Font.NotoSansMedium,textAlign:'center',fontSize:17,lineHeight:50,color:'#000'},
 	headerGear: {width:51,height:50,display:'flex',alignItems:'center',justifyContent:'center'},
 	notApproval: {display:'flex',flexDirection:'row',alignItems:'center',paddingHorizontal:20,paddingVertical:13,backgroundColor:'#404040',},
-	notApprovalText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:20,color:'#fff',marginLeft:12,},
+	notApprovalText: {width:innerWidth-32,fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:20,color:'#fff',marginLeft:12,},
 	mypageWrap: {paddingHorizontal:20},
 	mypageTit: {},
 	mypageTitText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000',},

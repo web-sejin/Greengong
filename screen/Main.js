@@ -37,8 +37,11 @@ import AlimList from './AlimList'; //알림 리스트
 import Login from './member/Login'; //로그인
 import Register from './member/Register'; //약관
 import Register2 from './member/Register2'; //회원가입
+import Register3 from './member/Register3'; //회원가입
+import Register4 from './member/Register4'; //회원가입
 import SnsRegister from './member/SnsRegister'; //약관-SNS
 import SnsRegister2 from './member/SnsRegister2'; //회원가입-SNS
+import SnsRegister3 from './member/SnsRegister3'; //회원가입-SNS
 import Findid from './member/Findid'; //아이디 찾기
 import Findpw from './member/Findpw'; //비밀번호 찾기
 import Match from './Match/Match';
@@ -108,6 +111,14 @@ import PushChk from '../components/Push';
 
 LogBox.ignoreLogs(['new NativeEventEmitter']); // Ignore log notification by message
 LogBox.ignoreAllLogs(); //Ignore all log notifications
+
+// Text 적용
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+// TextInput 적용
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -259,8 +270,11 @@ const StackNavigator = () => {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Register2" component={Register2} />      
+      <Stack.Screen name="Register3" component={Register3} />
+      <Stack.Screen name="Register4" component={Register4} />
       <Stack.Screen name="SnsRegister" component={SnsRegister} />
       <Stack.Screen name="SnsRegister2" component={SnsRegister2} />
+      <Stack.Screen name="SnsRegister3" component={SnsRegister3} />
       <Stack.Screen name="Findid" component={Findid} />
       <Stack.Screen name="Findpw" component={Findpw} />
       <Stack.Screen name="SearchList" component={SearchList} />

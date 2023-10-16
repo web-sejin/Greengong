@@ -171,6 +171,7 @@ const MyInfo = (props) => {
 				ToastMessage('본인인증이 완료되었습니다.');
 				setCertNumberSt(true);
 				timer_stop();
+				Keyboard.dismiss();
 			 }else{
 				ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
 				return false;
@@ -361,12 +362,27 @@ const MyInfo = (props) => {
 										maxLength={13}
 									/>
 									<TouchableOpacity 
+										style={[styles.certChkBtn, phoneIntervel ? styles.certDisabled : null]}
+										activeOpacity={opacityVal}
+										onPress={() => {
+											//console.log("phoneIntervel : ",phoneIntervel);
+											!phoneIntervel ? ( _sendSmsButton() ) : null
+											!phoneIntervel ? ( setCertNumber('') ) : null
+											!phoneIntervel ? ( setCertNumberSt(false) ) : null
+										}}
+									>
+										<Text style={[styles.certChkBtnText, phoneIntervel ? styles.certDisabledText : null]}>
+											인증번호
+										</Text>
+									</TouchableOpacity>
+
+									{/* <TouchableOpacity 
 										style={styles.certChkBtn}
 										activeOpacity={opacityVal}
 										onPress={() => {_sendSmsButton()}}
 									>
 										<Text style={styles.certChkBtnText}>인증번호</Text>
-									</TouchableOpacity>
+									</TouchableOpacity> */}
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
@@ -381,13 +397,15 @@ const MyInfo = (props) => {
 										<Text style={styles.timeBoxText}>
 											{timeStamp}
 										</Text>
-									</View>
+									</View>									
 									<TouchableOpacity 
-										style={styles.certChkBtn2}
+										style={[styles.certChkBtn2, certNumberSt ? styles.certChkBtn2Disabled : null]}
 										activeOpacity={opacityVal}
 										onPress={() => {_authComplete('cert_chk')}}
 									>
-										<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
+										<Text style={[styles.certChkBtnText2, certNumberSt ? styles.certChkBtn2DisabledText : null]}>
+											인증번호 확인
+										</Text>
 									</TouchableOpacity>
 								</View>
 							</View>
@@ -493,6 +511,10 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 	timeBox: {position:'absolute',right:20,top:0,},
 	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:56,color:'#000'},
+	certDisabled: {backgroundColor:'#efefef'},
+	certDisabledText: {color:'#aaa'},
+	certChkBtn2Disabled: {backgroundColor:'#efefef'},
+	certChkBtn2DisabledText: {color:'#aaa'},
 })
 
 //export default MyInfo

@@ -51,7 +51,7 @@ const Alim = (props) => {
     let opac = 0;
     
     if(state){
-      change = 22;
+      change = 23;
       opac = 1;
     }else{
       change = 3;

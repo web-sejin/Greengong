@@ -473,6 +473,7 @@ const Room = (props) => {
 
 	//전화걸기
 	function fnCall(){
+		setVisible4(false);
 		Linking.openURL(`tel:${phone}`)
 	}	
 

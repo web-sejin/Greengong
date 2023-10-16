@@ -672,11 +672,11 @@ const Home = (props) => {
 				visible={visible3}
 				transparent={true}
 				animationType={"fade"}
-				onRequestClose={() => {setVisible3(false)}}
+				onRequestClose={() => {submitFilter()}}
       >
 				<Pressable 
 					style={styles.modalBack}
-					onPress={() => {setVisible3(false)}}
+					onPress={() => {submitFilter()}}
 				></Pressable>
 				<View style={styles.modalCont3}>
 					<ScrollView>
@@ -684,7 +684,7 @@ const Home = (props) => {
 							<TouchableOpacity
 								style={styles.modalCont3Off}
 								activeOpacity={opacityVal}
-								onPress={()=>{setVisible3(false);}}
+								onPress={()=>{submitFilter();}}
 							>
 								<AutoHeightImage width={14} source={require("../assets/img/icon_close.png")} />
 							</TouchableOpacity>

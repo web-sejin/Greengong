@@ -1266,7 +1266,7 @@ const styles = StyleSheet.create({
 	registBox: {paddingVertical:20},
 	typingBox: {paddingHorizontal:20,},
 	typingBox2: {paddingRight:0,},
-	typingTitle: {},
+	typingTitle: {paddingLeft:9},
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},

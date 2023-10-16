@@ -225,13 +225,13 @@ const Login = (props) => {
 				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 					<View style={styles.loginBox}>
 						<View style={styles.logo}>
-							<AutoHeightImage width={78} source={require("../../assets/img/logo.png")} />
+							<AutoHeightImage width={105} source={require("../../assets/img/logo.png")} />
 						</View>
-						<View style={styles.loginDesc}>
+						{/* <View style={styles.loginDesc}>
 							<Text style={styles.loginDescText}>투명한 산업 거래</Text>
 							<Text style={[styles.loginDescText, styles.loginDescText2]}>모두가 만족하는 모두를 위한거래,</Text>
 							<Text style={[styles.loginDescText, styles.loginDescText2, styles.loginDescTextBold]}>지금 시작해보세요!</Text>
-						</View>				
+						</View>				 */}
 						<View style={styles.loginIptBox}>
 						<Text style={styles.loginIptBoxText}>이메일</Text>
 							<TextInput
@@ -239,7 +239,7 @@ const Login = (props) => {
 								value={email}
 								onChangeText={(v) => {setEmail(v)}}
 								placeholder={'이메일 입력'}
-								placeholderTextColor="#C5C5C6"
+								placeholderTextColor="#8791A1"
 								style={[styles.input]}
 								returnKyeType='done'
 								onSubmitEditing={_sendLogin}
@@ -252,7 +252,7 @@ const Login = (props) => {
 								value={pw}
 								onChangeText={(v) => {setPw(v)}}
 								placeholder={'비밀번호 입력'}
-								placeholderTextColor="#C5C5C6"
+								placeholderTextColor="#8791A1"
 								style={[styles.input]}
 								returnKyeType='done'
 								onSubmitEditing={_sendLogin}
@@ -345,24 +345,24 @@ const styles = StyleSheet.create({
 	loginDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:18,lineHeight:20,color:'#000000',},
 	loginDescText2: {marginTop:10,},
 	loginDescTextBold: {fontFamily:Font.NotoSansBold},
-	loginIptBox: {marginTop:35,},
-	loginIptBox2: {marginTop:30},
-	loginIptBoxText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000000'},
-	input: {width:innerWidth,height:46,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:8,paddingLeft:13,fontSize:14,color:'#000',marginTop:10,},
-	loginBtnBox: {marginTop:35,},
-	loginBtn: {width:innerWidth,height:50,backgroundColor:'#31B481',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'},
+	loginIptBox: {marginTop:60,},
+	loginIptBox2: {marginTop:40},
+	loginIptBoxText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000000',paddingLeft:12,},
+	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:8,paddingLeft:13,fontSize:14,color:'#000',marginTop:10,},
+	loginBtnBox: {marginTop:50,},
+	loginBtn: {width:innerWidth,height:58,backgroundColor:'#31B481',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'},
 	loginBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:50,color:'#fff'},
-	snsBtnBox: {marginTop:15,},
-	snsBtn: {width:innerWidth,height:50,backgroundColor:'#FFE812',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'},
+	snsBtnBox: {marginTop:20,},
+	snsBtn: {width:innerWidth,height:58,backgroundColor:'#FFE812',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'},
 	snsBtn2: {backgroundColor:'#000'},
-	kakaoLogo: {position:'absolute',left:20,top:16,},
-	appleLogo: {position:'absolute',left:20,top:13,},
+	kakaoLogo: {position:'absolute',left:20,top:20,},
+	appleLogo: {position:'absolute',left:20,top:17,},
 	snsBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:50,color:'#3C1E1E'},
 	snsBtnText2: {color:'#fff'},
 	loginFindBox: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:15,},
 	loginFindBtn: {width:(innerWidth/3),heiht:40,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'},
 	loginFindBtnText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:40,color:'#000'},
-	btnBar: {width:1,height:11,backgroundColor:'#D8DBE1',position:'absolute',top:10},
+	btnBar: {width:1,height:11,backgroundColor:'#D8DBE1',position:'absolute',top:14},
 	btnBar1: {left:0,},
 	btnBar2: {right:0},
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},

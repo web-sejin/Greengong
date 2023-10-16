@@ -4,19 +4,30 @@ import AutoHeightImage from "react-native-auto-height-image";
 
 import Font from "../assets/common/Font";
 
+// Text 적용
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+// TextInput 적용
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
+
+const opacityVal = 0.8;
+
 const Header = (props) => {    
 	const {navigation, headertitle, ModalEvent} = props;	
 	
 	return (
 		<View style={styles.header}>
 			<>
-			<TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
+			<TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn} activeOpacity={opacityVal}>
 				<AutoHeightImage width={9} source={require("../assets/img/icon_header_back.png")} />
 			</TouchableOpacity>
 			<Text ellipsizeMode='tail'style={styles.headerTitle}>{headertitle}</Text>
       <TouchableOpacity 
         style={styles.headerDot}
         onPress={ModalEvent} 
+				activeOpacity={opacityVal}
       >
         <AutoHeightImage width={3} source={require("../assets/img/icon_dot.png")} />
       </TouchableOpacity>

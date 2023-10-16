@@ -4,6 +4,16 @@ import AutoHeightImage from "react-native-auto-height-image";
 
 import Font from "../assets/common/Font";
 
+// Text 적용
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+// TextInput 적용
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
+
+const opacityVal = 0.8;
+
 const Header = (props) => {    
 	const {navigation, headertitle, backType=''} = props;	
 	
@@ -14,12 +24,13 @@ const Header = (props) => {
 			{backType == 'close' ? (
 			<TouchableOpacity
 				style={styles.headerBackBtn2}
-				onPress={() => navigation.goBack()}			
+				onPress={() => navigation.goBack()}
+				activeOpacity={opacityVal}
 			>
 				<AutoHeightImage width={14} source={require("../assets/img/icon_close.png")} />
 			</TouchableOpacity>
 			) : (
-			<TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn}>
+			<TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBackBtn} activeOpacity={opacityVal}>
 				<AutoHeightImage width={9} source={require("../assets/img/icon_header_back.png")} />
 			</TouchableOpacity>
 			)}

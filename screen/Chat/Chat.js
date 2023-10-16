@@ -138,9 +138,11 @@ const Chat = (props) => {
 							<AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />
 						)}
 					</View>
+					{item.cr_unread > 0 ? (
 					<View style={styles.readCnt}>
 						<Text style={styles.readCntText}>{item.cr_unread}</Text>
 					</View>
+					) : null}					
 				</View>
 				<View style={styles.chatBoxInfo}>
 					<View style={styles.chatBoxName}>
@@ -169,7 +171,7 @@ const Chat = (props) => {
 	);
 
 	const getMatchList = async (v) => {
-		//setIsLoading(false);
+		setIsLoading(false);
 		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -196,7 +198,7 @@ const Chat = (props) => {
         //ToastMessage(responseJson.result_text);
 			}
 		});
-		//setIsLoading(true);
+		setIsLoading(true);
 	}
 	const moreData2 = async () => {    
     if(totalPage2 > nowPage2){
@@ -236,9 +238,11 @@ const Chat = (props) => {
 							<AutoHeightImage width={69} source={require("../../assets/img/not_profile.png")} />
 						)}
 					</View>
+					{item.cr_unread > 0 ? (
 					<View style={styles.readCnt}>
 						<Text style={styles.readCntText}>{item.cr_unread}</Text>
 					</View>
+					) : null}
 				</View>
 				<View style={styles.chatBoxInfo}>
 					<View style={styles.chatBoxName}>
@@ -317,6 +321,11 @@ const Chat = (props) => {
 		setRoomChg(false);
 	}, [roomChg]);
 
+	function chatSchDel(){
+		setInputText('');
+		chatSch();
+	}
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>
 			<View style={styles.header}>
@@ -351,6 +360,16 @@ const Chat = (props) => {
 					>
 						<AutoHeightImage width={14} source={require("../../assets/img/icon_sch.png")} />
 					</TouchableOpacity>
+					
+					{inputText != '' ? (
+					<TouchableOpacity
+						style={styles.schDelBtn}
+						activeOpacity={opacityVal}
+						onPress={() => {chatSchDel()}}
+					>
+						<AutoHeightImage width={24} source={require("../../assets/img/icon_delete.png")} />					
+					</TouchableOpacity>
+					) : null}
 				</View>
 			</View>
 
@@ -445,6 +464,7 @@ const styles = StyleSheet.create({
 	schBox: {paddingHorizontal:20,position:'relative'},
 	schInput: {width:widnowWidth-40,height:44,backgroundColor:'#F2F2F2',borderRadius:12,paddingLeft:39,paddingRight:15,fontSize:14,color:'#000'},
 	schBtn: {width:34,height:44,display:'flex',alignItems:'center',justifyContent:'center',position:'absolute',left:5,top:0,},
+	schDelBtn: {position:'absolute',top:10,right:10,},
 	tabBox: {display:'flex',flexDirection:'row',backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:'#E3E3E4',marginTop:5,},
   tabBtn: {width:(widnowWidth/2),height:45,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},
   tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},

@@ -220,7 +220,7 @@ const SnsRegister2 = ({navigation, route}) => {
 		}
 
 		if(tcounter <= 0){
-			ToastMessage('인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
+			ToastMessage('인증이 완료되었거나 인증시간이 만료되었습니다.\n인증번호를 재발송 받아주세요.');
 			return false;
 		 }
 
@@ -228,6 +228,7 @@ const SnsRegister2 = ({navigation, route}) => {
 			ToastMessage('본인인증이 완료되었습니다.');
 			setCertNumberSt(true);
 			timer_stop();
+			Keyboard.dismiss();
 		 }else{
 			ToastMessage('인증번호가 일치하지 않습니다.\n다시 확인해 주세요.');
 			return false;
@@ -300,7 +301,8 @@ const SnsRegister2 = ({navigation, route}) => {
 			return false;
 		}
 
-		setModal2(true);
+		//setModal2(true);
+		navigation.navigate('SnsRegister3', {mbHp:mbHp, mbEmail:mbEmail, mbNickname:mbNickname, ssIdx:ssIdx});
 	}
 
 	function findMyPosition(v){
@@ -517,7 +519,14 @@ const SnsRegister2 = ({navigation, route}) => {
 
 		if(state){
 			if(mbcompanyNumber == ''){
-				setToastText('사업자 번호를 입력해 주세요.');
+				setToastText('사업자 10자리를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
+				return false;
+			}
+
+			if(mbcompanyNumber.length != 10){
+				setToastText('사업자 번호 10자리를 입력해 주세요.');
 				setToastModal(true);
 				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
@@ -691,7 +700,7 @@ const SnsRegister2 = ({navigation, route}) => {
 										maxLength={13}
 									/>
 									<TouchableOpacity 
-										style={styles.certChkBtn}
+										style={[styles.certChkBtn, phoneIntervel ? styles.certDisabled : null]}
 										activeOpacity={opacityVal}
 										onPress={() => {
 											//console.log("phoneIntervel : ",phoneIntervel);
@@ -700,7 +709,9 @@ const SnsRegister2 = ({navigation, route}) => {
 											!phoneIntervel ? ( setCertNumberSt(false) ) : null
 										}}
 									>
-										<Text style={styles.certChkBtnText}>인증번호</Text>
+										<Text style={[styles.certChkBtnText, phoneIntervel ? styles.certDisabledText : null]}>
+											인증번호
+										</Text>
 									</TouchableOpacity>
 								</View>
 								<View style={[styles.typingInputBox]}>
@@ -719,11 +730,13 @@ const SnsRegister2 = ({navigation, route}) => {
 										</Text>
 									</View>
 									<TouchableOpacity 
-										style={styles.certChkBtn2}
+										style={[styles.certChkBtn2, certNumberSt ? styles.certChkBtn2Disabled : null]}
 										activeOpacity={opacityVal}
 										onPress={() => {_authComplete()}}
 									>
-										<Text style={styles.certChkBtnText2}>인증번호 확인</Text>
+										<Text style={[styles.certChkBtnText2, certNumberSt ? styles.certChkBtn2DisabledText : null]}>
+											인증번호 확인
+										</Text>
 									</TouchableOpacity>
 								</View>
 							</View>
@@ -914,6 +927,7 @@ const SnsRegister2 = ({navigation, route}) => {
 											placeholder={'사업자 번호를 입력해 주세요.'}
 											placeholderTextColor="#8791A1"
 											style={[styles.input]}
+											maxLength={10}
 										/>
 									</View>
 								</View>
@@ -1056,19 +1070,20 @@ const SnsRegister2 = ({navigation, route}) => {
 											placeholder={"우편번호"}
 											style={[styles.input, styles.input3]}
 											placeholderTextColor={"#8791A1"}
+											editable={false}
 										/>
 										<TouchableOpacity 
 											style={[styles.certChkBtn, styles.certChkBtn3]}
 											activeOpacity={opacityVal}
 											onPress={() => {setPostcodeOn(!postcodeOn)}}
 										>
-											<Text style={styles.certChkBtnText3}>우편번호 검색</Text>
+											<Text style={styles.certChkBtnText3}>주소 검색</Text>
 										</TouchableOpacity>
 									</View>
 									{postcodeOn ? (
 									<View style={[styles.postcodeBox]}>
 										<Postcode
-											style={{ width: innerWidth, height: 320 }}
+											style={{ width: innerWidth, height: 430, marginTop:10, }}
 											jsOptions={{ animation: true }}
 											onSelected={data => {
 												//console.log(JSON.stringify(data))
@@ -1088,6 +1103,7 @@ const SnsRegister2 = ({navigation, route}) => {
 											placeholder={"주소"}
 											style={[styles.input]}
 											placeholderTextColor={"#8791A1"}
+											editable={false}
 										/>
 									</View>
 									<View style={[styles.typingInputBox]}>
@@ -1251,19 +1267,20 @@ const SnsRegister2 = ({navigation, route}) => {
 											placeholder={"우편번호"}
 											style={[styles.input, styles.input3]}
 											placeholderTextColor={"#8791A1"}
+											editable={false}
 										/>
 										<TouchableOpacity 
 											style={[styles.certChkBtn, styles.certChkBtn3]}
 											activeOpacity={opacityVal}
 											onPress={() => {setPostcodeOn2(!postcodeOn2)}}
 										>
-											<Text style={styles.certChkBtnText3}>우편번호 검색</Text>
+											<Text style={styles.certChkBtnText3}>주소 검색</Text>
 										</TouchableOpacity>
 									</View>
 									{postcodeOn2 ? (
 									<View style={[styles.postcodeBox]}>
 										<Postcode
-											style={{ width: innerWidth, height: 320 }}
+											style={{ width: innerWidth, height: 430, marginTop:10, }}
 											jsOptions={{ animation: true }}
 											onSelected={data => {
 												//console.log(JSON.stringify(data))
@@ -1283,6 +1300,7 @@ const SnsRegister2 = ({navigation, route}) => {
 											placeholder={"주소"}
 											style={[styles.input]}
 											placeholderTextColor={"#8791A1"}
+											editable={false}
 										/>
 									</View>
 									<View style={[styles.typingInputBox]}>
@@ -1422,7 +1440,7 @@ const styles = StyleSheet.create({
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
 	typingBox: {},
-	typingTitle: {},
+	typingTitle: {paddingLeft:9},
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},
@@ -1475,6 +1493,11 @@ const styles = StyleSheet.create({
 	cancel: {backgroundColor:'#fff',borderRadius:12,marginTop:10,},
 	modalCont2BtnText: {fontFamily:Font.NotoSansMedium,fontSize:19,color:'#007AFF'},
 	modalCont2BtnText2: {color:'#DF4339'},
+
+	certDisabled: {backgroundColor:'#efefef'},
+	certDisabledText: {color:'#aaa'},
+	certChkBtn2Disabled: {backgroundColor:'#efefef'},
+	certChkBtn2DisabledText: {color:'#aaa'},
 });
 
 export default SnsRegister2

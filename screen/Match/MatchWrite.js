@@ -35,6 +35,14 @@ LocaleConfig.locales['kr'] = {
 };
 LocaleConfig.defaultLocale = 'kr';
 
+// Text 적용
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
+
+// TextInput 적용
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
+
 //스크랩 글쓰기
 const MatchWrite = ({navigation, route}) => {
 	const fileListData = [
@@ -80,7 +88,7 @@ const MatchWrite = ({navigation, route}) => {
 	const [endDateObj, setEndDateObj] = useState(); //납기일
 	const [price, setPrice] = useState(''); //추정예산범위(금액)
 	const [content, setContent] = useState(contentMsg); //도면상세정보
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const [cateAry, setCateAry] = useState([]); //카테고리 리스트
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
@@ -1172,7 +1180,7 @@ const styles = StyleSheet.create({
 	registBox: {paddingVertical:20},
 	typingBox: {paddingHorizontal:20,},
 	typingBox2: {paddingRight:0,},
-	typingTitle: {},
+	typingTitle: {paddingLeft:9},
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},

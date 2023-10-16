@@ -20,7 +20,7 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MyCompany = (props) => {
+const SnsRegister3 = (props) => {
 	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
 	//console.log("userInfo : ",userInfo);
 	const [routeLoad, setRouteLoad] = useState(false);
@@ -33,6 +33,12 @@ const MyCompany = (props) => {
 	const [modal7, setModal7] = useState(false); //내 공장2 선택,등록,수정,삭제
 	const [toastModal, setToastModal] = useState(false);
 	const [toastText, setToastText] = useState('');
+
+  const ssIdx = route.params.ssIdx;
+  const [mbHp, setMbHp] = useState(route.params.mbHp);
+	const [mbEmail, setMbEmail] = useState(route.params.mbEmail);
+	const [mbNickname, setMbNickname] = useState(route.params.mbNickname);
+	const [pw, setPw] = useState('');
   const [mbcompanyNumber, setMbCompanyNumber] = useState('');
 	const [mbcompanyName, setMbCompanyName] = useState('');
 	const [mbName, setMbName] = useState('');
@@ -56,10 +62,6 @@ const MyCompany = (props) => {
 	const [factActive, setFactActive] = useState();
 	const [my1, setMy1] = useState(false);
 	const [my2, setMy2] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [bcState, setBcState] = useState();
-	const [bcStateComment, setBcStateComment] = useState('');
-	const [isCert, setIsCert] = useState();
 
   const isFocused = useIsFocused();
 	useEffect(() => {
@@ -76,83 +78,10 @@ const MyCompany = (props) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			getData();
-			//getData2();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
-
-	const getData = async () => {
-    setIsLoading(false);
-    await Api.send('GET', 'insert_fac', {is_api: 1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', responseJson);
-			if(responseJson.result === 'success' && responseJson){
-				console.log("insert_fac : ",responseJson);
-				if(responseJson.cert.bc_no){
-					setState(1);
-				}
-				setMbCompanyNumber(responseJson.cert.bc_no);
-				setMbCompanyName(responseJson.cert.bc_com_name);
-				setMbName(responseJson.cert.bc_name);
-				setMbCompanyAddr(responseJson.cert.bc_local);
-				setPickture(responseJson.cert.bc_img);
-				setBcState(responseJson.cert.bc_status_org);
-				setIsCert(responseJson.is_cert);
-				if(responseJson.cert.bc_status_org == 3){
-					setBcStateComment(responseJson.cert.bc_comment);
-				}else{
-					setBcStateComment('');
-				}
-
-				if(responseJson.fac_data[0]){
-					setMy1(true);
-					setFcIdx1(responseJson.fac_data[0].fc_idx);
-					setFactName1(responseJson.fac_data[0].fc_name);
-					setFactCode1((responseJson.fac_data[0].fc_zip).toString());
-					setFactAddr1(responseJson.fac_data[0].fc_addr1);
-					setFactAddrDt1(responseJson.fac_data[0].fc_addr2);
-					if(responseJson.fac_data[0].fc_use == 1){
-						setFactActive('1');
-					}
-				}	
-				
-				if(responseJson.fac_data[1]){
-					setMy2(true);
-					setFcIdx2(responseJson.fac_data[1].fc_idx);
-					setFactName2(responseJson.fac_data[1].fc_name);
-					setFactCode2((responseJson.fac_data[1].fc_zip).toString());
-					setFactAddr2(responseJson.fac_data[1].fc_addr1);
-					setFactAddrDt2(responseJson.fac_data[1].fc_addr2);
-					if(responseJson.fac_data[1].fc_use == 1){
-						setFactActive('2');
-					}
-				}
-			}else{
-				//setItemList([]);				
-				console.log('결과 출력 실패!', responseJson);
-			}
-		});
-		setIsLoading(true);
-  }
-
-	const getData2 = async () => {
-    await Api.send('GET', 'get_member_info', {is_api: 1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', responseJson);
-			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_member_info : ",responseJson);
-			}else{
-				//setItemList([]);				
-				console.log('결과 출력 실패!');
-			}
-		});
-  }
 
   const onAvatarChange = (image: ImageOrVideo) => {
     console.log(image);
@@ -301,39 +230,56 @@ const MyCompany = (props) => {
 	}
 
 	function submitRegist(){
+		let factory1 = false;
+		let factory2 = false;
+		
 		if(!my1){
-			ToastMessage('내 공장1을 등록해 주세요.');
+			setToastText('내 공장1을 등록해 주세요.');
+			setToastModal(true);
+			setTimeout(()=>{ setToastModal(false) },2000);
 			return false;
 		}
 
 		if(state){
 			if(mbcompanyNumber == ''){
-				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
+				setToastText('사업자 10자리를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(mbcompanyNumber.length != 10){
-				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
+				setToastText('사업자 번호 10자리를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(mbcompanyName == ''){
-				ToastMessage('상호(법인명)를 입력해 주세요.');
+				setToastText('상호(법인명)를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(mbName == ''){
-				ToastMessage('성명을 입력해 주세요.');
+				setToastText('성명을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(mbCompanyAddr == ''){
-				ToastMessage('사업장 소재지를 입력해 주세요.');
+				setToastText('사업장 소재지를 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 
 			if(picture == undefined || picture == ''){
-				ToastMessage('사업자등록증 사진을 입력해 주세요.');
+				setToastText('사업자등록증 사진을 입력해 주세요.');
+				setToastModal(true);
+				setTimeout(()=>{ setToastModal(false) },2000);
 				return false;
 			}
 		}
@@ -345,68 +291,104 @@ const MyCompany = (props) => {
 		if(factActive == "1"){
 			fac_use = 1;
 			fac_use2 = 0;
-		}else if(factActive == "2"){
+		}else{
 			fac_use = 0;
 			fac_use2 = 1;
 		}
 
-		let formData = {
-			is_api:1,
+		const formData = new FormData();
+		formData.append('is_api', 1);
+		formData.append('hp', mbHp);
+		formData.append('email', mbEmail);
+		formData.append('nick', mbNickname);
+		formData.append('os', Platform.OS);
+		formData.append('is_sso', 1);
+		formData.append('fac1_name', factName1);
+		formData.append('fac1_zip', factCode1);
+		formData.append('fac1_addr1', factAddr1);
+		formData.append('fac1_addr2', factAddrDt1);
+		formData.append('fac2_name', factName2);
+		formData.append('fac2_zip', factCode2);
+		formData.append('fac2_addr1', factAddr2);
+		formData.append('fac2_addr2', factAddrDt2);
+		formData.append('bc_no', mbcompanyNumber);
+		formData.append('bc_com_name', mbcompanyName);
+		formData.append('bc_name', mbName);
+		formData.append('bc_local', pw);
+		formData.append('fac1_use', fac_use);
+		formData.append('fac2_use', fac_use2);
+		formData.append('bc_img', picture);
+		formData.append('is_cert', state);
+
+		//console.log("::form::",formData);
+
+		let formData2 = {
+			is_api:1,				
+			hp:mbHp,
+			email:mbEmail,
+			nick:mbNickname,
 			os:Platform.OS,
-			fac1_idx:fcIdx1,
+			is_sso:1,
+			ss_idx:ssIdx,
 			fac1_name:factName1, 
 			fac1_zip:factCode1, 
 			fac1_addr1:factAddr1, 
 			fac1_addr2:factAddrDt1, 
 			fac2_name:factName2, 
-			fac2_idx:fcIdx2,
 			fac2_zip:factCode2, 
 			fac2_addr1:factAddr2, 
-			fac2_addr2:factAddrDt2, 
+			fac2_addr2:factAddrDt2, 			
 			fac1_use:fac_use, 
 			fac2_use:fac_use2, 
-			is_cert:state
+			is_cert:state,
 		};
 		
-		if(state){
-			formData.bc_no= mbcompanyNumber;
-			formData.bc_com_name= mbcompanyName;
-			formData.bc_name= mbName;
-			formData.bc_local= mbCompanyAddr;
-			formData.bc_img= { 'uri': picture, 'type': 'image/png', 'name': 'bc.png'}
+		if(state == 1){
+			formData2 = {
+				is_api:1,				
+				hp:mbHp,
+				email:mbEmail,
+				nick:mbNickname,
+				os:Platform.OS,
+				is_sso:1,
+				ss_idx:ssIdx,
+				fac1_name:factName1, 
+				fac1_zip:factCode1, 
+				fac1_addr1:factAddr1, 
+				fac1_addr2:factAddrDt1, 
+				fac2_name:factName2, 
+				fac2_zip:factCode2, 
+				fac2_addr1:factAddr2, 
+				fac2_addr2:factAddrDt2, 			
+				fac1_use:fac_use, 
+				fac2_use:fac_use2, 
+				is_cert:state,
+				bc_no:mbcompanyNumber, 
+				bc_com_name:mbcompanyName, 
+				bc_name:mbName, 
+				bc_local:mbCompanyAddr, 			
+				bc_img: {
+					'uri': picture,
+					'type': 'image/png',
+					'name': 'bc.png',
+				}
+			};
 		}
-
-		console.log('formData : ',formData);
-
-		Api.send('POST', 'modify_fac', formData, (args)=>{
+					
+		Api.send('POST', 'member_save', formData2, (args)=>{			
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 
 			if(responseJson.result === 'success'){
-				//console.log('성공 : ',responseJson);				
-				ToastMessage('수정이 완료되었습니다.');
-				getData();
+				console.log('성공 : ',responseJson);
+				navigation.reset({
+					routes: [{ name: 'Intro'}],	
+				});
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
 			}
 		});
-	}	
-
-	const delBsLicense = async () => {
-		// Api.send('POST', 'del_cert', {is_api:1}, (args)=>{
-		// 	let resultItem = args.resultItem;
-		// 	let responseJson = args.responseJson;
-
-		// 	if(responseJson.result === 'success'){
-		// 		console.log('성공 : ',responseJson);								
-		// 		setPickture('');
-		// 	}else{
-		// 		console.log('결과 출력 실패!', resultItem);
-		// 		ToastMessage(responseJson.result_text);
-		// 	}
-		// });
-		setPickture('');
 	}
 
 	return (
@@ -477,47 +459,22 @@ const MyCompany = (props) => {
 
             <View style={[styles.alertBox, styles.mgTop35]}>
               <AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-              
-              {/* 공장및인증정보설정,미등록 */}
-							{isCert==0 ? (
-              <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text>
-							) : null }
+              <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요. 가입 후에도 등록 가능합니다.</Text>
+            </View>						
 
-							{/* 사업자등록증 관리자인증중 */}
-							{bcState==1 ? (
-              <Text style={styles.alertBoxText}>사업자등록증 인증중입니다.</Text>
-							) : null }
-              
-              {/* 사업자등록번호 정상 등록되어 있을 때 */}
-							{bcState==2 ? (
-              <Text style={styles.alertBoxText}>사업자등록증을 등록하여 인증된 회원들과 거래를 시작해 보세요.</Text>
-							) : null }              
-
-              {/* 사업자등록증 반려 */}
-							{bcState==3 ? (
-              <Text style={styles.alertBoxText}>사업자등록증이 반려되었습니다.</Text>
-							) : null } 
-            </View>
-
-						{bcState==3 ? (
-            <View style={styles.inputAlert}>
-              <AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
-              <Text style={styles.inputAlertText}>사유 : {bcStateComment}</Text>
-            </View>
-						) : null}
-
-            {!state ? (
+            {state == 0 ? (
             <TouchableOpacity
               style={styles.addBtn}
               activeOpacity={opacityVal}
-              onPress={() => {setState(true)}}
+              onPress={() => {setState(1)}}
             >
               <AutoHeightImage width={13} source={require("../../assets/img/icon_plus.png")} style={styles.icon_add} />
               <Text style={styles.addBtnText}>등록</Text>
             </TouchableOpacity>
             ) : null}
           </View>
-          {state ? (
+
+          {state == 1 ? (
           <View style={[styles.registBox, styles.registBox2]}>
             <View style={[styles.typingBox]}>
               <View style={[styles.typingTitle, styles.typingTitleFlex]}>
@@ -533,13 +490,13 @@ const MyCompany = (props) => {
               </View>
               <View style={[styles.typingInputBox]}>
                 <TextInput
-									keyboardType = 'numeric'
+                  keyboardType = 'numeric'
                   value={mbcompanyNumber}
                   onChangeText={(v) => {setMbCompanyNumber(v)}}
                   placeholder={'사업자 번호를 입력해 주세요.'}
                   placeholderTextColor="#8791A1"
                   style={[styles.input]}
-									maxLength={10}
+                  maxLength={10}
                 />
               </View>
             </View>
@@ -592,43 +549,35 @@ const MyCompany = (props) => {
             <View style={[styles.typingBox, styles.mgTop35]}>
               <View style={styles.typingTitle}>
                 <Text style={styles.typingTitleText}>사업자등록증 사진</Text>
-              </View>
-              <View style={styles.compImgBox}>
-                <TouchableOpacity
-									style={styles.photoBoxBtn}
-                  activeOpacity={opacityVal}						
-                  onPress={() => {setModal4(true);}}
-                >
-                  {picture ? (
-                    <AutoHeightImage width={102} source={{uri: picture}} />
-                  ) : (
-                    <AutoHeightImage 
-                      width={102} 
-                      source={require("../../assets/img/pick_photo.jpg")}
-                      style={[styles.photoBox]}
-                    />
-                  )}
-                </TouchableOpacity>
-                {/* <TouchableOpacity
-                  style={styles.compImgBoxDelete}
-                  activeOpacity={opacityVal}
-                  onPress={()=>{setVisible(true)}}
-                >
-                  <AutoHeightImage width={25} source={require("../../assets/img/icon_delete2.png")} />
-                </TouchableOpacity> */}
-              </View>
+              </View>								
+              <TouchableOpacity
+                style={styles.photoBoxBtn}
+                activeOpacity={opacityVal}						
+                onPress={() => {setModal4(true);}}
+              >
+                {picture ? (
+                  <AutoHeightImage width={102} source={{uri: picture}} style={[styles.photoBox]} />
+                ) : (
+                  <AutoHeightImage 
+                    width={102} 
+                    source={require("../../assets/img/pick_photo.jpg")}
+                    style={[styles.photoBox]}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
           </View>
           ) : null}
         </View>
       </KeyboardAwareScrollView>
+
       <View style={styles.nextFix}>
         <TouchableOpacity 
           style={styles.nextBtn}
           activeOpacity={opacityVal}
           onPress={() => submitRegist()}
         >
-          <Text style={styles.nextBtnText}>수정</Text>
+          <Text style={styles.nextBtnText}>가입완료</Text>
         </TouchableOpacity>
       </View>
 
@@ -1071,12 +1020,6 @@ const MyCompany = (props) => {
 					</View>
 				</View>
 			</Modal>
-
-			{!isLoading ? (
-			<View style={[styles.indicator]}>
-				<ActivityIndicator size="large" />
-			</View>
-			) : null}
 		</SafeAreaView>
 	)
 }
@@ -1175,15 +1118,4 @@ const styles = StyleSheet.create({
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
 })
 
-//export default MyCompany
-export default connect(
-	({ User }) => ({
-		userInfo: User.userInfo, //회원정보
-	}),
-	(dispatch) => ({
-		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
-		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
-		member_logout: (user) => dispatch(UserAction.member_logout(user)), //로그아웃
-		member_out: (user) => dispatch(UserAction.member_out(user)), //회원탈퇴
-	})
-)(MyCompany);
+export default SnsRegister3

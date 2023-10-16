@@ -596,11 +596,11 @@ const Match = (props) => {
 				visible={visible3}
 				transparent={true}
 				animationType={"fade"}
-				onRequestClose={() => {setVisible3(false)}}
+				onRequestClose={() => {submitFilter()}}
       >
 				<Pressable 
 					style={styles.modalBack}
-					onPress={() => {setVisible3(false)}}
+					onPress={() => {submitFilter()}}
 				></Pressable>
 				<View style={styles.modalCont3}>
 					<ScrollView>
@@ -608,7 +608,7 @@ const Match = (props) => {
 							<TouchableOpacity
 								style={styles.modalCont3Off}
 								activeOpacity={opacityVal}
-								onPress={()=>{setVisible3(false);}}
+								onPress={()=>{submitFilter();}}
 							>
 								<AutoHeightImage width={14} source={require("../../assets/img/icon_close.png")} />
 							</TouchableOpacity>
@@ -620,7 +620,7 @@ const Match = (props) => {
 							</View>
 							<View style={styles.mainFilterAll}>
 								<View style={styles.mainFilterAllTitle}>
-									<Text style={styles.mainFilterAllTitleText}>모두 선택</Text>
+									<Text style={styles.mainFilterAllTitleText}>모두 선1택</Text>
 								</View>
 								<View style={styles.filterBtnList}>
 									<TouchableOpacity

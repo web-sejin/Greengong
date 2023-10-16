@@ -162,7 +162,13 @@ const SaleList = ({navigation, route}) => {
           <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />          
         </TouchableOpacity>			
         ) : null}
-        <View style={styles.listInfoBox}>
+        <TouchableOpacity 
+          style={styles.listInfoBox}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedView', {idx:item.pd_idx})
+          }}
+        >
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.pd_name}
@@ -173,7 +179,7 @@ const SaleList = ({navigation, route}) => {
             <View style={styles.listInfoDescBar}></View>
             <Text style={styles.listInfoDescText}>{item.pd_date}</Text>
           </View>         
-        </View>                 
+        </TouchableOpacity>                 
       </View>
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
@@ -257,7 +263,13 @@ const SaleList = ({navigation, route}) => {
           <AutoHeightImage width={63} source={{uri: item.pd_image}} style={styles.listImg} />          
         </TouchableOpacity>			
         ) : null}
-        <View style={styles.listInfoBox}>
+        <TouchableOpacity 
+          style={styles.listInfoBox}
+          activeOpacity={opacityVal}
+          onPress={() => {
+            navigation.navigate('UsedView', {idx:item.pd_idx})
+          }}
+        >
           <View style={styles.listInfoTitle}>
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.pd_name}
@@ -283,7 +295,7 @@ const SaleList = ({navigation, route}) => {
               </View>
             </View>
           </View>         
-        </View>                 
+        </TouchableOpacity>                 
       </View>
       <View style={styles.listInfoPriceBox}>
         <View style={styles.listInfoPriceWrap}>
