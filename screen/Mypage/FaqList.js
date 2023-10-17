@@ -189,7 +189,7 @@ const FaqList = ({navigation, route}) => {
 					</View>
 					)}
 
-			<View style={styles.nextFix}>
+			{/* <View style={styles.nextFix}>
 				<TouchableOpacity 
 					style={styles.nextBtn}
 					activeOpacity={opacityVal}
@@ -199,7 +199,7 @@ const FaqList = ({navigation, route}) => {
 				>
 					<Text style={styles.nextBtnText}>1:1문의</Text>
 				</TouchableOpacity>
-			</View>
+			</View> */}
 		</SafeAreaView>
 	)
 }

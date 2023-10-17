@@ -234,7 +234,11 @@ const MatchDownUsedView = ({navigation, route}) => {
 	return (
 		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={pageTitle} />
-      <View style={[styles.listLi, usedState != 1 ? styles.listLi2 : null]}>
+      <TouchableOpacity 
+        style={[styles.listLi, usedState != 1 ? styles.listLi2 : null]}
+        activeOpacity={opacityVal}
+        onPress={() => {navigation.navigate('MatchView', {idx:itemInfo.mc_idx})}}
+      >
         <>
         {itemInfo.mc_image ? (
         <View style={styles.pdImage}>
@@ -267,7 +271,7 @@ const MatchDownUsedView = ({navigation, route}) => {
           </View>
         </View>
         </>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.allChkBox}>
         <TouchableOpacity

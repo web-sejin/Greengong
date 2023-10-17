@@ -65,7 +65,7 @@ const UsedView = (props) => {
 
   const getData = async () => {
     setIsLoading(false);
-    console.log('idx : ',idx);
+    //console.log('idx : ',idx);
     await Api.send('GET', 'view_product', {'is_api': 1, pd_idx:idx, page_name:'view'}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -551,6 +551,22 @@ const UsedView = (props) => {
             <View style={styles.viewSumm}>
               <Text  style={styles.viewSummText}>{itemInfo.pd_summary}</Text>
             </View>
+            
+            {itemInfo.c1_idx == 2 ? (
+            <View style={styles.viewSumm}>
+              {itemInfo.is_test_analysis == 0 ? (
+                <Text  style={styles.viewSummText}>성분분석표 : 무</Text>
+              ) : (
+                <Text  style={styles.viewSummText}>성분분석표 : 유</Text>
+              )}
+              <Text  style={styles.viewSummText}>중량 : {itemInfo.pd_weight}kg</Text>
+              <Text  style={styles.viewSummText}>두께 : {itemInfo.pd_thickness}t</Text>
+              <Text  style={styles.viewSummText}>외경 : {itemInfo.pd_outside}∅</Text>
+              <Text  style={styles.viewSummText}>폭 : {itemInfo.pd_width}cm</Text>
+              <Text  style={styles.viewSummText}>길이 : {itemInfo.pd_length}cm</Text>
+            </View>
+            ) : null}
+
             <View style={styles.viewContent}>
               <Text  style={styles.viewContentText}>{itemInfo.pd_contents}</Text>
             </View>
@@ -736,9 +752,19 @@ const UsedView = (props) => {
                 style={[styles.nextBtn, styles.nextBtn2]}
                 activeOpacity={opacityVal}
                 //onPress={() => {notBuy()}}
-                onPress={() => {bidChk();}}
+                onPress={() => {
+                  if(myInfo.mb_idx == itemInfo.pd_mb_idx){
+                    navigation.navigate('UsedBidList', {});
+                  }else{
+                    bidChk();
+                  }
+                }}
               >
-                <Text style={styles.nextBtnText}>입찰하기</Text>
+                {myInfo.mb_idx == itemInfo.pd_mb_idx ? (
+                  <Text style={styles.nextBtnText}>입찰내역</Text>
+                ) : (
+                  <Text style={styles.nextBtnText}>입찰하기</Text>
+                )}
               </TouchableOpacity>
               ) : null } 
 
@@ -747,7 +773,15 @@ const UsedView = (props) => {
                 activeOpacity={opacityVal}
                 onPress={() => {chatCheck();}}
               >
-                <Text style={styles.nextBtnText}>채팅하기</Text>
+                {myInfo.mb_idx == itemInfo.pd_mb_idx ? (
+                  itemInfo.pd_sell_type==3 || itemInfo.c1_idx==4 ? (
+                    <Text style={styles.nextBtnText}>채팅목록</Text>
+                  ) : (
+                    <Text style={styles.nextBtnText}>대화 중인 채팅방</Text>
+                  )
+                ) : (
+                  <Text style={styles.nextBtnText}>채팅하기</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -770,6 +804,7 @@ const UsedView = (props) => {
 				></Pressable>
 				<View style={styles.modalCont2}>
 					<View style={styles.modalCont2Box}>
+            {itemInfo.pd_status_org != 3 ? (
 						<TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
@@ -782,10 +817,11 @@ const UsedView = (props) => {
 						>
 							<Text style={styles.modalCont2BtnText}>수정하기</Text>
 						</TouchableOpacity>
+            ) : null}
             
             {itemInfo.pd_status_org == 2 || itemInfo.pd_status_org == 3 ? null : (     
             <TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
+							style={[styles.modalCont2Btn, itemInfo.pd_status_org == 3 ? styles.choice : styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {chgStateRes()}}
 						>
@@ -795,7 +831,7 @@ const UsedView = (props) => {
             
             {itemInfo.pd_status_org == 2 || itemInfo.pd_status_org == 3 ? (
 						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
+							style={[styles.modalCont2Btn, itemInfo.pd_status_org == 3 ? styles.choice : styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {chgStateSell()}}
 						>

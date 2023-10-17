@@ -63,7 +63,9 @@ const Chat = (props) => {
 				}
 				delete params?.reload
 			}
-		}
+
+			console.log('알림 체크3!!!');
+		}		
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
@@ -340,6 +342,7 @@ const Chat = (props) => {
 					}}
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
+					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>99+</Text></View>
 				</TouchableOpacity>
 			</View>
 			<View style={styles.schBox}>
@@ -492,6 +495,9 @@ const styles = StyleSheet.create({
 	chatItemBox: {width:47,height:47,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center',marginTop:4,},
 
 	indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
+
+	alimCircle: {alignItems:'center',justifyContent:'center',width:20,height:20,backgroundColor:'#DF4339',borderRadius:50,position:'absolute',top:-10,right:-10,},
+	alimCircleText: {fontFamily:Font.NotoSansRegular,fontSize:8,lineHeight:22,color:'#fff'},
 });
 
 export default Chat

@@ -76,7 +76,7 @@ const NoticeList = ({navigation, route}) => {
         <View style={styles.noticeListCont}>
           <View style={styles.noticeTit}>
             {/* <Text style={styles.noticeTitSort}>[공지]</Text> */}
-            <Text style={styles.noticeTitText}>{item.bd_title}</Text>
+            <Text style={styles.noticeTitText} numberOfLines={1} ellipsizeMode='tail'>{item.bd_title}</Text>
           </View>
           <View style={styles.noticeDate}>
             <Text style={styles.noticeDateText}>{item.date}</Text>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
   noticeBtn: {paddingHorizontal:20,},
   noticeWrap: {paddingVertical:20,borderBottomWidth:1,borderColor:'#EDEDED',display:'flex',flexDirection:'row',alignItems:'center'},
-  noticeListCont: {width:(innerWidth-17),},
+  noticeListCont: {width:(innerWidth-7),paddingRight:15,},
   noticeTit: {display:'flex',flexDirection:'row',alignItems:'center'},
   noticeTitSort: {width:45,fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:22,color:'#000'},
   noticeTitText: {/*width:(innerWidth-62),*/fontFamily:Font.NotoSansMedium,fontSize:16,lineHeight:22,color:'#000'},

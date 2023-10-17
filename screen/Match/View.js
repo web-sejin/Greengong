@@ -672,7 +672,11 @@ const MatchView = (props) => {
                   }
                 }}
               >
-                <Text style={styles.nextBtnText}>채팅하기</Text>
+                {myInfo.mb_idx == itemInfo.mc_mb_idx ? (
+                  <Text style={styles.nextBtnText}>대화 중인 채팅방</Text>
+                ) : (
+                  <Text style={styles.nextBtnText}>채팅하기</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>

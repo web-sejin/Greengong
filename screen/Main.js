@@ -18,7 +18,6 @@ import {
   View,
 } from 'react-native';
 import { CALL_PERMISSIONS_NOTI, usePermissions } from '../hooks/usePermissions'; 
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -30,8 +29,13 @@ import {Provider} from 'react-redux';
 import { Provider as PaperProvider } from 'react-native-paper';
 import messaging from '@react-native-firebase/messaging';
 
+import Api from '../Api';
+import {connect} from 'react-redux';
+import { actionCreators as UserAction } from '../redux/module/action/UserAction';
+
 import Font from '../assets/common/Font';
 import Intro from './Intro';
+import TabNav from './TabNav';
 import Home from './Home'; //메인-중고상품 리스트
 import AlimList from './AlimList'; //알림 리스트
 import Login from './member/Login'; //로그인
@@ -123,13 +127,34 @@ TextInput.defaultProps.allowFontScaling = false;
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const opacityVal = 0.8;
+let chatCnt = 0;
+
+const getMyInfo = async () => {		
+  await Api.send('GET', 'get_member_info', {is_api:1}, (args)=>{
+    let resultItem = args.resultItem;
+    let responseJson = args.responseJson;
+    let arrItems = args.arrItems;
+    //console.log('args ', responseJson);
+    if(responseJson.result === 'success' && responseJson){
+      //console.log(responseJson);
+      console.log('chatCnt');
+      chatCnt = 10;
+    }else{
+      //console.log(responseJson.result_text);
+    }
+  });  
+}
 
 const TabBarMenu = (props) => {
   const {state, navigation, optionsNum} = props;
   //console.log("state : ",state);
   const screenName = state.routes[state.index].name;  
 
-  //console.log("screenName : ",screenName);
+  //console.log('screenName : ',screenName);
+  if(screenName == 'Home' || screenName == 'Match' || screenName == 'Chat'){
+    console.log('!!!');
+    getMyInfo();
+  }
 
   return (
     <View style={styles.TabBarMainContainer}>
@@ -169,14 +194,14 @@ const TabBarMenu = (props) => {
       >
         {screenName == 'Match' ? (
           <>
-          <AutoHeightImage width={27} source={require("../assets/img/tab_icon2_on.png")} style={styles.selectArr} />
+          <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_on.png")} style={styles.selectArr} />
           <View style={styles.tabView}>
             <Text style={[styles.tabViewText, styles.tabViewTextOn]}>매칭</Text>
           </View>
           </>
         ) : (
           <>
-          <AutoHeightImage width={27} source={require("../assets/img/tab_icon2_off.png")} style={styles.selectArr} />
+          <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_off.png")} style={styles.selectArr} />
           <View style={styles.tabView}>
             <Text style={[styles.tabViewText]}>매칭</Text>
           </View>
@@ -192,21 +217,24 @@ const TabBarMenu = (props) => {
           });
         }}
       >
-        {screenName == 'Chat' ? (
-          <>
-          <AutoHeightImage width={20} source={require("../assets/img/tab_icon3_on.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText, styles.tabViewTextOn]}>채팅</Text>
-          </View>
-          </>
-        ) : (
-          <>
-          <AutoHeightImage width={20} source={require("../assets/img/tab_icon3_off.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText]}>채팅</Text>
-          </View>
-          </>
-        )}
+        <View style={styles.chatWrap}>
+          {screenName == 'Chat' ? (
+            <>
+            <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_on.png")} style={styles.selectArr} />
+            <View style={styles.tabView}>
+              <Text style={[styles.tabViewText, styles.tabViewTextOn]}>채팅</Text>
+            </View>          
+            </>
+          ) : (
+            <>
+            <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_off.png")} style={styles.selectArr} />
+            <View style={styles.tabView}>
+              <Text style={[styles.tabViewText]}>채팅</Text>
+            </View>
+            </>
+          )}
+          <View style={styles.alimCircle}><Text style={styles.alimCircleText}>{chatCnt}</Text></View>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.TabBarBtn} 
@@ -337,13 +365,12 @@ const StackNavigator = () => {
       <Stack.Screen name="Other" component={Other} />
       <Stack.Screen name="OtherUsed" component={OtherUsed} />
       <Stack.Screen name="OtherMatch" component={OtherMatch} />
-      
     </Stack.Navigator>
   )
 }
 
 const Main = () => {  
-  usePermissions(CALL_PERMISSIONS_NOTI);  
+  usePermissions(CALL_PERMISSIONS_NOTI);
 
   const toastConfig = {
 		custom_type: (internalState) => (
@@ -381,10 +408,9 @@ const Main = () => {
       <Provider store={store}>
         <PaperProvider>
           <NavigationContainer>
-            <StackNavigator />
-            <Toast config={toastConfig} ref={(ref) => Toast.setRef(ref)} />
-
+            <StackNavigator />            
           </NavigationContainer>
+          <Toast config={toastConfig} ref={(ref) => Toast.setRef(ref)} />
         </PaperProvider>
       </Provider>
     </SafeAreaView>
@@ -399,8 +425,6 @@ const styles = StyleSheet.create({
     width:'100%',
     height:80,
     backgroundColor:'#fff',
-    borderTopLeftRadius:15,
-    borderTopRightRadius:15,
     display:'flex',
     flexDirection:'row',
     alignItems:'center',
@@ -420,6 +444,9 @@ const styles = StyleSheet.create({
   tabView: {marginTop:8},
   tabViewText: {fontFamily:Font.NotoSansRegular,fontSize:12,lineHeight:14,color:'#C5C5C6'},
   tabViewTextOn: {fontFamily:Font.NotoSansBold,color:'#353636'},
+  chatWrap: {position:'relative'},
+  alimCircle: {alignItems:'center',justifyContent:'center',width:20,height:20,backgroundColor:'#DF4339',borderRadius:50,position:'absolute',top:-10,right:-10,},
+	alimCircleText: {fontFamily:Font.NotoSansRegular,fontSize:8,lineHeight:22,color:'#fff'},
 });
 
 export default Main;

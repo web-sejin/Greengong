@@ -77,6 +77,10 @@ const Home = (props) => {
 
 		AsyncStorage.removeItem('roomPage');
 		AsyncStorage.removeItem('roomIdx');
+
+		if(isFocused){
+			console.log('알림 체크!!!');
+		}
 	},[isFocused]);
 
 	//회원 정보
@@ -87,7 +91,7 @@ const Home = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log(responseJson);
+				//console.log(responseJson);
         setMyInfo(responseJson);
 				setMyFac(responseJson.fac_info);
 				
@@ -200,16 +204,13 @@ const Home = (props) => {
 					</View>
 				</View>
 				<View style={styles.listInfoPriceBox}>
-					{item.is_free != 1 && item.pd_status_org == 1 ? (
+					{item.is_free != 1 && item.pd_sell_type != 3 && item.pd_status_org == 1 ? (
 					<View style={[styles.listInfoPriceArea]}>
 						<View style={styles.listInfoPrice}>
 							<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
 						</View>
 					</View>
-					)
-					:
-					null
-					}
+					) : null}
 
 					{item.is_free == 1 && item.pd_status_org == 1 ? (
 					<View style={[styles.listInfoPriceArea]}>
@@ -217,10 +218,7 @@ const Home = (props) => {
 							<Text style={styles.listInfoPriceStateText}>나눔</Text>
 						</View>
 					</View>
-					)
-					:
-					null
-					}
+					) : null}
 
 					{item.pd_status_org == 2 ? (
 					<View style={[styles.listInfoPriceArea]}>
@@ -233,10 +231,7 @@ const Home = (props) => {
 						</View>
 						) : null }
 					</View>
-					)
-					:
-					null
-					}
+					) : null}
 
 					{item.pd_status_org == 3 ? (
 					<View style={[styles.listInfoPriceArea]}>
@@ -249,10 +244,15 @@ const Home = (props) => {
 						</View>
 						) : null }
 					</View>
-					)
-					:
-					null
-					}					
+					) : null}
+
+					{item.pd_sell_type == 3 ? (
+					<View style={[styles.listInfoPriceArea]}>
+						<View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>
+							<Text style={styles.listInfoPriceStateText}>입찰상품</Text>
+						</View>
+					</View>
+					) : null}					
 				</View>
 			</View>
 			</>
@@ -452,6 +452,7 @@ const Home = (props) => {
 					}}
 				>
 					<AutoHeightImage width={20} source={require("../assets/img/icon_alarm.png")} />
+					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>99+</Text></View>
 				</TouchableOpacity>
 			</View>
 			
@@ -693,6 +694,7 @@ const Home = (props) => {
 							</View>
 							<View style={styles.mainFilterBoxDesc}>
 								<Text style={styles.mainFilterBoxDescText}>※개별 선택은 다중 선택이 가능합니다.</Text>
+								<Text style={[styles.mainFilterBoxDescText, styles.mrgTop5]}>※[모두 선택]선택시 선택 & 해제 가능합니다. </Text>
 							</View>
 							<View style={styles.mainFilterAll}>
 								<View style={styles.mainFilterAllTitle}>
@@ -751,6 +753,9 @@ const styles = StyleSheet.create({
 	header: {padding:20,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	headerBtn1: {display:'flex',flexDirection:'row',alignItems:'center',},
 	headerBtn1Text: {fontFamily:Font.NotoSansBold,fontSize:17,lineHeight:21,color:'#000',marginRight:5,},
+	headerBtn2: {position:'relative'},
+	alimCircle: {alignItems:'center',justifyContent:'center',width:20,height:20,backgroundColor:'#DF4339',borderRadius:50,position:'absolute',top:-10,right:-10,},
+	alimCircleText: {fontFamily:Font.NotoSansRegular,fontSize:8,lineHeight:22,color:'#fff'},
 	schBox: {padding:20,paddingTop:0,},
 	schIptBox: {position:'relative',},
 	goToSch: {width:'100%',height:48,borderWidth:1,borderColor:'#000000',borderRadius:12,paddingLeft:20,display:'flex',justifyContent:'center'},
@@ -787,6 +792,7 @@ const styles = StyleSheet.create({
 	listInfoPriceState1: {backgroundColor:'#31B481'},
 	listInfoPriceState2: {backgroundColor:'#F58C40'},
 	listInfoPriceState3: {width:64,backgroundColor:'#353636'},
+	listInfoPriceState4: {width:64,backgroundColor:'#31B481'},
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
@@ -831,6 +837,8 @@ const styles = StyleSheet.create({
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
+
+	mrgTop5: {marginTop:5,}
 })
 
 //export default Home

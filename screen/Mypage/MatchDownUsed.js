@@ -174,7 +174,7 @@ const MatchDownUsed = ({navigation, route}) => {
 				</View>
 
 				<View style={styles.listInfoState}>
-					<Text style={styles.listInfoStateText}>요청내역</Text>
+					<Text style={styles.listInfoStateText}>내가 쓴글 요청내역</Text>
 				</View>
 			</View>
 			</>
@@ -385,8 +385,8 @@ const styles = StyleSheet.create({
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
-  listInfoState: {alignItems:'center',justifyContent:'center',marginTop:8,width:64,height:24,backgroundColor:'#797979',borderRadius:12,},
-	listInfoState2: {backgroundColor:'#31B481'},
+  listInfoState: {alignItems:'center',justifyContent:'center',marginTop:8,width:114,height:24,backgroundColor:'#797979',borderRadius:12,},
+	listInfoState2: {width:64,backgroundColor:'#31B481'},
   listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
   listInfoStateText2: {},  
   notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},

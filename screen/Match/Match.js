@@ -75,6 +75,10 @@ const Match = (props) => {
 				AsyncStorage.removeItem('mainReload2');
 			}
 		});
+
+		if(isFocused){
+			console.log('알림 체크2!!!');
+		}
 	},[isFocused]);
 
 	//회원 정보
@@ -384,6 +388,7 @@ const Match = (props) => {
 					}}
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
+					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>99+</Text></View>
 				</TouchableOpacity>
 			</View>
 
@@ -617,6 +622,7 @@ const Match = (props) => {
 							</View>
 							<View style={styles.mainFilterBoxDesc}>
 								<Text style={styles.mainFilterBoxDescText}>※개별 선택은 다중 선택이 가능합니다.</Text>
+								<Text style={[styles.mainFilterBoxDescText, styles.mrgTop5]}>※[모두 선택]선택시 선택 & 해제 가능합니다. </Text>
 							</View>
 							<View style={styles.mainFilterAll}>
 								<View style={styles.mainFilterAllTitle}>
@@ -752,6 +758,11 @@ const styles = StyleSheet.create({
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
+
+	alimCircle: {alignItems:'center',justifyContent:'center',width:20,height:20,backgroundColor:'#DF4339',borderRadius:50,position:'absolute',top:-10,right:-10,},
+	alimCircleText: {fontFamily:Font.NotoSansRegular,fontSize:8,lineHeight:22,color:'#fff'},
+
+	mrgTop5: {marginTop:5,}
 })
 
 //export default Match

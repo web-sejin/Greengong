@@ -8,7 +8,7 @@ const ToastMessage = ( message, duration, position, offset, message2 = '') => {
 		position: position == '1' ? position : 'bottom',
 		text1   : message,
 		text2   : message2,
-		visibilityTime: duration ? duration : 2500,
+		visibilityTime: duration ? duration : 2000,
 		autoHide: true,
 		topOffset: (Platform.OS === 'ios' ? 10 : 10),
 		bottomOffset: offset ? offset + 100 : 100,

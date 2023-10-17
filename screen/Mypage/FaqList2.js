@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
@@ -18,6 +18,7 @@ const opacityVal = 0.8;
 
 const FaqList2 = ({navigation, route}) => {
   const sct = route.params.filter;
+	const refInput = useRef(null);
 
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -29,8 +30,10 @@ const FaqList2 = ({navigation, route}) => {
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
+		
 
 		if(!isFocused){
+			Keyboard.dismiss();
 			if(!pageSt){
         //setSchText('');
 			}
@@ -41,6 +44,7 @@ const FaqList2 = ({navigation, route}) => {
 			}else{
 				//console.log("route off!!");
 			}
+			refInput.current.focus();
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
@@ -129,11 +133,13 @@ const FaqList2 = ({navigation, route}) => {
 								style={[styles.input]}
 								returnKyeType='done'
 								onSubmitEditing={_submit}
+								autoFocus={true}
+								ref={refInput}
 							/>
 							<TouchableOpacity 
 								style={styles.faqSchBtn}
 								activeOpacity={opacityVal}
-								onPress={() => {_submit()}}
+								onPress={() => {_submit()}}								
 							>                
 								<AutoHeightImage width={16} source={require("../../assets/img/icon_search.png")} />
 							</TouchableOpacity>
@@ -174,7 +180,7 @@ const FaqList2 = ({navigation, route}) => {
 			</View>
 			)}
 			
-			<View style={styles.nextFix}>
+			{/* <View style={styles.nextFix}>
 				<TouchableOpacity 
 					style={styles.nextBtn}
 					activeOpacity={opacityVal}
@@ -184,7 +190,7 @@ const FaqList2 = ({navigation, route}) => {
 				>
 					<Text style={styles.nextBtnText}>1:1문의</Text>
 				</TouchableOpacity>
-			</View>
+			</View> */}
 		</SafeAreaView>
 	)
 }

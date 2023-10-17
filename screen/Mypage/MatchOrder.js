@@ -56,7 +56,7 @@ const MatchOrder = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log('order_list_match2 : ',responseJson);
+				console.log('order_list_match2 : ',responseJson);
 				setOdList(responseJson.data);
         setTotalPage(responseJson.total_page);  
 			}else{
@@ -90,10 +90,14 @@ const MatchOrder = ({navigation, route}) => {
   const getList = ({item, index}) => (     
     <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
       <View style={[styles.compBtn]}>
-        <View style={[styles.compWrap, styles.compWrapFst]}>
+        <TouchableOpacity 
+          style={[styles.compWrap, styles.compWrapFst]}
+          activeOpacity={opacityVal}
+          onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
+        >
           <View style={styles.compInfo}>                  
             <View style={styles.compInfoName}>
-              <Text style={styles.compInfoNameText}>{item.mc_name}</Text>
+              <Text style={styles.compInfoNameText}>{item.mc_name}{item.mc_status_org}</Text>
             </View>
             <View style={styles.compInfoDate}>
               <Text style={styles.compInfoDateText}>{item.mc_loc} · {item.mc_regdate}</Text>
@@ -102,10 +106,12 @@ const MatchOrder = ({navigation, route}) => {
               <Text style={styles.compInfoLocText}>{item.mc_summary}</Text>
             </View>
           </View>
+          {item.mf_image ? (
           <View style={styles.compThumb}>
-            <AutoHeightImage width={70} source={require("../../assets/img/sample1.jpg")} />
+            <AutoHeightImage width={70} source={{uri:item.mf_image}} />
           </View>
-        </View>
+          ) : null}
+        </TouchableOpacity>
         {item.is_estimate == 1 ? (
         <View style={styles.matchPrice}>
           <Text style={styles.matchPriceText}>발주금액</Text>

@@ -41,6 +41,8 @@ const MyInfo = (props) => {
 	const [oldHp, setOldHp] = useState('');
 	const [oldEmail, setOldEmail] = useState('');
 	const [oldNick, setOldNick] = useState('');
+	const [disable, setDisable] = useState(true);
+	const [disable2, setDisable2] = useState(true);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -220,8 +222,10 @@ const MyInfo = (props) => {
 				ToastMessage('사용가능한 이메일입니다.');
 			}else if(responseJson.result === 'error'){
 				setMbEmailSt(false);
+				setDisable(true);
 				ToastMessage(responseJson.result_text);
 			}else{
+				setDisable(true);
 				console.log('결과 출력 실패!', resultItem);
 				//ToastMessage(resultItem.message);
 			}
@@ -245,8 +249,10 @@ const MyInfo = (props) => {
 				ToastMessage('사용가능한 닉네임입니다.');
 			}else if(responseJson.result === 'error'){
 				setMbNicknameSt(false);
+				setDisable(true);
 				ToastMessage(responseJson.result_text);
 			}else{
+				setDisable(true);
 				console.log('결과 출력 실패!', resultItem);
 				//ToastMessage(resultItem.message);
 			}
@@ -355,6 +361,13 @@ const MyInfo = (props) => {
 											setMbHp(phone);
 											setCertNumber('');
 											setCertNumberSt(false);
+											if(oldHp == phone){
+												setDisable(true);
+												setDisable2(true);
+											}else{
+												setDisable(false);
+												setDisable2(false);
+											}
 										}}
 										placeholder={"휴대폰번호를 입력해 주세요."}
 										style={[styles.input, styles.input2]}
@@ -399,11 +412,12 @@ const MyInfo = (props) => {
 										</Text>
 									</View>									
 									<TouchableOpacity 
-										style={[styles.certChkBtn2, certNumberSt ? styles.certChkBtn2Disabled : null]}
+										style={[styles.certChkBtn2, certNumberSt ? styles.certChkBtn2Disabled : null, disable2 ? styles.disableBtn : null]}
 										activeOpacity={opacityVal}
 										onPress={() => {_authComplete('cert_chk')}}
+										disabled={disable2}
 									>
-										<Text style={[styles.certChkBtnText2, certNumberSt ? styles.certChkBtn2DisabledText : null]}>
+										<Text style={[styles.certChkBtnText2, certNumberSt ? styles.certChkBtn2DisabledText : null, disable2 ? styles.disableBtnText : null]}>
 											인증번호 확인
 										</Text>
 									</TouchableOpacity>
@@ -420,7 +434,14 @@ const MyInfo = (props) => {
 									<TextInput
 										keyboardType='email-address'
 										value={mbEmail}
-										onChangeText={(v) => {setMbEmail(v)}}
+										onChangeText={(v) => {											
+											setMbEmail(v);
+											if(oldEmail == v){
+												setDisable(true);
+											}else{
+												setDisable(false);
+											}											
+										}}
 										placeholder={'이메일을 입력해 주세요.'}
 										placeholderTextColor="#C5C5C6"
 										style={[styles.input, styles.input2]}
@@ -442,7 +463,14 @@ const MyInfo = (props) => {
 								<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 									<TextInput
 										value={mbNickname}									
-										onChangeText={(v) => {setMbNickname(v)}}
+										onChangeText={(v) => {
+											setMbNickname(v);
+											if(oldNick == v){
+												setDisable(true);
+											}else{
+												setDisable(false);
+											}
+										}}
 										placeholder={"닉네임을 입력해 주세요."}
 										style={[styles.input, styles.input2]}
 										placeholderTextColor={"#8791A1"}
@@ -462,11 +490,12 @@ const MyInfo = (props) => {
 			</KeyboardAwareScrollView>
 			<View style={styles.nextFix}>
 				<TouchableOpacity 
-					style={styles.nextBtn}
+					style={[styles.nextBtn, disable ? styles.disableBtn : null]}
 					activeOpacity={opacityVal}
 					onPress={() => _submit()}
+					disabled={disable}
 				>
-					<Text style={styles.nextBtnText}>수정</Text>
+					<Text style={[styles.nextBtnText, disable ? styles.disableBtnText : null]}>수정</Text>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
@@ -515,6 +544,8 @@ const styles = StyleSheet.create({
 	certDisabledText: {color:'#aaa'},
 	certChkBtn2Disabled: {backgroundColor:'#efefef'},
 	certChkBtn2DisabledText: {color:'#aaa'},
+	disableBtn: {backgroundColor:'#efefef'},
+	disableBtnText: {color:'#aaa'},
 })
 
 //export default MyInfo

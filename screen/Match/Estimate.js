@@ -65,7 +65,7 @@ const Estimate = ({navigation, route}) => {
 	const [itemCnt, setItemCnt] = useState(1); //견적정보 개수
 
 	const [itemList2, setItemList2] = useState(itemData2); //디자인/설계정보
-	const [itemCnt2, setItemCnt2] = useState(1); //디자인/설계정보 개수
+	const [itemCnt2, setItemCnt2] = useState(0); //디자인/설계정보 개수
 
 	const [itemInfo, setItemInfo] = useState({});
 
@@ -357,9 +357,9 @@ const Estimate = ({navigation, route}) => {
 			ToastMessage('디자인/설계의 모든 정보를 입력해 주세요.'); return false;
 		}
 		
-		if(itemCnt2 > 1){
-			if(cnt2 != itemCnt2){ ToastMessage('디자인/설계를 2개이상 추가한 경우\n디자인/설계의 모든 정보를 입력해 주세요.'); return false; }
-		}
+		if(itemCnt2 > 0){
+			if(cnt2 != itemCnt2){ ToastMessage('디자인/설계를 1개이상 추가한 경우\n디자인/설계의 모든 정보를 입력해 주세요.'); return false; }
+		}		
 
 		const formData = {
 			is_api:1,				
@@ -725,6 +725,25 @@ const Estimate = ({navigation, route}) => {
 						)
 					})}
 
+					<View style={styles.secBoxTitView}>
+						<View style={styles.secBoxTit}>
+							<Text style={styles.secBoxTitText}>디자인/설계 정보 ({itemCnt2}개)</Text>
+							<TouchableOpacity
+								style={styles.addBtn}
+								activeOpacity={opacityVal}
+								onPress={()=>{
+									if(itemCnt2 < 5){
+										setItemCnt2(itemCnt2+1);
+									}else{
+										ToastMessage("디자인/설계 정보는 최대 5개까지 등록이 가능합니다.");
+									}
+								}}
+							>
+								<Text style={styles.addBtnText}>추가</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+
 					{itemList2.map((item, index) => {
 						let openState2 = false;
 
@@ -739,35 +758,15 @@ const Estimate = ({navigation, route}) => {
 						return(
 						<View 
 							key={index}
-							style={[styles.registBox, styles.borderBot, !openState2 ? styles.displayNone : null]}>
-							{index == 0 ? (
-							<View style={styles.secBoxTit}>
-								<Text style={styles.secBoxTitText}>디자인/설계 정보 ({itemCnt2}개)</Text>
-								<TouchableOpacity
-									style={styles.addBtn}
-									activeOpacity={opacityVal}
-									onPress={()=>{
-										if(itemCnt2 < 5){
-											setItemCnt2(itemCnt2+1);
-										}else{
-											ToastMessage("디자인/설계 정보는 최대 5개까지 등록이 가능합니다.");
-										}
-									}}
-								>
-									<Text style={styles.addBtnText}>추가</Text>
-								</TouchableOpacity>
-							</View>
-							) : null }
-
+							style={[styles.registBox, styles.borderBot, !openState2 ? styles.displayNone : null, index==0 ? styles.registBox2 : null]}>								
 							<View style={[styles.typingBox]}>
 								<View style={styles.typingTitle}>
 									<Text style={styles.typingTitleText}>품명</Text>
-									{index > 0 ? (
 									<TouchableOpacity
 										style={[styles.addBtn, styles.addBtn2]}
 										activeOpacity={opacityVal}
 										onPress={()=>{
-											if(itemCnt2 > 1 && itemCnt2 <= 5){
+											if(itemCnt2 > 0 && itemCnt2 <= 5){
 												inputDelete2(index);
 												setItemCnt2(itemCnt2-1);
 											}											
@@ -775,7 +774,6 @@ const Estimate = ({navigation, route}) => {
 									>
 										<Text style={[styles.addBtnText]}>삭제</Text>
 									</TouchableOpacity>
-									) : null}
 								</View>
 								<View style={[styles.typingInputBox]}>
 									<TextInput
@@ -892,6 +890,7 @@ const styles = StyleSheet.create({
 	paddBot13: {paddingBottom:13},
 	registArea: {},
 	registBox: {padding:20,paddingVertical:30,},
+	registBox2: {paddingTop:0,},
 	alertBox: {width:innerWidth,padding:15,paddingLeft:45,backgroundColor:'#F3FAF8',borderRadius:12,position:'relative',},
 	icon_alert: {position:'absolute',left:15,top:15},
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
@@ -917,6 +916,7 @@ const styles = StyleSheet.create({
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:19,color:'#000'},
 	inputUnit2: {width:98,height:56,position:'absolute',top:1,left:12,display:'flex',justifyContent:'center'},
 	inputUnit2Line: {width:1,height:14,backgroundColor:'#E3E3E3',position:'absolute',right:0,top:21.5,},
+	secBoxTitView: {paddingTop:30,paddingHorizontal:20,},
 	secBoxTit: {marginBottom:20,paddingBottom:15,borderBottomWidth:1,borderBottomColor:'#000',position:'relative'},
 	secBoxTitText: {fontFamily:Font.NotoSansBold,fontSize:17,lineHeight:19,color:'#353636'},
 	addBtn: {width:54,height:25,backgroundColor:'#31B481',borderRadius:13,position:'absolute',right:0,top:-5,display:'flex',alignItems:'center',justifyContent:'center'},

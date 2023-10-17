@@ -10,7 +10,7 @@ export const WISH_LIST_FLEX = 'user/WISH_LIST_FLEX';
 export const MEMBER_PUSH_LIST = 'user/MEMBER_PUSH_LIST';
 export const MEMBER_KEYWORD_LIST = 'user/MEMBER_KEYWORD_LIST';
 export const MEMBER_LOGOUT = 'user/MEMBER_LOGOUT';
-export const MEMBER_HOSPITAL = 'user/MEMBER_HOSPITAL';
+export const CHAT_COUNT = 'user/CHAT_COUNT';
 
 export const actionCreators = {
   //회원 로그인
@@ -230,6 +230,18 @@ export const actionCreators = {
     } catch (error) {
       // console.log('member_out Error : ', error);
       return { state: false, msg: '' };
+    }
+  },
+
+  //채팅 카운트 변경
+  chat_count: (user) => async (dispatch) => {
+    try {
+      const response = await UserApi.chat_count(user);
+      console.log('chat_count ::', response);
+      return response;
+    } catch (error) {
+      console.log('chat_count Error : ', error);
+      return { result: false };
     }
   },
 };

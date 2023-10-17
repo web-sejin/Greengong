@@ -63,7 +63,8 @@ const UsedLike = (props) => {
 			if(responseJson.result === 'success' && responseJson){
 				console.log("list_scrap_product : ",responseJson);
 				setItemList(responseJson.data);
-        setTotalPage(responseJson.total_page);        
+        setTotalPage(responseJson.total_page);       
+        setNowPage(1); 
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -145,7 +146,7 @@ const UsedLike = (props) => {
       <TouchableOpacity
         style={styles.listLikeBtn}
         activeOpacity={opacityVal}
-        onPress={()=>{}}
+        onPress={() => {fnLike(item.pd_idx)}}
       >
         <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
       </TouchableOpacity>
@@ -163,7 +164,8 @@ const UsedLike = (props) => {
 			if(responseJson.result === 'success' && responseJson){
 				console.log('list_scrap_seller : ',responseJson);
 				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);
+        setTotalPage2(responseJson.total_page);        
+        setNowPage2(1);
 			}else{
 				setItemList2([]);
 				setNowPage2(1);
@@ -222,10 +224,14 @@ const UsedLike = (props) => {
             <Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
               {item.mb_nick}
             </Text>
-          </View>
-          <View style={[styles.listLikeBtn, styles.listLikeBtn2]}>
+          </View>        
+          <TouchableOpacity
+            style={[styles.listLikeBtn, styles.listLikeBtn2]}
+            activeOpacity={opacityVal}
+            onPress={() => {fnScrap(item.mb_idx)}}
+          >
             <AutoHeightImage width={22} source={require("../../assets/img/icon_heart.png")} />
-          </View>
+          </TouchableOpacity>
         </TouchableOpacity>
       </View>      
 			</>
@@ -247,6 +253,49 @@ const UsedLike = (props) => {
         setItemList([]);
       },200);
     }
+  }
+
+  //관심판매자
+  function fnScrap(mb_idx){
+    const formData = {
+			is_api:1,				
+			mb_idx:mb_idx,
+      sr_code:'product'
+		};
+
+    Api.send('POST', 'save_scrap', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				//console.log('성공 : ',responseJson);				
+        getData2();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
+  }
+
+  //좋아요
+  function fnLike(like_idx){
+    const formData = {
+			is_api:1,				
+			pd_idx:like_idx,
+		};
+
+    Api.send('POST', 'save_like_product', formData, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+
+			if(responseJson.result === 'success'){
+				console.log('성공 : ',responseJson);
+        getData();
+			}else{
+				console.log('결과 출력 실패!', resultItem);
+				ToastMessage(responseJson.result_text);
+			}
+		});
   }
 
 	return (

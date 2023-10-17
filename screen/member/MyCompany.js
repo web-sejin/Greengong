@@ -306,33 +306,33 @@ const MyCompany = (props) => {
 			return false;
 		}
 
-		if(state){
-			if(mbcompanyNumber == ''){
+		if(state){			
+			if(!mbcompanyNumber || mbcompanyNumber == ''){
 				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
 				return false;
 			}
-
+			
 			if(mbcompanyNumber.length != 10){
 				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
 				return false;
 			}
 
-			if(mbcompanyName == ''){
+			if(!mbcompanyName || mbcompanyName == ''){
 				ToastMessage('상호(법인명)를 입력해 주세요.');
 				return false;
 			}
 
-			if(mbName == ''){
+			if(!mbName || mbName == ''){
 				ToastMessage('성명을 입력해 주세요.');
 				return false;
 			}
 
-			if(mbCompanyAddr == ''){
+			if(!mbCompanyAddr || mbCompanyAddr == ''){
 				ToastMessage('사업장 소재지를 입력해 주세요.');
 				return false;
 			}
-
-			if(picture == undefined || picture == ''){
+			console.log('picture : ',picture);
+			if(!picture || picture == undefined || picture == ''){
 				ToastMessage('사업자등록증 사진을 입력해 주세요.');
 				return false;
 			}
@@ -376,7 +376,7 @@ const MyCompany = (props) => {
 			formData.bc_img= { 'uri': picture, 'type': 'image/png', 'name': 'bc.png'}
 		}
 
-		console.log('formData : ',formData);
+		//console.log('formData : ',formData);
 
 		Api.send('POST', 'modify_fac', formData, (args)=>{
 			let resultItem = args.resultItem;
@@ -600,7 +600,7 @@ const MyCompany = (props) => {
                   onPress={() => {setModal4(true);}}
                 >
                   {picture ? (
-                    <AutoHeightImage width={102} source={{uri: picture}} />
+                    <AutoHeightImage width={102} source={{uri: picture}} style={[styles.photoBox]} />
                   ) : (
                     <AutoHeightImage 
                       width={102} 

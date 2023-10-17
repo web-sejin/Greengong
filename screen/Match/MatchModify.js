@@ -496,7 +496,9 @@ const MatchModify = ({navigation, route}) => {
 
 		if(cnt == ""){ ToastMessage('수량을 입력해 주세요.'); return false; }
 		
-		if(security == ""){ ToastMessage('도면보안설정을 선택해 주세요.'); return false; }
+		if((call != 1 || (call==1 && (cate==6 || cate==7))) && security == ""){ 
+			ToastMessage('도면보안설정을 선택해 주세요.'); return false; 
+		}
 
 		if(advice == ""){ ToastMessage('상담방식(견적서)을 선택해 주세요.'); return false; }
 
@@ -792,6 +794,7 @@ const MatchModify = ({navigation, route}) => {
 								<RNPickerSelect
 									value={cate}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setCate(value);
 										select2();
 									}}
@@ -827,6 +830,7 @@ const MatchModify = ({navigation, route}) => {
 								<RNPickerSelect
 									value={sort}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setSort(value);
 										sortChk();
 									}}
@@ -866,6 +870,7 @@ const MatchModify = ({navigation, route}) => {
 									<RNPickerSelect
 										value={matt1}
 										onValueChange={(value) => {
+											Keyboard.dismiss();
 											setMatt1(value);
 											matt1Chk();
 										}}
@@ -907,6 +912,7 @@ const MatchModify = ({navigation, route}) => {
 										<RNPickerSelect
 											value={matt2}
 											onValueChange={(value) => {
+												Keyboard.dismiss();
 												setMatt2(value);
 												if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
 													
@@ -975,16 +981,32 @@ const MatchModify = ({navigation, route}) => {
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>도면 업로드</Text>
+								{cate == 6 || cate == 7 ? (
+									<Text style={styles.typingTitleText}>자료첨부(도면,이미지,텍스트파일)</Text>
+								):(
+									<Text style={styles.typingTitleText}>도면 업로드</Text>
+								)}
 							</View>
+							{call != 1 || (call==1 && (cate==6 || cate==7)) ? (
+							<>
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
-								<TextInput
-									value={floorFile}
-									editable = {false}
-									placeholder={'도면을 업로드해 주세요.'}
-									placeholderTextColor="#8791A1"
-									style={[styles.input, styles.input2, floorFile!=""? styles.input4:null]}
-								/>
+								{cate == 6 || cate == 7 ? (
+									<TextInput
+										value={floorFile}
+										editable = {false}
+										placeholder={'자료를 첨부해 주세요.'}
+										placeholderTextColor="#8791A1"
+										style={[styles.input, styles.input2, floorFile!=""? styles.input4:null]}
+									/>
+								):(
+									<TextInput
+										value={floorFile}
+										editable = {false}
+										placeholder={'도면을 업로드해 주세요.'}
+										placeholderTextColor="#8791A1"
+										style={[styles.input, styles.input2, floorFile!=""? styles.input4:null]}
+									/>
+								)}
 								<TouchableOpacity 
 									style={[styles.certChkBtn, floorFile!=""? styles.certChkBtn4:null]}
 									activeOpacity={opacityVal}
@@ -1006,8 +1028,28 @@ const MatchModify = ({navigation, route}) => {
 								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
 								<Text style={styles.inputAlertText}>도면이 없으면 자세한 견적을 받을 수 없습니다.</Text>
 							</View>
+							</>
+							) : null}
 							
 							{floorFile=="" ? (
+							<TouchableOpacity
+								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
+								activeOpacity={opacityVal}
+								onPress={() => {
+									if(call == 1){
+										setCall(0)
+									}else{
+										setCall(1)
+										setSecurity('');
+									}	
+								}}
+							>
+								<AutoHeightImage width={15} source={require("../../assets/img/icon_chk_on.png")} style={styles.floorBtnImg} />
+								<Text style={styles.floorBtnText}>설계요청</Text>
+							</TouchableOpacity>
+							) : null}
+
+							{floorFile!="" && (cate==6 || cate==7) ? (
 							<TouchableOpacity
 								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
 								activeOpacity={opacityVal}
@@ -1024,7 +1066,8 @@ const MatchModify = ({navigation, route}) => {
 							</TouchableOpacity>
 							) : null}
 						</View>
-
+						
+						{call != 1 || (call==1 && (cate==6 || cate==7)) ? (
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>도면보안설정</Text>
@@ -1032,7 +1075,10 @@ const MatchModify = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={security}
-									onValueChange={(value) => setSecurity(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setSecurity(value);
+									}}
 									placeholder={{
 										label: '도면보안설정을 확인해 주세요.',
 										inputLabel: '도면보안설정을 확인해 주세요.',
@@ -1055,7 +1101,8 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
-						</View>						
+						</View>				
+						) : null}		
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -1064,7 +1111,10 @@ const MatchModify = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={advice}
-									onValueChange={(value) => setAdvice(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setAdvice(value);
+									}}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',
@@ -1114,6 +1164,7 @@ const MatchModify = ({navigation, route}) => {
 								<RNPickerSelect
 									value={useInfo}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setUseInfo(value);
 										select8();
 									}}
@@ -1149,6 +1200,7 @@ const MatchModify = ({navigation, route}) => {
 								<RNPickerSelect
 									value={indCate}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setIndCate(value);
 										setIndCateDirect('');
 									}}
@@ -1266,11 +1318,11 @@ const MatchModify = ({navigation, route}) => {
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TextInput
 									value={price}
+									keyboardType = 'numeric'
 									onChangeText={(v) => {
-										// let comma = (v).split(',').join('');
-										// comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
-										// setPrice(comma);
-										setPrice(v);
+										let comma = (v).split(',').join('');
+										comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+										setPrice(comma);
 									}}
 									placeholder={'추정예산범위를 입력해 주세요.'}
 									placeholderTextColor="#8791A1"

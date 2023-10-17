@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
-import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
+import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList, TouchableNativeFeedback} from 'react-native';
+import {Select} from 'native-base'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -484,11 +485,13 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									value={sort}
-									onValueChange={(value) => {			
+									value={sort}								
+									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setSort(value);
 										select2(value);
 									}}
+									
 									placeholder={{
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
@@ -505,8 +508,9 @@ const Write1 = ({navigation, route}) => {
 										inputIOS: styles.input,
 										inputIOSContainer: styles.inputContainer,
 									}}
-								/>
-								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
+									
+								/>								
+								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />					
 							</View>
 						</View>
 
@@ -518,6 +522,7 @@ const Write1 = ({navigation, route}) => {
 								<RNPickerSelect
 									value={ingred}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setIngred(value);
 										select3(value);
 									}}
@@ -530,6 +535,7 @@ const Write1 = ({navigation, route}) => {
 									items={ingreAry}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
+									onOpen={()=>{console.log('1')}}
 									style={{
 										placeholder: {color: '#8791A1'},
 										inputAndroid: styles.input,
@@ -551,6 +557,7 @@ const Write1 = ({navigation, route}) => {
 								<RNPickerSelect
 									value={shape}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setShape(value);
 									}}
 									placeholder={{
@@ -644,7 +651,10 @@ const Write1 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={dealMethod2}
-									onValueChange={(value) => setDealMethod2(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setDealMethod2(value);
+									}}
 									placeholder={{
 										label: '거래방식2를 선택해 주세요.',
 										inputLabel: '거래방식2를 선택해 주세요.',
@@ -765,7 +775,10 @@ const Write1 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={period}
-									onValueChange={(value) => setPeriod(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setPeriod(value);
+									}}
 									placeholder={{
 										label: '입찰 기간을 선택해 주세요.',
 										inputLabel: '입찰 기간을 선택해 주세요.',
@@ -795,7 +808,10 @@ const Write1 = ({navigation, route}) => {
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
-									onValueChange={(value) => setPayMethod(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setPayMethod(value);
+									}}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',

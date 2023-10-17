@@ -342,6 +342,16 @@ const Mypage = (props) => {
 								style={styles.mypageLinkListBtn}
 								activeOpacity={opacityVal}
 								onPress={() => {
+									navigation.navigate('QnaList');
+								}}	
+							>
+								<Text style={styles.mypageLinkListBtnText}>1:1문의</Text>
+							</TouchableOpacity>
+							
+							<TouchableOpacity
+								style={styles.mypageLinkListBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {
 									navigation.navigate('NoticeList');
 								}}	
 							>

@@ -48,8 +48,8 @@ const SaleList = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setIsLoading(false);
-        setTabState(1);
+				//setIsLoading(false);
+        //setTabState(1);
         setVisible(false);
         setVisible2(false);        
 			}

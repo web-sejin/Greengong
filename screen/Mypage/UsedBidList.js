@@ -195,7 +195,9 @@ const UsedBidList = ({navigation, route}) => {
           <TouchableOpacity 
             style={styles.compThumb}
             activeOpacity={1}
-            //onPress={()=>{navigation.navigate('Other', {idx:item.bd_mb_idx})}}
+            onPress={() => {
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
           >
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />
@@ -315,18 +317,26 @@ const UsedBidList = ({navigation, route}) => {
     <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList2.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
-          <View style={styles.compInfo}>
+          <TouchableOpacity 
+            style={styles.compInfo}
+            activeOpacity={opacityVal}
+            onPress={() => {
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
+          >
             <View style={styles.compInfoDate}>
               <Text style={styles.compInfoDateText}>구매자 공장 : {item.mb_nick}</Text>
             </View>
             <View style={styles.compInfoName}>
               <Text style={styles.compInfoNameText}>{item.pd_name}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.compThumb}
-            activeOpacity={1}
-            //onPress={()=>{navigation.navigate('Other', {idx:item.bd_mb_idx})}}
+            activeOpacity={opacityVal}
+            onPress={() => {
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
           >
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />

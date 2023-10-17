@@ -234,52 +234,40 @@ const SnsRegister3 = (props) => {
 		let factory2 = false;
 		
 		if(!my1){
-			setToastText('내 공장1을 등록해 주세요.');
-			setToastModal(true);
-			setTimeout(()=>{ setToastModal(false) },2000);
+			ToastMessage('내 공장1을 등록해 주세요.');
 			return false;
 		}
 
 		if(state){
-			if(mbcompanyNumber == ''){
-				setToastText('사업자 10자리를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
+			if(!mbcompanyNumber || mbcompanyNumber == ''){
+				ToastMessage('사업자 10자리를 입력해 주세요.');
 				return false;
 			}
 
-			if(mbcompanyNumber.length != 10){
-				setToastText('사업자 번호 10자리를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
-				return false;
-			}
+			// if(mbcompanyNumber.length != 10){
+			// 	setToastText('사업자 번호 10자리를 입력해 주세요.');
+			// 	setToastModal(true);
+			// 	setTimeout(()=>{ setToastModal(false) },2000);
+			// 	return false;
+			// }
 
 			if(mbcompanyName == ''){
-				setToastText('상호(법인명)를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
+				ToastMessage('상호(법인명)를 입력해 주세요.');
 				return false;
 			}
 
 			if(mbName == ''){
-				setToastText('성명을 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
+				ToastMessage('성명을 입력해 주세요.');
 				return false;
 			}
 
 			if(mbCompanyAddr == ''){
-				setToastText('사업장 소재지를 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
+				ToastMessage('사업장 소재지를 입력해 주세요.');
 				return false;
 			}
 
 			if(picture == undefined || picture == ''){
-				setToastText('사업자등록증 사진을 입력해 주세요.');
-				setToastModal(true);
-				setTimeout(()=>{ setToastModal(false) },2000);
+				ToastMessage('사업자등록증 사진을 입력해 주세요.');
 				return false;
 			}
 		}

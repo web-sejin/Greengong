@@ -652,6 +652,7 @@ const Modify4 = ({navigation, route}) => {
 								<RNPickerSelect
 									value={sort}
 									onValueChange={(value) => {
+										Keyboard.dismiss();
 										setSort(value);
 										select2(value);
 									}}
@@ -684,7 +685,10 @@ const Modify4 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={ingred}
-									onValueChange={(value) => setIngred(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setIngred(value);
+									}}
 									placeholder={{
 										label: '성분을 선택해 주세요.',
 										inputLabel: '성분을 선택해 주세요.',
@@ -802,7 +806,10 @@ const Modify4 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={dealMethod2}
-									onValueChange={(value) => setDealMethod2(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setDealMethod2(value);
+									}}
 									placeholder={{
 										label: '거래방식2를 선택해 주세요.',
 										inputLabel: '거래방식2를 선택해 주세요.',
@@ -832,7 +839,10 @@ const Modify4 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={period}
-									onValueChange={(value) => setPeriod(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setPeriod(value);
+									}}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',
@@ -861,7 +871,10 @@ const Modify4 = ({navigation, route}) => {
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={payMethod}
-									onValueChange={(value) => setPayMethod(value)}
+									onValueChange={(value) => {
+										Keyboard.dismiss();
+										setPayMethod(value);
+									}}
 									placeholder={{
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',

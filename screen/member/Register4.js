@@ -235,7 +235,7 @@ const Register4 = (props) => {
 		}
 
 		if(state){
-			if(mbcompanyNumber == ''){
+			if(!mbcompanyNumber || mbcompanyNumber == ''){
 				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
 				return false;
 			}
@@ -245,17 +245,17 @@ const Register4 = (props) => {
 				return false;
 			}
 
-			if(mbcompanyName == ''){
+			if(!mbcompanyName || mbcompanyName == ''){
 				ToastMessage('상호(법인명)를 입력해 주세요.');
 				return false;
 			}
 
-			if(mbName == ''){
+			if(!mbName || mbName == ''){
 				ToastMessage('성명을 입력해 주세요.');
 				return false;
 			}
 
-			if(mbCompanyAddr == ''){
+			if(!mbCompanyAddr || mbCompanyAddr == ''){
 				ToastMessage('사업장 소재지를 입력해 주세요.');
 				return false;
 			}

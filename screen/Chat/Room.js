@@ -504,7 +504,25 @@ const Room = (props) => {
         headertitle={itemInfo.mb_nick} 
         ModalEvent={ModalOn} 
       />
-			<View	style={[styles.chatItemBox]}>    
+			<TouchableOpacity	
+				style={[styles.chatItemBox]}
+				activeOpacity={opacityVal}
+				onPress={()=>{
+					if(page_code == "product"){
+						if(itemInfo.pd_status_org == 9){
+							ToastMessage('삭제된 글입니다.');
+						}else{
+							navigation.push('UsedView', {idx:page_idx})
+						}
+					}else{
+						if(itemInfo.mc_status_org == 9){
+							ToastMessage('삭제된 글입니다.');
+						}else{
+							navigation.push('MatchView', {idx:page_idx})
+						}						
+					}
+				}}
+			>    
 				<View style={styles.chatItemImg}>
 					{itemInfo.image ? (
 						<AutoHeightImage width={66} source={{uri: itemInfo.image}} />
@@ -522,18 +540,34 @@ const Room = (props) => {
 					</View>
 					<View style={styles.listInfoTitle}>
 						{page_code == "product" ? (
-							<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-								[{itemInfo.pd_status}] [{itemInfo.c1_name}] {itemInfo.pd_name}
-							</Text>
+							itemInfo.pd_status_org == 9 ? (
+								<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+									[삭제됨] [{itemInfo.c1_name}] {itemInfo.pd_name}
+								</Text>
+							):(
+								<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+									[{itemInfo.pd_status}] [{itemInfo.c1_name}] {itemInfo.pd_name}
+								</Text>
+							)
 						) : (
-							<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
-								[{itemInfo.mc_status}] [{itemInfo.c1_name}] {itemInfo.mc_name}
-							</Text>
+							itemInfo.mc_status_org == 9 ? (
+								<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+									[삭제됨] [{itemInfo.c1_name}] {itemInfo.mc_name}
+								</Text>
+							):(
+								<Text numberOfLines={1} ellipsizeMode='tail' style={styles.listInfoTitleText}>
+									[{itemInfo.mc_status}] [{itemInfo.c1_name}] {itemInfo.mc_name}
+								</Text>
+							)
 						)}
 					</View>
 					{page_code == "product" ? (
 					<View style={styles.listInfoDesc}>
-						<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>
+						{itemInfo.pd_sell_type == 3 ? (						
+							<Text style={styles.listInfoDescText}>입찰상품</Text>
+						) : (
+							<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>							
+						)}
 					</View>
 					) : null}
 					{/* <TouchableOpacity 
@@ -544,7 +578,7 @@ const Room = (props) => {
 						<Text style={[styles.listInfoStateText]}>거래평가 작성</Text>
 					</TouchableOpacity> */}
 				</View>          
-			</View>
+			</TouchableOpacity>
 
 			<ScrollView
 				style={{backgroundColor:'#F7F7F7'}}

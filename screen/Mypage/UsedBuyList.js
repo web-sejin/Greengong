@@ -98,7 +98,13 @@ const UsedBuyList = (props) => {
     <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
-          <View style={styles.compInfo}>
+          <TouchableOpacity 
+            style={styles.compInfo}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
+          >
             <View style={styles.compInfoDate}>
               <Text style={styles.compInfoDateText}>{item.mb_nick}</Text>
             </View>
@@ -109,12 +115,14 @@ const UsedBuyList = (props) => {
               <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
               <Text style={styles.compInfoLocText}>중3동</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           {item.pd_image ? (
           <TouchableOpacity 
             style={styles.compThumb}
-            activeOpacity={1}
-            //onPress={()=>{navigation.navigate('Other', {idx:item.pd_mb_idx})}}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
           >
             <AutoHeightImage width={63} source={{uri: item.pd_image}} />
           </TouchableOpacity>
