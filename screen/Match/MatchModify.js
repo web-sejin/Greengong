@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
@@ -52,6 +52,7 @@ const MatchModify = ({navigation, route}) => {
 	];
 
   const idx = route.params.idx;
+	const scrollRef = useRef();
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -284,6 +285,10 @@ const MatchModify = ({navigation, route}) => {
 		});
 
 		setFileCnt(cnt);
+
+		if(cnt >= 3){
+			scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+		}
 	}
 
 	const onAvatarChange = (image: ImageOrVideo) => {
@@ -656,7 +661,7 @@ const MatchModify = ({navigation, route}) => {
 				if(imgList.length > 0){
 					let selectCon = fileList.map((item,index) => {					
 						if(imgList[index]){
-							return {...item, path: imgList[index].mf_name_org, mf_idx:imgList[index].mf_idx};
+							return {...item, path: imgList[index].mf_name, mf_idx:imgList[index].mf_idx};
 						}else{
 							return {...item, path: item.path, mf_idx:''};
 						}
@@ -724,6 +729,7 @@ const MatchModify = ({navigation, route}) => {
 								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
 							<ScrollView
+								ref={scrollRef}
 								horizontal={true}
 								showsHorizontalScrollIndicator = {false}
 								onMomentumScrollEnd ={() => {}}

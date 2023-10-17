@@ -174,7 +174,13 @@ const UsedBidList = ({navigation, route}) => {
     <View style={[styles.matchCompleteMb, index == 0 ? styles.matchCompleteMbFst : null, index != itemList.length ? styles.borderBot : null, index != 0 ? styles.borderTop : null]}>
       <View style={[styles.compBtn]}>
         <View style={[styles.compWrap, styles.compWrapFst]}>
-          <View style={styles.compInfo}>
+          <TouchableOpacity 
+            style={styles.compInfo}
+            activeOpacity={opacityVal}
+            onPress={() => {
+              navigation.navigate('UsedView', {idx:item.pd_idx})
+            }}
+          >
             <View style={styles.compInfoDate}>
               <Text style={styles.compInfoDateText}>판매자 공장 : {item.mb_nick}</Text>
             </View>
@@ -185,7 +191,7 @@ const UsedBidList = ({navigation, route}) => {
               <AutoHeightImage width={12} source={require("../../assets/img/icon_calendar2.png")}  style={styles.compInfoLocImg}/>
               <Text style={styles.compInfoLocText}>입찰기간 : {item.pd_bidding_enday}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.compThumb}
             activeOpacity={1}
@@ -194,7 +200,7 @@ const UsedBidList = ({navigation, route}) => {
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />
             ) : (
-              <AutoHeightImage width={63} source={require("../../assets/img/sample1.jpg")} />
+              <AutoHeightImage width={63} source={require("../../assets/img/not_profile.png")} />
             )}
           </TouchableOpacity>
         </View>

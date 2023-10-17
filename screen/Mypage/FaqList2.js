@@ -163,7 +163,8 @@ const FaqList2 = ({navigation, route}) => {
 				ListEmptyComponent={
 					<View style={styles.notData}>
 						<AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-						<Text style={styles.notDataText}>등록된 FAQ가 없습니다.</Text>
+						<Text style={styles.notDataText}>검색 결과가 없습니다.</Text>
+						<Text style={styles.notDataText}>다른 키워드로 다시 검색해보세요.</Text>
 					</View>
 				}
 			/>

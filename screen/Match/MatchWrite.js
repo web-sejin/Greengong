@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
@@ -59,6 +59,7 @@ const MatchWrite = ({navigation, route}) => {
 	];
 
 	const contentMsg = '도면의 치수, 가공 용도, 상세 가공 요청을파트너에게 알려주세요. 요청 사항이 상세할수록, 업체로부터 정확한 답변을 받을 확률이 높아집니다.\n공차\n조립성\n도색\n표면처리\n도면의 치수\n가공용도\n상세 가공 요청';
+	const scrollRef = useRef();
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -314,6 +315,10 @@ const MatchWrite = ({navigation, route}) => {
 		});
 
 		setFileCnt(cnt);
+		if(cnt >= 3){
+			console.log('a');
+			scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+		}
 	}
 
 	const onAvatarChange = (image: ImageOrVideo) => {
@@ -545,6 +550,7 @@ const MatchWrite = ({navigation, route}) => {
 								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
 							<ScrollView
+								ref={scrollRef}
 								horizontal={true}
 								showsHorizontalScrollIndicator = {false}
 								onMomentumScrollEnd ={() => {}}

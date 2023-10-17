@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
@@ -44,6 +44,7 @@ const Modify3 = ({navigation, route}) => {
 	]
 	
   const idx = route.params.idx;
+	const scrollRef = useRef();
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -176,6 +177,10 @@ const Modify3 = ({navigation, route}) => {
 		});
 
 		setFileCnt(cnt);
+
+		if(cnt >= 3){
+			scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+		}
 	}
 
 	const onAvatarChange = (image: ImageOrVideo) => {
@@ -351,7 +356,7 @@ const Modify3 = ({navigation, route}) => {
 
 		if(priceOpt == 3 && period == ""){ ToastMessage('입찰 기간을 선택해 주세요.'); return false; }
 
-		if(payMethod == ""){ ToastMessage('결제방식을 선택해 주세요.'); return false; }
+		if(priceOpt!=2 && payMethod == ""){ ToastMessage('결제방식을 선택해 주세요.'); return false; }
 
 		if(content == ""){ ToastMessage('내용을 입력해 주세요.'); return false; }
 
@@ -505,7 +510,7 @@ const Modify3 = ({navigation, route}) => {
 					let selectCon = fileList.map((item,index) => {
 						//console.log(item);
 						if(imgList[index]){
-							return {...item, path: imgList[index].pf_name_org, pf_idx:imgList[index].pf_idx};
+							return {...item, path: imgList[index].pf_name, pf_idx:imgList[index].pf_idx};
 						}else{
 							return {...item, path: item.path, pf_idx:''};
 						}
@@ -554,6 +559,7 @@ const Modify3 = ({navigation, route}) => {
 								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
 							<ScrollView
+								ref={scrollRef}
 								horizontal={true}
 								showsHorizontalScrollIndicator = {false}
 								onMomentumScrollEnd ={() => {}}
@@ -824,8 +830,8 @@ const Modify3 = ({navigation, route}) => {
 									value={period}
 									onValueChange={(value) => setPeriod(value)}
 									placeholder={{
-										label: '결제방식을 선택해 주세요.',
-										inputLabel: '결제방식을 선택해 주세요.',
+										label: '입찰 기간을 선택해 주세요.',
+										inputLabel: '입찰 기간을 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}
@@ -845,6 +851,7 @@ const Modify3 = ({navigation, route}) => {
 						</View>
 						) : null}
 
+						{priceOpt != 2 ? (
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>결제방식</Text>
@@ -873,6 +880,7 @@ const Modify3 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View>
+						) : null}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>

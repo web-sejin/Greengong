@@ -525,7 +525,8 @@ const SaleList = ({navigation, route}) => {
 				></Pressable>
 				<View style={styles.modalCont2}>
 					<View style={styles.modalCont2Box}>
-          <TouchableOpacity 
+            {itemState != 3 ? (
+            <TouchableOpacity 
 							style={[styles.modalCont2Btn, styles.choice]}
 							activeOpacity={opacityVal}
 							onPress={() => {
@@ -535,10 +536,11 @@ const SaleList = ({navigation, route}) => {
 						>
 							<Text style={styles.modalCont2BtnText}>수정하기</Text>
 						</TouchableOpacity>
+            ) : null}
             
             {itemState == 1 ? (
             <TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
+							style={[styles.modalCont2Btn, itemState == 3 ? styles.choice : styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {chgStateRes()}}
 						>
@@ -548,7 +550,7 @@ const SaleList = ({navigation, route}) => {
 
             {itemState == 2 || itemState == 3 ? (
 						<TouchableOpacity 
-							style={[styles.modalCont2Btn, styles.modify]}
+							style={[styles.modalCont2Btn, itemState == 3 ? styles.choice : styles.modify]}
 							activeOpacity={opacityVal}
 							onPress={() => {chgStateSell()}}
 						>

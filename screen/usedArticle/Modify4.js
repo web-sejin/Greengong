@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {ActivityIndicator, Alert, Button, Dimensions, View, Text, TextInput, TouchableOpacity, Modal, Pressable, StyleSheet, ScrollView, ToastAndroid, Keyboard, KeyboardAvoidingView, FlatList} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AutoHeightImage from "react-native-auto-height-image";
@@ -44,6 +44,7 @@ const Modify4 = ({navigation, route}) => {
 	]
 
   const idx = route.params.idx;
+	const scrollRef = useRef();
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
@@ -109,6 +110,10 @@ const Modify4 = ({navigation, route}) => {
 		});
 
 		setFileCnt(cnt);
+
+		if(cnt >= 3){
+			scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+		}
 	}
 
 	//분류
@@ -538,7 +543,7 @@ const Modify4 = ({navigation, route}) => {
 					let selectCon = fileList.map((item,index) => {
 						//console.log(item);
 						if(imgList[index]){
-							return {...item, path: imgList[index].pf_name_org, pf_idx:imgList[index].pf_idx};
+							return {...item, path: imgList[index].pf_name, pf_idx:imgList[index].pf_idx};
 						}else{
 							return {...item, path: item.path, pf_idx:''};
 						}
@@ -584,6 +589,7 @@ const Modify4 = ({navigation, route}) => {
 								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
 							<ScrollView
+								ref={scrollRef}
 								horizontal={true}
 								showsHorizontalScrollIndicator = {false}
 								onMomentumScrollEnd ={() => {}}
