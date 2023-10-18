@@ -21,6 +21,7 @@ import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../redux/module/action/UserAction';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-community/async-storage';
+import { useFocusEffect, useIsFocused, useRoute } from '@react-navigation/native';
 import Font from '../assets/common/Font';
 
 import Home from './Home'; //메인-중고상품 리스트
@@ -37,13 +38,13 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const TabBarMenu = (props) => {
-  const {state, navigation, chatInfo} = props;
-  //console.log("state : ",state);
+  const {state, navigation, chatInfo } = props;
+  //console.log("chatInfo ::::::::: ",chatInfo);
   const screenName = state.routes[state.index].name;  
 
   //console.log('screenName : ',screenName);
   if(screenName == 'Home' || screenName == 'Match' || screenName == 'Chat' || screenName == 'Room'){        
-    //getMyChatCnt();
+    
   }
 
   return (
@@ -123,8 +124,8 @@ const TabBarMenu = (props) => {
             </View>
             </>
           )}
-          {chatInfo > 0 ? (
-          <View style={styles.alimCircle}><Text style={styles.alimCircleText}>{chatInfo}</Text></View>
+          {chatInfo?.total_unread > 0 ? (
+          <View style={styles.alimCircle}><Text style={styles.alimCircleText}>{chatInfo?.total_unread}</Text></View>
           ) : null}
         </View>
       </TouchableOpacity>
@@ -160,7 +161,6 @@ const TabBarMenu = (props) => {
 
 const TabNav = (props) => {
   const {navigation, userInfo, chatInfo, member_chatCnt} = props;
-  const [alimCnt, setAlimCnt] = useState(0);
   const [pushVisible, setPushVisible] = useState(false);
   const [state, setState] = useState(false);
   const [naviIntent, setNaviIntent] = useState('');
@@ -174,29 +174,21 @@ const TabNav = (props) => {
 
     const chat_cnt = await member_chatCnt(formData);
 
-    console.log("chat_cnt Tabnav::", chat_cnt);
+    //console.log("chat_cnt Tabnav::", chat_cnt);
   }
 
-  //알림 카운트
-	const getAlimCnt = async () => {
-		await Api.send('GET', 'total_unread_alarm', {is_api:1}, (args)=>{
-			let resultItem = args.resultItem;
-			let responseJson = args.responseJson;
-			let arrItems = args.arrItems;
-			//console.log('args ', responseJson);
-			if(responseJson.result === 'success' && responseJson){
-				console.log('total_unread_alarm : ',responseJson);
-        setAlimCnt(responseJson.total_unerad);
-			}else{
-				//console.log(responseJson.result_text);
-			}
-		});  
-	}
+  const isFocused = useIsFocused();
+	useEffect(() => {
+		let isSubscribed = true;
 
-  useEffect(() => {
-    chatCntHandler();
-    getAlimCnt();
-  }, []);
+		if(!isFocused){
+				
+		}else{
+			chatCntHandler();      
+		}
+
+		return () => isSubscribed = false;
+	}, [isFocused]);
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
@@ -227,13 +219,9 @@ const TabNav = (props) => {
       //채팅 메시지가 전송 되었을 때
       let room_page = '';
       let room_idx = '';
-      // AsyncStorage.getItem('roomPage', (err, result) => {
-      //   //console.log("result : ",result);
-      //   room_page = result;
-      // });
 
       AsyncStorage.getItem('roomIdx', (err, result) => {
-        console.log("result : ",result);
+        //console.log("result : ",result);
         room_idx = result;
         if(room_idx != contentIdx.cr_idx){
           setPushVisible(true);
@@ -253,7 +241,7 @@ const TabNav = (props) => {
         //등록한 키워드의 중고 상품을 등록 했을 때
         //중고 상품 입찰 승인이 되었을 때
         //중고 상품 입찰 요청 건에 대해서 거절 했을 때
-        console.log('contentIdx : ',contentIdx.pd_idx);
+        //console.log('contentIdx : ',contentIdx.pd_idx);
         setNaviProp({idx:contentIdx.pd_idx});
 
       }else if(navi == 'MatchView'){
@@ -267,8 +255,6 @@ const TabNav = (props) => {
         setNaviProp({});
       }
     }
-        
-    
   }
 
   useEffect(() => {
@@ -308,7 +294,7 @@ const TabNav = (props) => {
  
    const moveNavigation = () => {
      setPushVisible(false);
-     console.log("naviProp : ",naviProp);
+     //console.log("naviProp : ",naviProp);
      navigation.navigate(naviIntent, naviProp);
    }
 
@@ -320,9 +306,9 @@ const TabNav = (props) => {
       tabBar={ (props) => <TabBarMenu {...props} chatInfo={chatInfo} /> }
       backBehavior={'history'}
     >
-      <Tab.Screen name="Home" component={Home} options={{}} initialParams={{alimCntInfo: alimCnt}} />
-      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{alimCntInfo: alimCnt}} />
-      <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on', alimCntInfo: alimCnt}} />
+      <Tab.Screen name="Home" component={Home} options={{}} initialParams={{alimCnt:chatInfo?.total_unread_alarm}} />
+      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{alimCnt:chatInfo?.total_unread_alarm}} />
+      <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on', alimCnt:chatInfo?.total_unread_alarm}} />
       <Tab.Screen name="Mypage" component={Mypage} options={{}} />
     </Tab.Navigator>
 

@@ -53,7 +53,7 @@ const Match = (props) => {
 	const [myFacOn, setMyFacOn] = useState('');
 	const [initLoading, setInitLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
-	const [alimCnt, setAlimCnt] = useState(params?.alimCntInfo);
+	const [alimCnt, setAlimCnt] = useState(params?.alimCnt);
 
 	const isFocused = useIsFocused();
 	useEffect(()=>{

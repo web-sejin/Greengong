@@ -54,7 +54,7 @@ export const actionCreators = {
   member_info: (user) => async (dispatch) => {
     try {      
       const response = await UserApi.member_info(user);
-      console.log('member_info ::: ', user);
+      //console.log('member_info ::: ', user);
 
       if (response.result) {
         await dispatch({
@@ -237,14 +237,14 @@ export const actionCreators = {
   member_chatCnt: (user) => async (dispatch) => {
     try {
       const response = await UserApi.member_chatCnt(user);
-       console.log('member_chatCnt action ::: ', response);
+       //console.log('member_chatCnt action ::: ', response);
 
       if (response.result) {
         await dispatch({
           type: MEMBER_CHAT_CNT,
-          payload: response.total_unread,
+          payload: response,
         });
-        return { state: true, result: response.total_unread, msg:response.msg };
+        return { state: true, total_unread: response.total_unread, total_unread_alarm:response.total_unread_alarm, msg:response.msg };
       } else {
         await dispatch({
           type: MEMBER_CHAT_CNT,

@@ -653,16 +653,13 @@ const UsedView = (props) => {
                       </View>
                     </View>
                     <View style={styles.listInfoPriceBox}>
-                      {item2.is_free != 1 && item2.pd_status_org == 1 ? (
+                      {item2.is_free != 1 && item2.pd_sell_type != 3 && item2.pd_status_org == 1 ? (
                       <View style={[styles.listInfoPriceArea]}>
                         <View style={styles.listInfoPrice}>
                           <Text style={styles.listInfoPriceText}>{item2.pd_price}원</Text>
                         </View>
                       </View>
-                      )
-                      :
-                      null
-                      }
+                      ) : null}
 
                       {item2.pd_status_org == 2 ? (
                       <View style={[styles.listInfoPriceArea]}>
@@ -673,10 +670,7 @@ const UsedView = (props) => {
                           <Text style={styles.listInfoPriceText}>{item2.pd_price}원</Text>
                         </View>
                       </View>
-                      )
-                      :
-                      null
-                      }
+                      ) : null}
             
                       {item2.is_free == 1 && item2.pd_status_org == 1 ? (
                       <View style={[styles.listInfoPriceArea]}>
@@ -684,10 +678,7 @@ const UsedView = (props) => {
                           <Text style={styles.listInfoPriceStateText}>나눔</Text>
                         </View>
                       </View>
-                      )
-                      :
-                      null
-                      }
+                      ) : null}
 
                       {item2.pd_status_org == 3 ? (
                       <View style={[styles.listInfoPriceArea]}>
@@ -700,10 +691,16 @@ const UsedView = (props) => {
                         </View>
                         ) : null }
                       </View>
-                      )
-                      :
-                      null
-                      }                        
+                      ) : null}
+
+                      {item2.pd_sell_type == 3 ? (
+                      <View style={[styles.listInfoPriceArea]}>
+                        <View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>
+                          <Text style={styles.listInfoPriceStateText}>입찰상품</Text>
+                        </View>
+                      </View>
+                      ) : null} 
+
                     </View>
                   </View>
                   </>
@@ -1179,6 +1176,7 @@ const styles = StyleSheet.create({
 	listInfoPriceState1: {backgroundColor:'#31B481'},
 	listInfoPriceState2: {backgroundColor:'#F58C40'},
   listInfoPriceState3: {width:64,backgroundColor:'#353636'},
+  listInfoPriceState4: {width:64,backgroundColor:'#31B481'},
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},

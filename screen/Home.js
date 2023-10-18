@@ -50,7 +50,7 @@ const Home = (props) => {
 	const [myFacOn, setMyFacOn] = useState('');
 	const [initLoading, setInitLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
-	const [alimCnt, setAlimCnt] = useState(params?.alimCntInfo);
+	const [alimCnt, setAlimCnt] = useState(params?.alimCnt);
 
 	const isFocused = useIsFocused();
 	useEffect(()=>{
@@ -269,7 +269,7 @@ const Home = (props) => {
 							<Text style={styles.listInfoPriceStateText}>입찰상품</Text>
 						</View>
 					</View>
-					) : null}					
+					) : null}		
 				</View>
 			</View>
 			</>
@@ -864,9 +864,11 @@ const styles = StyleSheet.create({
 export default connect(
 	({ User }) => ({
 		userInfo: User.userInfo, //회원정보
+		chatInfo : User.chatInfo
 	}),
 	(dispatch) => ({
 		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
 		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_chatCnt: (user) => dispatch(UserAction.member_chatCnt(user))
 	})
 )(Home);

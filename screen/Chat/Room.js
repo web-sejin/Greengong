@@ -25,7 +25,7 @@ const opacityVal = 0.8;
 
 const Room = (props) => {
 	let scrollViewRef = useRef(null);
-	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const {navigation, userInfo, route, member_chatCnt} = props;
 	const page_idx = route.params.pd_idx;
 	const page_code = route.params.page_code;
 	const recv_idx = route.params.recv_idx;
@@ -91,6 +91,20 @@ const Room = (props) => {
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	const chatCntHandler = async () => {
+    const formData = new FormData();
+    formData.append('mid', userInfo.id);
+    formData.append('method', 'member_chatCnt');
+
+    const chat_cnt = await member_chatCnt(formData);
+
+    console.log("chat_cnt Tabnav::", chat_cnt);
+  }
+
+	useEffect(() => {
+    chatCntHandler();
+  }, []);
 
 	const currentTimer = () => {
     const today = new Date();
@@ -1246,5 +1260,6 @@ export default connect(
 	(dispatch) => ({
 		member_login: (user) => dispatch(UserAction.member_login(user)), //로그인
 		member_info: (user) => dispatch(UserAction.member_info(user)), //회원 정보 조회
+		member_chatCnt: (user) => dispatch(UserAction.member_chatCnt(user)),
 	})
 )(Room);

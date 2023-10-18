@@ -34,7 +34,7 @@ const Chat = (props) => {
 	const [initLoading, setInitLoading] = useState(false);
 	const [roomAry, setRoomAry] = useState([]);
 	const [roomChg, setRoomChg] = useState(false);
-	const [alimCnt, setAlimCnt] = useState(params?.alimCntInfo);
+	const [alimCnt, setAlimCnt] = useState(params?.alimCnt);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
