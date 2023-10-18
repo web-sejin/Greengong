@@ -433,6 +433,7 @@ const Home = (props) => {
 		if(!refreshing) {
 			setRefreshing(true);
 			getItemList();
+			getMyInfo();
 			setTimeout(() => {
 				setRefreshing(false);
 			}, 2000);
@@ -440,11 +441,12 @@ const Home = (props) => {
 	}
 
 	const writeChk = () => {
-		if(userInfo?.bc_status_org == 1 || userInfo?.bc_status_org == null){
+		//console.log('myInfo :::: ',myInfo.bc_status_org);
+		if(myInfo.bc_status_org == 1 || myInfo.bc_status_org == null){
 			ToastMessage('사업자등록증이 대기상태입니다.');
-		}else if(userInfo?.bc_status_org == 3){
+		}else if(myInfo.bc_status_org == 3){
 			ToastMessage('사업자등록증이 반려상태입니다.');
-		}else if(userInfo?.bc_status_org == 2){
+		}else if(myInfo.bc_status_org == 2){
 			setVisible2(true);
 		}		
 	}

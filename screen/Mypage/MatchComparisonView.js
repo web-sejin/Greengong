@@ -65,7 +65,7 @@ const MatchComparisonView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log('list_diff_detail_match', responseJson);
+				console.log('list_diff_detail_match', responseJson);
         setItemInfo(responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
@@ -131,10 +131,12 @@ const MatchComparisonView = (props) => {
               )}
             </TouchableOpacity>
           </View>
+          {item.mc_chat_permit==1 || item.mc_chat_permit==2 ? (
           <View style={styles.matchPrice}>
-            <Text style={styles.matchPriceText}>가격{itemInfo.mc_chat_permit}</Text>
+            <Text style={styles.matchPriceText}>가격</Text>
             <Text style={styles.matchPriceText2}>{item.me_total_price}원</Text>
-          </View>            
+          </View>
+          ) : null}
         </View>
       </View>
                   
@@ -453,7 +455,11 @@ const MatchComparisonView = (props) => {
       {isLoading ? (
         <>
         <View style={styles.borderBot}>
-          <View style={[styles.listLi]}>
+          <TouchableOpacity 
+            style={[styles.listLi]}
+            activeOpacity={opacityVal}
+            onPress={() => {navigation.navigate('MatchView', {idx:itemInfo.mc_idx})}}
+          >
             <View style={styles.pdImage}>
               {itemInfo.mc_image ? (
                 <AutoHeightImage width={68} source={{uri: itemInfo.mc_image}} style={styles.listImg} />
@@ -475,7 +481,7 @@ const MatchComparisonView = (props) => {
                 </Text>
               </View>
             </View>          
-          </View>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={itemList}

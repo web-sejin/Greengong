@@ -621,7 +621,7 @@ const MatchView = (props) => {
                   </TouchableOpacity>
                 ):(
                   <TouchableOpacity 
-                    style={[styles.nextBtn, downReq ? styles.nextBtnGray : null]}
+                    style={[styles.nextBtn, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGray : null]}
                     activeOpacity={opacityVal}
                     onPress={() => {
                       if(itemInfo.mc_dwg_secure_org == 1){
@@ -639,7 +639,7 @@ const MatchView = (props) => {
                       <Text style={styles.nextBtnText}>도면 다운로드</Text>
                     ) : (
                       dwgPmSt == 0 ? (
-                        <Text style={[styles.nextBtnText, downReq ? styles.nextBtnGrayText : null]}>
+                        <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
                           도면 권한 요청
                         </Text>
                       ) : (
@@ -1058,9 +1058,9 @@ const styles = StyleSheet.create({
   justifyContent:'center',},
   nextBtn2: {backgroundColor:'#353636',},
   nextBtn3: {width:innerWidth},
-  nextBtnGray: {backgroundColor:'#dfdfdf'},
+  nextBtnGray: {backgroundColor:'#eaeaea'},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
-  nextBtnGrayText: {color:'#999'},
+  nextBtnGrayText: {color:'#bbb'},
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},
   swiperActiveDot: {opacity:1,},

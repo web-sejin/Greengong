@@ -542,10 +542,10 @@ const styles = StyleSheet.create({
 	timeBoxText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:56,color:'#000'},
 	certDisabled: {backgroundColor:'#efefef'},
 	certDisabledText: {color:'#aaa'},
-	certChkBtn2Disabled: {backgroundColor:'#efefef'},
-	certChkBtn2DisabledText: {color:'#aaa'},
-	disableBtn: {backgroundColor:'#efefef'},
-	disableBtnText: {color:'#aaa'},
+	certChkBtn2Disabled: {backgroundColor:'#eaeaea'},
+	certChkBtn2DisabledText: {color:'#bbb'},
+	disableBtn: {backgroundColor:'#eaeaea'},
+	disableBtnText: {color:'#bbb'},
 })
 
 //export default MyInfo

@@ -83,7 +83,8 @@ const Login = (props) => {
 			//console.log("member_info_list : ",member_info_list);
 			if(member_info_list.state){
 				setTimeout(() => {
-					navigation.replace('TabNavigator', {
+					//navigation.replace('TabNavigator', {
+						navigation.replace('TabNav', {
 						screen: 'Home',
 						params: {
 							msg: member_info_list.result,
@@ -116,7 +117,7 @@ const Login = (props) => {
 			if(member_info_list.state){
 				setTimeout(() => {
 					setIndi(false);
-					navigation.replace('TabNavigator', {
+					navigation.replace('TabNav', {
 						screen: 'Home',
 						params: {
 							msg: member_info_list.result,

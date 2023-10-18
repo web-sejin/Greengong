@@ -160,11 +160,11 @@ const MatchComparison = (props) => {
       </TouchableOpacity>
       <View style={styles.comparisonBtnBox}>
         <TouchableOpacity 
-          style={styles.comparisonBtn}
+          style={[styles.comparisonBtn, item.mc_status_org == 2 ? styles.comparisonBtn2 : null]}
           activeOpacity={opacityVal}
           onPress={() => {navigation.navigate('MatchComparisonView', {idx:item.mc_idx})}}
         >
-          <Text style={styles.comparisonBtnText}>업체비교</Text>
+          <Text style={[styles.comparisonBtnText, item.mc_status_org == 2 ? styles.comparisonBtn2Text : null]}>업체비교</Text>
         </TouchableOpacity>
       </View>
 			</>
@@ -235,6 +235,8 @@ const styles = StyleSheet.create({
   comparisonBtnBox: {paddingHorizontal:20,paddingTop:10,paddingBottom:30,},
   comparisonBtn: {width:innerWidth,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
   comparisonBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
+	comparisonBtn2: {backgroundColor:'#eaeaea'},
+	comparisonBtn2Text: {color:'#bbb'},
   notData: {height:(widnowHeight-170),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},

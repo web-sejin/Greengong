@@ -244,12 +244,10 @@ const SnsRegister3 = (props) => {
 				return false;
 			}
 
-			// if(mbcompanyNumber.length != 10){
-			// 	setToastText('사업자 번호 10자리를 입력해 주세요.');
-			// 	setToastModal(true);
-			// 	setTimeout(()=>{ setToastModal(false) },2000);
-			// 	return false;
-			// }
+			if(mbcompanyNumber.length != 10){
+				ToastMessage('사업자 번호 10자리를 입력해 주세요.');
+				return false;
+			}
 
 			if(mbcompanyName == ''){
 				ToastMessage('상호(법인명)를 입력해 주세요.');
