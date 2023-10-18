@@ -24,7 +24,7 @@ const filterListData = [
 ];
 
 const Home = (props) => {
-	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;
+	const {navigation, userInfo, chatInfo, route} = props;
 	const {params} = route	
 	const [searchVal, setSearchVal] = useState();
 	const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +50,7 @@ const Home = (props) => {
 	const [myFacOn, setMyFacOn] = useState('');
 	const [initLoading, setInitLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
+	const [alimCnt, setAlimCnt] = useState(params?.alimCntInfo);
 
 	const isFocused = useIsFocused();
 	useEffect(()=>{
@@ -79,9 +80,25 @@ const Home = (props) => {
 		AsyncStorage.removeItem('roomIdx');
 
 		if(isFocused){
-			console.log('알림 체크!!!');
+			getAlimCnt();
 		}
 	},[isFocused]);
+	
+	//알림 카운트
+	const getAlimCnt = async () => {
+		await Api.send('GET', 'total_unread_alarm', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log('total_unread_alarm : ',responseJson);
+				setAlimCnt(responseJson.total_unread);
+			}else{
+				//console.log(responseJson.result_text);
+			}
+		});  
+	}
 
 	//회원 정보
 	const getMyInfo = async () => {		
@@ -452,7 +469,9 @@ const Home = (props) => {
 					}}
 				>
 					<AutoHeightImage width={20} source={require("../assets/img/icon_alarm.png")} />
-					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>99+</Text></View>
+					{alimCnt > 0 ? (
+					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>{alimCnt}</Text></View>
+					) : null}
 				</TouchableOpacity>
 			</View>
 			

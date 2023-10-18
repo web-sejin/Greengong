@@ -129,159 +129,164 @@ const Tab = createBottomTabNavigator();
 const opacityVal = 0.8;
 let chatCnt = 0;
 
-const getMyInfo = async () => {		
-  await Api.send('GET', 'get_member_info', {is_api:1}, (args)=>{
-    let resultItem = args.resultItem;
-    let responseJson = args.responseJson;
-    let arrItems = args.arrItems;
-    //console.log('args ', responseJson);
-    if(responseJson.result === 'success' && responseJson){
-      //console.log(responseJson);
-      console.log('chatCnt');
-      chatCnt = 10;
-    }else{
-      //console.log(responseJson.result_text);
-    }
-  });  
-}
+// const TabBarMenu = (props) => {
+//   const {state, navigation, optionsNum} = props;
+//   //console.log("state : ",state);
+//   const screenName = state.routes[state.index].name;  
 
-const TabBarMenu = (props) => {
-  const {state, navigation, optionsNum} = props;
-  //console.log("state : ",state);
-  const screenName = state.routes[state.index].name;  
+//   //console.log('screenName : ',screenName);
+//   //if(screenName == 'Home' || screenName == 'Match' || screenName == 'Chat' || screenName == 'Room'){    
+//     console.log('!!');
+//   //}
 
-  //console.log('screenName : ',screenName);
-  if(screenName == 'Home' || screenName == 'Match' || screenName == 'Chat'){
-    console.log('!!!');
-    getMyInfo();
-  }
+//   return (
+//     <View style={styles.TabBarMainContainer}>
+//       <TouchableOpacity 
+//         style={styles.TabBarBtn} 
+//         activeOpacity={opacityVal}
+//         onPress={() => {
+//           navigation.navigate('TabNavigator', {
+//             screen: 'Home',
+//           });
+//         }}
+//       >
+//         {screenName == 'Home' ? (
+//           <>
+//           <AutoHeightImage width={20} source={require("../assets/img/tab_icon1_on.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText, styles.tabViewTextOn]}>홈</Text>
+//           </View>
+//           </>
+//         ) : (
+//           <>
+//           <AutoHeightImage width={20} source={require("../assets/img/tab_icon1_off.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText]}>홈</Text>
+//           </View>
+//           </>
+//         )}
+//       </TouchableOpacity>
+//       <TouchableOpacity
+//         style={styles.TabBarBtn} 
+//         activeOpacity={opacityVal}
+//         onPress={() => {
+//           navigation.navigate('TabNavigator', {
+//             screen: 'Match',
+//           });
+//         }}
+//       >
+//         {screenName == 'Match' ? (
+//           <>
+//           <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_on.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText, styles.tabViewTextOn]}>매칭</Text>
+//           </View>
+//           </>
+//         ) : (
+//           <>
+//           <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_off.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText]}>매칭</Text>
+//           </View>
+//           </>
+//         )}
+//       </TouchableOpacity>
+//       <TouchableOpacity 
+//         style={styles.TabBarBtn} 
+//         activeOpacity={opacityVal}
+//         onPress={() => {
+//           navigation.navigate('TabNavigator', {
+//             screen: 'Chat',            
+//           });
+//         }}
+//       >
+//         <View style={styles.chatWrap}>
+//           {screenName == 'Chat' ? (
+//             <>
+//             <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_on.png")} style={styles.selectArr} />
+//             <View style={styles.tabView}>
+//               <Text style={[styles.tabViewText, styles.tabViewTextOn]}>채팅</Text>
+//             </View>          
+//             </>
+//           ) : (
+//             <>
+//             <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_off.png")} style={styles.selectArr} />
+//             <View style={styles.tabView}>
+//               <Text style={[styles.tabViewText]}>채팅</Text>
+//             </View>
+//             </>
+//           )}
+//           <View style={styles.alimCircle}><Text style={styles.alimCircleText}>{chatCnt}</Text></View>
+//         </View>
+//       </TouchableOpacity>
+//       <TouchableOpacity 
+//         style={styles.TabBarBtn} 
+//         activeOpacity={opacityVal}
+//         onPress={() => {
+//           navigation.navigate('TabNavigator', {
+//             screen: 'Mypage',
+//           });
+//         }}
+//       >
+//         {screenName == 'Mypage' ? (
+//           <>
+//           <AutoHeightImage width={18} source={require("../assets/img/tab_icon4_on.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText, styles.tabViewTextOn]}>마이페이지</Text>
+//           </View>
+//           </>
+//         ) : (
+//           <>
+//           <AutoHeightImage width={18} source={require("../assets/img/tab_icon4_off.png")} style={styles.selectArr} />
+//           <View style={styles.tabView}>
+//             <Text style={[styles.tabViewText]}>마이페이지</Text>
+//           </View>
+//           </>
+//         )}
+//       </TouchableOpacity>
+// 			<PushChk navigation={navigation} />
+//     </View>
+//   )
+// }
 
-  return (
-    <View style={styles.TabBarMainContainer}>
-      <TouchableOpacity 
-        style={styles.TabBarBtn} 
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('TabNavigator', {
-            screen: 'Home',
-          });
-        }}
-      >
-        {screenName == 'Home' ? (
-          <>
-          <AutoHeightImage width={20} source={require("../assets/img/tab_icon1_on.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText, styles.tabViewTextOn]}>홈</Text>
-          </View>
-          </>
-        ) : (
-          <>
-          <AutoHeightImage width={20} source={require("../assets/img/tab_icon1_off.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText]}>홈</Text>
-          </View>
-          </>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.TabBarBtn} 
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('TabNavigator', {
-            screen: 'Match',
-          });
-        }}
-      >
-        {screenName == 'Match' ? (
-          <>
-          <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_on.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText, styles.tabViewTextOn]}>매칭</Text>
-          </View>
-          </>
-        ) : (
-          <>
-          <AutoHeightImage width={26} source={require("../assets/img/tab_icon2_off.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText]}>매칭</Text>
-          </View>
-          </>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.TabBarBtn} 
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('TabNavigator', {
-            screen: 'Chat',            
-          });
-        }}
-      >
-        <View style={styles.chatWrap}>
-          {screenName == 'Chat' ? (
-            <>
-            <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_on.png")} style={styles.selectArr} />
-            <View style={styles.tabView}>
-              <Text style={[styles.tabViewText, styles.tabViewTextOn]}>채팅</Text>
-            </View>          
-            </>
-          ) : (
-            <>
-            <AutoHeightImage width={24} source={require("../assets/img/tab_icon3_off.png")} style={styles.selectArr} />
-            <View style={styles.tabView}>
-              <Text style={[styles.tabViewText]}>채팅</Text>
-            </View>
-            </>
-          )}
-          <View style={styles.alimCircle}><Text style={styles.alimCircleText}>{chatCnt}</Text></View>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.TabBarBtn} 
-        activeOpacity={opacityVal}
-        onPress={() => {
-          navigation.navigate('TabNavigator', {
-            screen: 'Mypage',
-          });
-        }}
-      >
-        {screenName == 'Mypage' ? (
-          <>
-          <AutoHeightImage width={18} source={require("../assets/img/tab_icon4_on.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText, styles.tabViewTextOn]}>마이페이지</Text>
-          </View>
-          </>
-        ) : (
-          <>
-          <AutoHeightImage width={18} source={require("../assets/img/tab_icon4_off.png")} style={styles.selectArr} />
-          <View style={styles.tabView}>
-            <Text style={[styles.tabViewText]}>마이페이지</Text>
-          </View>
-          </>
-        )}
-      </TouchableOpacity>
-			<PushChk navigation={navigation} />
-    </View>
-  )
-}
+// const TabNavigator = ({ navigation }) => {
+//   const [alimCnt, setAlimCnt] = useState(0);
+  
+//   useEffect(() => {
+//     getAlimCnt();
+//   }, [])
 
-const TabNavigator = ({ navigation }) => {
-  return (
-    <Tab.Navigator 
-      initialRouteName="Home"
-      screenOptions={{headerShown: false}}
-      tabBar={ (props) => <TabBarMenu {...props} /> }
-    >
-      {/* <Tab.Screen name="Home" component={Home} options={{}} initialParams={{isSubmit: true}} />
-      <Tab.Screen name="Match" component={Match} options={{}} initialParams={{isSubmit: true}} /> */}
-      <Tab.Screen name="Home" component={Home} options={{}} />
-      <Tab.Screen name="Match" component={Match} options={{}} />
-      <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on'}} />
-      <Tab.Screen name="Mypage" component={Mypage} options={{}} />
-    </Tab.Navigator>
-  );
-};
+//   //알림 카운트
+// 	const getAlimCnt = async () => {
+// 		await Api.send('GET', 'total_unread_alarm', {is_api:1}, (args)=>{
+// 			let resultItem = args.resultItem;
+// 			let responseJson = args.responseJson;
+// 			let arrItems = args.arrItems;
+// 			//console.log('args ', responseJson);
+// 			if(responseJson.result === 'success' && responseJson){
+// 				console.log('total_unread_alarm : ',responseJson);
+//         setAlimCnt(responseJson.total_unerad);
+// 			}else{
+// 				//console.log(responseJson.result_text);
+// 			}
+// 		});  
+// 	}
+
+//   return (
+//     <Tab.Navigator 
+//       initialRouteName="Home"
+//       screenOptions={{headerShown: false}}
+//       tabBar={ (props) => <TabBarMenu {...props} /> }
+//     >
+//       {/* <Tab.Screen name="Home" component={Home} options={{}} initialParams={{isSubmit: true}} />
+//       <Tab.Screen name="Match" component={Match} options={{}} initialParams={{isSubmit: true}} /> */}
+//       <Tab.Screen name="Home" component={Home} options={{}} initialParams={{alimCnt: alimCnt}} />
+//       <Tab.Screen name="Match" component={Match} options={{}} initialParams={{alimCnt: alimCnt}} />
+//       <Tab.Screen name="Chat" component={Chat} options={{}} initialParams={{reload: 'on', alimCnt: alimCnt}} />
+//       <Tab.Screen name="Mypage" component={Mypage} options={{}} />
+//     </Tab.Navigator>
+//   );
+// };
 
 const StackNavigator = () => {
   return (
@@ -292,10 +297,11 @@ const StackNavigator = () => {
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       }}
     >
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />      
+      {/* <Stack.Screen name="TabNavigator" component={TabNavigator} />*/}
+      <Stack.Screen name="TabNav" component={TabNav} />
       <Stack.Screen name="AlimList" component={AlimList} />
       <Stack.Screen name="Intro" component={Intro} />
-      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Login" component={Login} />      
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Register2" component={Register2} />      
       <Stack.Screen name="Register3" component={Register3} />
@@ -370,8 +376,7 @@ const StackNavigator = () => {
 }
 
 const Main = () => {  
-  usePermissions(CALL_PERMISSIONS_NOTI);
-
+  usePermissions(CALL_PERMISSIONS_NOTI);  
   const toastConfig = {
 		custom_type: (internalState) => (
 			<View
@@ -398,10 +403,6 @@ const Main = () => {
 			</View>
 		),
 	};
-  
-  // useEffect(() => { 
-  //   setTimeout(function(){SplashScreen.hide();}, 1500); 
-  // }, []);
 
   return (
     <SafeAreaView style={{flex:1}}>

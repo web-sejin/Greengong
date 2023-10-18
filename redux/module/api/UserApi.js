@@ -16,7 +16,7 @@ export default {
 	member_info: async (data) => {
 		const url = `${BASE_URL}app/`;
 		const payloadString = Object.entries(data).map( ([key,value]) => ( value && key+'='+value )).filter(v=>v).join('&');
-		console.log('member_info - payloadString : ', payloadString);
+		//console.log('member_info - payloadString : ', payloadString);
 		return await $http.get(url + 'get_member_info?' + payloadString, data);
 	},
   //회원정보 변경
@@ -39,8 +39,9 @@ export default {
   },
 
   //채팅 카운트 변경
-  chat_count: async (data) => {
+  member_chatCnt: async (data) => {
     const url = `${BASE_URL}app/`;
+    return await $http.get(url+'total_unread_msg');
   },
 
 };

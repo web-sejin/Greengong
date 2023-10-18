@@ -10,7 +10,7 @@ export const WISH_LIST_FLEX = 'user/WISH_LIST_FLEX';
 export const MEMBER_PUSH_LIST = 'user/MEMBER_PUSH_LIST';
 export const MEMBER_KEYWORD_LIST = 'user/MEMBER_KEYWORD_LIST';
 export const MEMBER_LOGOUT = 'user/MEMBER_LOGOUT';
-export const CHAT_COUNT = 'user/CHAT_COUNT';
+export const MEMBER_CHAT_CNT = 'user/MEMBER_CHAT_CNT';
 
 export const actionCreators = {
   //회원 로그인
@@ -54,7 +54,7 @@ export const actionCreators = {
   member_info: (user) => async (dispatch) => {
     try {      
       const response = await UserApi.member_info(user);
-      //console.log('member_info ::: ', response);
+      console.log('member_info ::: ', user);
 
       if (response.result) {
         await dispatch({
@@ -234,14 +234,26 @@ export const actionCreators = {
   },
 
   //채팅 카운트 변경
-  chat_count: (user) => async (dispatch) => {
+  member_chatCnt: (user) => async (dispatch) => {
     try {
-      const response = await UserApi.chat_count(user);
-      console.log('chat_count ::', response);
-      return response;
+      const response = await UserApi.member_chatCnt(user);
+       console.log('member_chatCnt action ::: ', response);
+
+      if (response.result) {
+        await dispatch({
+          type: MEMBER_CHAT_CNT,
+          payload: response.total_unread,
+        });
+        return { state: true, result: response.total_unread, msg:response.msg };
+      } else {
+        await dispatch({
+          type: MEMBER_CHAT_CNT,
+          payload: null,
+        });
+        return { state: false, msg: response.msg, nick: '' };
+      }
     } catch (error) {
-      console.log('chat_count Error : ', error);
-      return { result: false };
+      return { state: false, msg: '', nick: '' };
     }
   },
 };

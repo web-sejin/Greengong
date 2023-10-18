@@ -18,8 +18,8 @@ const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
 const Chat = (props) => {
-	const {navigation, userInfo, member_info, member_logout, member_out, route} = props;	
-	const {params} = route;	
+	const {navigation, userInfo, route, chatInfo} = props;	
+	const {params} = route;		
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +34,7 @@ const Chat = (props) => {
 	const [initLoading, setInitLoading] = useState(false);
 	const [roomAry, setRoomAry] = useState([]);
 	const [roomChg, setRoomChg] = useState(false);
+	const [alimCnt, setAlimCnt] = useState(params?.alimCntInfo);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -46,6 +47,7 @@ const Chat = (props) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
+			getAlimCnt();
 
 			if(!initLoading){
 				if(tabState==1){
@@ -63,12 +65,26 @@ const Chat = (props) => {
 				}
 				delete params?.reload
 			}
-
-			console.log('알림 체크3!!!');
 		}		
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
+
+	//알림 카운트
+	const getAlimCnt = async () => {
+		await Api.send('GET', 'total_unread_alarm', {is_api:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log('total_unread_alarm : ',responseJson);
+				setAlimCnt(responseJson.total_unread);
+			}else{
+				//console.log(responseJson.result_text);
+			}
+		});  
+	}
 
 	const getProductList = async (v) => {
 		//setIsLoading(false);
@@ -342,7 +358,9 @@ const Chat = (props) => {
 					}}
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alarm.png")} />
-					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>99+</Text></View>
+					{alimCnt > 0 ? (
+					<View style={styles.alimCircle}><Text style={styles.alimCircleText}>{alimCnt}</Text></View>
+					) : null}
 				</TouchableOpacity>
 			</View>
 			<View style={styles.schBox}>

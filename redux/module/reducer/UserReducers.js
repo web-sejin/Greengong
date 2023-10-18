@@ -9,7 +9,8 @@ import {
   MEMBER_PUSH_LIST,
   MEMBER_KEYWORD_LIST,
   WISH_LIST_FLEX,
-  MEMBER_HOSPITAL
+  MEMBER_HOSPITAL,
+  MEMBER_CHAT_CNT
 } from '../action/UserAction.js';
 const initialState = {
   userInfo: null, // user
@@ -45,6 +46,11 @@ export default (
       return {
         ...state,
         userInfo: payload,
+      };
+    case MEMBER_CHAT_CNT:
+      return {
+        ...state,
+        chatInfo: payload,
       };
     case MEMBER_JOIN:
       return {

@@ -78,7 +78,8 @@ const Intro = (props) => {
 				//console.log("payload : ",payload);
 				if(member_info_list.state){
 					setTimeout(() => {
-						navigation.replace('TabNavigator', {
+						//navigation.replace('TabNavigator', {
+							navigation.replace('TabNav', {
 							screen: 'Home',
 							params: {
 								msg : member_info_list.result,
