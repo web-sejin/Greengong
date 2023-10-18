@@ -55,6 +55,7 @@ const MatchView = (props) => {
   const [dwgPmSt, setDwgPmSt] = useState(0);
   const [swpCurr, setSwpCurr] = useState(0);
   const [popImgUrl, setPopImgUrl] = useState('');
+  const [downReq, setDownReq] = useState(false); //도면 다운 권한 요청 여부 - false : 요청하지 않은 상태 / true : 요청한 상태
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -102,6 +103,12 @@ const MatchView = (props) => {
         setZzim(responseJson.is_scrap);
         setMcMbIdx(responseJson.mc_mb_idx);
         setDwgPmSt(responseJson.is_dwg_permit);
+
+        if(itemInfo.is_request_dwg == 1){
+          setDownReq(true);
+        }else{
+          setDownReq(false);
+        }
 
         if(responseJson.is_match_like == 1){
           setLike(1);
@@ -407,6 +414,7 @@ const MatchView = (props) => {
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);
         ToastMessage('도면권한이 요청되었습니다.');
+        setDownReq(true);
 			}else{
 				console.log('결과 출력 실패!', responseJson);
         ToastMessage('이미 요청한 상태입니다.');
@@ -613,7 +621,7 @@ const MatchView = (props) => {
                   </TouchableOpacity>
                 ):(
                   <TouchableOpacity 
-                    style={[styles.nextBtn]}
+                    style={[styles.nextBtn, downReq ? styles.nextBtnGray : null]}
                     activeOpacity={opacityVal}
                     onPress={() => {
                       if(itemInfo.mc_dwg_secure_org == 1){
@@ -631,7 +639,9 @@ const MatchView = (props) => {
                       <Text style={styles.nextBtnText}>도면 다운로드</Text>
                     ) : (
                       dwgPmSt == 0 ? (
-                        <Text style={styles.nextBtnText}>도면 권한 요청</Text>
+                        <Text style={[styles.nextBtnText, downReq ? styles.nextBtnGrayText : null]}>
+                          도면 권한 요청
+                        </Text>
                       ) : (
                         <Text style={styles.nextBtnText}>도면 다운로드</Text>
                       )
@@ -1048,7 +1058,9 @@ const styles = StyleSheet.create({
   justifyContent:'center',},
   nextBtn2: {backgroundColor:'#353636',},
   nextBtn3: {width:innerWidth},
+  nextBtnGray: {backgroundColor:'#dfdfdf'},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+  nextBtnGrayText: {color:'#999'},
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},
   swiperActiveDot: {opacity:1,},

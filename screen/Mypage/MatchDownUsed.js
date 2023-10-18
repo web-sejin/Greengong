@@ -175,6 +175,11 @@ const MatchDownUsed = ({navigation, route}) => {
 
 				<View style={styles.listInfoState}>
 					<Text style={styles.listInfoStateText}>내가 쓴글 요청내역</Text>
+					{item.request_cnt_org > 0 ? (
+					<View style={styles.listInfoStateCnt}>
+						<Text style={styles.listInfoStateCntText}>{item.request_cnt}</Text>
+					</View>
+					) : null}
 				</View>
 			</View>
 			</>
@@ -263,7 +268,12 @@ const MatchDownUsed = ({navigation, route}) => {
 				</View>
 
 				<View style={[styles.listInfoState, styles.listInfoState2]}>
-					<Text style={[styles.listInfoStateText, styles.listInfoStateText2]}>완료내역</Text>
+					<Text style={[styles.listInfoStateText, styles.listInfoStateText2]}>완료내역</Text>					
+					{item.request_cnt_org > 0 ? (
+					<View style={styles.listInfoStateCnt}>
+						<Text style={styles.listInfoStateCntText}>{item.request_cnt}</Text>
+					</View>
+					) : null}
 				</View>
 			</View>
 			</>
@@ -385,10 +395,12 @@ const styles = StyleSheet.create({
 	listInfoPriceStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:15,color:'#fff'},
 	listInfoPrice: {},
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
-  listInfoState: {alignItems:'center',justifyContent:'center',marginTop:8,width:114,height:24,backgroundColor:'#797979',borderRadius:12,},
+  listInfoState: {flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:8,width:114,height:24,backgroundColor:'#797979',borderRadius:12,position:'relative'},
 	listInfoState2: {width:64,backgroundColor:'#31B481'},
   listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
   listInfoStateText2: {},  
+	listInfoStateCnt: {alignItems:'center',justifyContent:'center',width:20,height:20,backgroundColor:'#DF4339',borderRadius:50,position:'absolute',top:-8,right:-8,},
+	listInfoStateCntText: {fontFamily:Font.NotoSansMedium,fontSize:9,lineHeight:14,color:'#fff',},
   notData: {height:(widnowHeight-220),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })

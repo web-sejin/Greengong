@@ -334,10 +334,12 @@ const UsedView = (props) => {
 
   //비딩체크
   function bidChk(){
-    console.log("userInfo : ",userInfo);
+    //console.log("userInfo : ",userInfo);
     console.log("itemInfo : ",itemInfo);
     if(userInfo?.mb_idx == itemInfo.pd_mb_idx){
       ToastMessage("자신의 게시물은 입찰할 수 없습니다.");
+    }else if(itemInfo.pd_is_within_bidding == 0){
+      ToastMessage('입찰기간이 지난 상품입니다.');
     }else{
       if(userInfo?.bc_status_org == 1){
         ToastMessage('사업자등록증이 대기상태입니다.');
