@@ -694,8 +694,8 @@ const UsedView = (props) => {
                         ) : null }
                       </View>
                       ) : null}
-
-                      {item2.pd_sell_type == 3 ? (
+                      
+                      {item2.pd_status_org != 2 && item2.pd_sell_type == 3 ? (
                       <View style={[styles.listInfoPriceArea]}>
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>
                           <Text style={styles.listInfoPriceStateText}>입찰상품</Text>
