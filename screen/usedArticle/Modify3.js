@@ -344,7 +344,7 @@ const Modify3 = ({navigation, route}) => {
 
 		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
 
-		if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }		
+		//if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }		
 
 		if(dealMethod1 == ""){ ToastMessage('거래방식1을 선택해 주세요.'); return false; }
 		
@@ -522,7 +522,7 @@ const Modify3 = ({navigation, route}) => {
         setSubject(responseJson.pd_name);                        								
 				select1();
 				setSort((responseJson.c2_idx).toString());
-				select2(responseJson.c2_idx, (responseJson.c3_idx).toString());			
+				//select2(responseJson.c2_idx, (responseJson.c3_idx).toString());			
 				
 				setDealMethod1(responseJson.pd_trade1);
 				if(responseJson.pd_trade1 == 1){
@@ -624,7 +624,7 @@ const Modify3 = ({navigation, route}) => {
 									onValueChange={(value) => {
 										Keyboard.dismiss();
 										setSort(value);
-										select2(value);
+										//select2(value);
 									}}
 									placeholder={{
 										label: '분류를 선택해 주세요.',
@@ -647,7 +647,7 @@ const Modify3 = ({navigation, route}) => {
 							</View>
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						{/* <View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>성분</Text>
 							</View>
@@ -677,7 +677,7 @@ const Modify3 = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
-						</View>
+						</View> */}
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
