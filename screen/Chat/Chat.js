@@ -190,7 +190,18 @@ const Chat = (props) => {
 
 	const getMatchList = async (v) => {
 		setIsLoading(false);
-		await Api.send('GET', 'list_chat_match_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
+		console.log('inputText : ',v);
+
+		const formData = {
+			is_api:1,				
+			page:1,
+		};
+
+		if(v != 'cancel'){
+			formData.keyword = inputText;
+		}
+
+		await Api.send('GET', 'list_chat_match_room', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
@@ -288,13 +299,13 @@ const Chat = (props) => {
 		</TouchableOpacity>
 	);
 	
-	const chatSch = async () => {
+	const chatSch = async (v) => {
 		Keyboard.dismiss();
 		if(tabState == 1){
-			getProductList();
+			getProductList(v);
 			setNowPage(1);    
 		}else{
-			getMatchList();
+			getMatchList(v);
 			setNowPage2(1);
 		}
 	}
@@ -341,7 +352,7 @@ const Chat = (props) => {
 
 	function chatSchDel(){
 		setInputText('');
-		chatSch();
+		chatSch('cancel');
 	}
 
 	return (
@@ -386,7 +397,10 @@ const Chat = (props) => {
 					<TouchableOpacity
 						style={styles.schDelBtn}
 						activeOpacity={opacityVal}
-						onPress={() => {chatSchDel()}}
+						onPress={() => {
+							setInputText('');
+							chatSchDel()
+						}}
 					>
 						<AutoHeightImage width={24} source={require("../../assets/img/icon_delete.png")} />					
 					</TouchableOpacity>

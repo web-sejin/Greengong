@@ -54,7 +54,7 @@ export const actionCreators = {
   member_info: (user) => async (dispatch) => {
     try {      
       const response = await UserApi.member_info(user);
-      //console.log('member_info ::: ', user);
+      console.log('member_info api ::: ', response);
 
       if (response.result) {
         await dispatch({
@@ -66,6 +66,7 @@ export const actionCreators = {
 					'mb_idx': response.mb_idx,
 					'nick': response.mb_nick,
 					'result': response.result,
+          'result_code': response.result_code,
 					'result_text': response.result_text,
           'recently_notice': response.recently_notice
 				};

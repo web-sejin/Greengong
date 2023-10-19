@@ -68,6 +68,7 @@ const Intro = (props) => {
 	function movePageCheck(token){
 		AsyncStorage.getItem('mb_id').then(async (response) => {
 			//console.log("response : ",response);
+			
       if (response === null || response == undefined) {
         setTimeout(() => {
 					navigation.replace('Login');
@@ -76,15 +77,16 @@ const Intro = (props) => {
         const payload = {'is_api':1, 'id':response, 'mb_regnum':token};
 				const member_info_list = await member_info(payload);
 				//console.log("payload : ",payload);
-				if(member_info_list.state){
+				//console.log("member_info_list :::::::::::::::: ",member_info_list);
+				if(member_info_list.result_code == 1){
 					setTimeout(() => {
 						//navigation.replace('TabNavigator', {
-							navigation.replace('TabNav', {
+						navigation.replace('TabNav', {
 							screen: 'Home',
 							params: {
 								msg : member_info_list.result,
 							}
-						});
+						})
 					}, 2000);
 				}else{
 					setTimeout(() => {

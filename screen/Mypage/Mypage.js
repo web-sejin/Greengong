@@ -117,9 +117,7 @@ const Mypage = (props) => {
 				<TouchableOpacity 
 					style={styles.notApproval}
 					activeOpacity={opacityVal}
-					onPress={() => {
-						navigation.navigate('NoticeList');
-					}}
+					onPress={() => { navigation.navigate('NoticeList'); }}
 				>
 					<AutoHeightImage width={20} source={require("../../assets/img/icon_alert4.png")} />
 					{recentNotice != '' ? (
