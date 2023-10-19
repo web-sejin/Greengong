@@ -226,7 +226,7 @@ const Write1 = ({navigation, route}) => {
 		}); 
 	}
 
-	function getFileCount(selectCon){
+	function getFileCount(selectCon, type){
 		let cnt = 0;
 		selectCon.map((item) => {
 			if(item.path != ''){
@@ -234,8 +234,11 @@ const Write1 = ({navigation, route}) => {
 			}
 		});
 		setFileCnt(cnt);
-		if(cnt >= 3){
-			scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+
+		if(type == 'add'){
+			if(cnt >= 3){
+				scrollRef.current.scrollTo({ x: (cnt-1)*89, y: 0, animated: true })
+			}
 		}
 	}
 
@@ -250,7 +253,7 @@ const Write1 = ({navigation, route}) => {
 			}
 		});
 		setFileList(selectCon);
-    getFileCount(selectCon);
+    getFileCount(selectCon, 'add');
   };
 
 	function deleteFile(v){
@@ -262,7 +265,7 @@ const Write1 = ({navigation, route}) => {
 			}
 		});
 		setFileList(selectCon);
-		getFileCount(selectCon);
+		getFileCount(selectCon, 'del');
 	}
 
 	const handleChange = (idx) => {

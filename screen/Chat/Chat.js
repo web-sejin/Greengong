@@ -89,7 +89,17 @@ const Chat = (props) => {
 	const getProductList = async (v) => {
 		//setIsLoading(false);
 		//console.log("inputText : ",inputText);
-		await Api.send('GET', 'list_chat_product_room', {is_api: 1, page: 1, keyword: inputText}, (args)=>{
+
+		const formData = {
+			is_api:1,				
+			page:1,
+		};
+
+		if(v != 'cancel'){
+			formData.keyword = inputText;
+		}
+
+		await Api.send('GET', 'list_chat_product_room', formData, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
