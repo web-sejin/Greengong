@@ -276,7 +276,7 @@ const MatchModify = ({navigation, route}) => {
 		}); 
 	}
 
-	function getFileCount(selectCon){
+	function getFileCount(selectCon, type){
 		let cnt = 0;
 		selectCon.map((item) => {
 			if(item.path != ''){
@@ -546,7 +546,7 @@ const MatchModify = ({navigation, route}) => {
 			mc_price:price
 		};
 
-		//console.log(floorFileType);
+		//console.log(formData);
 
 		if(floorFile != ''){ 
 			formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; 

@@ -473,7 +473,8 @@ const Room = (props) => {
 			}else{
 				setVisible7(false);
 				console.log('결과 출력 실패!', resultItem);
-				ToastMessage(responseJson.result_text);
+				//ToastMessage(responseJson.result_text);
+				navigation.goBack();
 			}
 		});		
 	}

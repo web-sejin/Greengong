@@ -255,7 +255,7 @@ const Home = (props) => {
 						<View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
 							<Text style={styles.listInfoPriceStateText}>판매완료</Text>
 						</View>
-						{item.is_free != 1 ? (
+						{item.is_free != 1 && item.pd_sell_type != 3 ? (
 						<View style={styles.listInfoPrice}>
 							<Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
 						</View>
@@ -263,7 +263,7 @@ const Home = (props) => {
 					</View>
 					) : null}
 
-					{item.pd_status_org != 2 && item.pd_sell_type == 3 ? (
+					{item.pd_status_org != 2 && item.pd_status_org != 3 && item.pd_sell_type == 3 ? (
 					<View style={[styles.listInfoPriceArea]}>
 						<View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>
 							<Text style={styles.listInfoPriceStateText}>입찰상품</Text>

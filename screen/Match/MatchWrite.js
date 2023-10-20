@@ -524,7 +524,7 @@ const MatchWrite = ({navigation, route}) => {
 		if(img9Path != ''){ formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; }
 		if(img10Path != ''){ formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; }
 
-		console.log("formData : ",formData);
+		//console.log("formData : ",formData);
 
 		Api.send('POST', 'save_match', formData, (args)=>{
 			let resultItem = args.resultItem;

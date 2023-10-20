@@ -97,11 +97,13 @@ const MatchView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("view_match : ",responseJson);
+				//console.log("view_match : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.mf_data);
         setZzim(responseJson.is_scrap);
         setMcMbIdx(responseJson.mc_mb_idx);
+        console.log('is_dwg_permit : ',responseJson.is_dwg_permit);
+        console.log('is_request_dwg : ',responseJson.is_request_dwg);
         setDwgPmSt(responseJson.is_dwg_permit);
 
         if(itemInfo.is_request_dwg == 1){
@@ -621,7 +623,7 @@ const MatchView = (props) => {
                   </TouchableOpacity>
                 ):(
                   <TouchableOpacity 
-                    style={[styles.nextBtn, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGray : null]}
+                    style={[styles.nextBtn, dwgPmSt == 0 && (downReq == 1 || itemInfo.is_request_dwg==1) ? styles.nextBtnGray : null]}
                     activeOpacity={opacityVal}
                     onPress={() => {
                       if(itemInfo.mc_dwg_secure_org == 1){
