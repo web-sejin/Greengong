@@ -187,7 +187,18 @@ const SaleList = ({navigation, route}) => {
             <View style={styles.listInfoPriceState}>
               <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
             </View>
-            <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+            
+            {item.is_free != 1 && item.pd_sell_type != 3 ? (
+              <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+            ) : null}
+
+            {item.is_free == 1 ? (
+              <Text style={styles.listInfoPriceText}>나눔</Text>
+            ) : null} 
+            
+            {item.pd_sell_type == 3 ? (
+              <Text style={styles.listInfoPriceText}>입찰상품</Text>
+            ) : null} 
           </View>
           {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>
@@ -303,7 +314,18 @@ const SaleList = ({navigation, route}) => {
             <View style={styles.listInfoPriceState}>
               <Text style={styles.listInfoPriceStateText}>판매완료</Text>
             </View>
-            <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+            
+            {item.is_free != 1 && item.pd_sell_type != 3 ? (
+              <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
+            ) : null}
+
+            {item.is_free == 1 ? (
+              <Text style={styles.listInfoPriceText}>나눔</Text>
+            ) : null} 
+            
+            {item.pd_sell_type == 3 ? (
+              <Text style={styles.listInfoPriceText}>입찰상품</Text>
+            ) : null} 
           </View>
           {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>

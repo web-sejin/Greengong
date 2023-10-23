@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
 	loginIptBox: {marginTop:60,},
 	loginIptBox2: {marginTop:40},
 	loginIptBoxText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000000',paddingLeft:12,},
-	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:8,paddingLeft:13,fontSize:14,color:'#000',marginTop:10,},
+	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000',marginTop:10,},
 	loginBtnBox: {marginTop:50,},
 	loginBtn: {width:innerWidth,height:58,backgroundColor:'#31B481',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'},
 	loginBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:50,color:'#fff'},

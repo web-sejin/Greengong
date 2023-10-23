@@ -799,6 +799,9 @@ const MatchModify = ({navigation, route}) => {
 										Keyboard.dismiss();
 										setCate(value);
 										select2();
+										if(floorFile && (cate==6 || cate==7) && call==1){
+											setCall(0);
+										}
 									}}
 									placeholder={{
 										label: '카테고리를 선택해 주세요.',
@@ -1030,6 +1033,12 @@ const MatchModify = ({navigation, route}) => {
 								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
 								<Text style={styles.inputAlertText}>도면이 없으면 자세한 견적을 받을 수 없습니다.</Text>
 							</View>
+							{cate == 6 || cate == 7 ? (
+							<View style={[styles.inputAlert, styles.inputAlert2]}>
+								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert3.png")} />
+								<Text style={styles.inputAlertText}>ZIP파일만 업로드 가능합니다.</Text>
+							</View>
+							):null}
 							</>
 							) : null}
 							
@@ -1463,6 +1472,7 @@ const styles = StyleSheet.create({
 	inputUnit: {position:'absolute',top:0,right:20,},
 	inputUnitText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:56,color:'#000'},
 	inputAlert: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
+	inputAlert2: {marginTop:5},
 	inputAlertText: {width:(innerWidth-14),paddingLeft:7,fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#ED0000'},
 	floorBtn: {height:58,backgroundColor:'#D8D8D8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',marginTop:20,},
 	floorBtnOn: {backgroundColor:'#31B481'},

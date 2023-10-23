@@ -68,7 +68,7 @@ const EstimateResult = ({navigation, route}) => {
 			<ScrollView>
         <View style={styles.estResult}>
           <View style={[styles.registBox, styles.borderBot]}>
-              <View style={{marginBottom:10,}}>
+              <View style={{marginBottom:10,paddingLeft:9}}>
                 <Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>발행정보</Text>
               </View>
               <View style={styles.alertBox}>

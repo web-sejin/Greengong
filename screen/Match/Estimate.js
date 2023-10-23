@@ -430,7 +430,7 @@ const Estimate = ({navigation, route}) => {
 			<KeyboardAwareScrollView>
 				<View style={styles.registArea}>					
 					<View style={[styles.registBox, styles.borderBot, styles.zindexTop]}>
-						<View style={{marginBottom:10,}}>
+						<View style={{marginBottom:10,paddingLeft:9}}>
 							<Text style={{fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000'}}>발행정보</Text>
 						</View>
 						<View style={styles.alertBox}>
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
 	typingBox: {},
-	typingTitle: {position:'relative'},
+	typingTitle: {position:'relative',paddingLeft:9},
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},

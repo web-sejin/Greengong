@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
 	allChkBtnText: {fontFamily:Font.NotoSansRegular,fontSize:16,lineHeight:56,color:'#C5C5C6'},
 	allChkBtnTextOn: {},
 	chkBox: {marginTop:30,},
-	chkBtn: {display:'flex',flexDirection:'row',alignItems:'center'},
+	chkBtn: {display:'flex',flexDirection:'row',alignItems:'center',paddingHorizontal:15,},
 	chkBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',marginLeft:12,marginRight:5,},
 	chkBtnText2: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#ED0000',},
 	pollContent: {width:innerWidth,height:114,backgroundColor:'#fff',borderWidth:1,borderRadius:12,borderColor:'#ECECEC',padding:15,marginTop:10,},
