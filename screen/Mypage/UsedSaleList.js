@@ -185,20 +185,28 @@ const SaleList = ({navigation, route}) => {
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
             <View style={styles.listInfoPriceState}>
-              <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
+              {item.pd_status_org != 2 && item.is_free == 1 ? (
+                <Text style={styles.listInfoPriceStateText}>나눔</Text>
+              ) : null}
+
+              {item.pd_status_org != 2 && item.pd_sell_type == 3 ? (
+               <Text style={styles.listInfoPriceStateText}>입찰상품</Text>
+              ) : null}
+
+              {item.pd_status_org == 2 ? (
+               <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
+              ) : null}
+
+              {item.pd_status_org == 1 && item.is_free != 1 && item.pd_sell_type != 3 ? (
+               <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
+              ) : null}
+
+              {/* <Text style={styles.listInfoPriceStateText}>{item.pd_status_org}</Text> */}
             </View>
             
             {item.is_free != 1 && item.pd_sell_type != 3 ? (
               <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
-            ) : null}
-
-            {item.is_free == 1 ? (
-              <Text style={styles.listInfoPriceText}>나눔</Text>
-            ) : null} 
-            
-            {item.pd_sell_type == 3 ? (
-              <Text style={styles.listInfoPriceText}>입찰상품</Text>
-            ) : null} 
+            ) : null}                      
           </View>
           {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>
@@ -312,20 +320,22 @@ const SaleList = ({navigation, route}) => {
         <View style={styles.listInfoPriceWrap}>
           <View style={styles.listInfoPrice}>
             <View style={styles.listInfoPriceState}>
-              <Text style={styles.listInfoPriceStateText}>판매완료</Text>
+              {item.is_free == 1 ? (
+                <Text style={styles.listInfoPriceStateText}>나눔</Text>
+              ) : null}
+
+              {item.pd_sell_type == 3 ? (
+               <Text style={styles.listInfoPriceStateText}>입찰상품</Text>
+              ) : null}
+
+              {item.pd_status_org == 3 && item.is_free != 1 && item.pd_sell_type != 3 ? (
+               <Text style={styles.listInfoPriceStateText}>{item.pd_status}</Text>
+              ) : null}          
             </View>
             
             {item.is_free != 1 && item.pd_sell_type != 3 ? (
               <Text style={styles.listInfoPriceText}>{item.pd_price}원</Text>
             ) : null}
-
-            {item.is_free == 1 ? (
-              <Text style={styles.listInfoPriceText}>나눔</Text>
-            ) : null} 
-            
-            {item.pd_sell_type == 3 ? (
-              <Text style={styles.listInfoPriceText}>입찰상품</Text>
-            ) : null} 
           </View>
           {/* <View style={styles.listInfoDate}>
             <Text style={styles.listInfoDateText}>{item.date}</Text>
