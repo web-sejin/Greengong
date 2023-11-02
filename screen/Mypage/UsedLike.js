@@ -108,11 +108,9 @@ const UsedLike = (props) => {
             }
           }}
         >
-          {item.image ? (
-            <AutoHeightImage width={73} source={{uri: item.image}} />
-          ) : (
-            <AutoHeightImage width={73} source={require("../../assets/img/not_profile.png")} />	
-          )}
+          {item.pd_image_org ? (
+            <AutoHeightImage width={73} source={{uri: item.pd_image_org}} />
+          ) : null}
         </TouchableOpacity>        
         <TouchableOpacity 
           style={styles.listInfoBox}

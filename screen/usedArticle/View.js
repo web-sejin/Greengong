@@ -668,9 +668,11 @@ const UsedView = (props) => {
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState1]}>
                           <Text style={styles.listInfoPriceStateText}>예약중</Text>
                         </View>
+                        {item2.is_free != 1 && item2.pd_sell_type != 3 ? (
                         <View style={styles.listInfoPrice}>
                           <Text style={styles.listInfoPriceText}>{item2.pd_price}원</Text>
                         </View>
+                        ) : null}
                       </View>
                       ) : null}
             
@@ -687,7 +689,7 @@ const UsedView = (props) => {
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState3]}>
                           <Text style={styles.listInfoPriceStateText}>판매완료</Text>
                         </View>
-                        {item2.is_free != 1 ? (
+                        {item2.is_free != 1 && item2.pd_sell_type != 3 ? (
                         <View style={styles.listInfoPrice}>
                           <Text style={styles.listInfoPriceText}>{item2.pd_price}원</Text>
                         </View>
@@ -695,7 +697,7 @@ const UsedView = (props) => {
                       </View>
                       ) : null}
                       
-                      {item2.pd_status_org != 2 && item2.pd_sell_type == 3 ? (
+                      {item2.pd_status_org != 2 && item2.pd_status_org != 3 && item2.pd_sell_type == 3 ? (
                       <View style={[styles.listInfoPriceArea]}>
                         <View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>
                           <Text style={styles.listInfoPriceStateText}>입찰상품</Text>

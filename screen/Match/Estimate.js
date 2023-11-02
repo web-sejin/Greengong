@@ -117,7 +117,7 @@ const Estimate = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("view_match : ",responseJson);
+				console.log("view_match : ",responseJson);
 				//console.log("mc_chat_permit : ",responseJson.mc_chat_permit);
 				setItemInfo(responseJson);
 			}else{
@@ -435,8 +435,8 @@ const Estimate = ({navigation, route}) => {
 						</View>
 						<View style={styles.alertBox}>
 							<AutoHeightImage width={20} source={require("../../assets/img/icon_alert.png")} style={styles.icon_alert} />
-							<Text style={styles.alertBoxText}>참좋은공장</Text>
-							<Text style={[styles.alertBoxText, styles.alertBoxText2]}>아직 밝혀지지 않은 달 뒤를 가보고 남은 장비 프로젝트</Text>
+							<Text style={styles.alertBoxText}>{itemInfo.mb_nick}</Text>
+							<Text style={[styles.alertBoxText, styles.alertBoxText2]}>{itemInfo.mc_name}</Text>
 						</View>
 						<View style={[styles.typingBox, styles.mgTop30]}>
 							<View style={styles.typingTitle}>

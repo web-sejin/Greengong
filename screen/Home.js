@@ -269,7 +269,7 @@ const Home = (props) => {
 							<Text style={styles.listInfoPriceStateText}>입찰상품</Text>
 						</View>
 					</View>
-					) : null}		
+					) : null}
 				</View>
 			</View>
 			</>

@@ -1042,7 +1042,7 @@ const MatchModify = ({navigation, route}) => {
 							</>
 							) : null}
 							
-							{floorFile=="" ? (
+							{floorFile=="" || (floorFile!="" && (cate==6 || cate==7)) ? (
 							<TouchableOpacity
 								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
 								activeOpacity={opacityVal}
@@ -1052,23 +1052,6 @@ const MatchModify = ({navigation, route}) => {
 									}else{
 										setCall(1)
 										setSecurity('');
-									}	
-								}}
-							>
-								<AutoHeightImage width={15} source={require("../../assets/img/icon_chk_on.png")} style={styles.floorBtnImg} />
-								<Text style={styles.floorBtnText}>설계요청</Text>
-							</TouchableOpacity>
-							) : null}
-
-							{floorFile!="" && (cate==6 || cate==7) ? (
-							<TouchableOpacity
-								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
-								activeOpacity={opacityVal}
-								onPress={() => {
-									if(call == 1){
-										setCall(0)
-									}else{
-										setCall(1)
 									}	
 								}}
 							>

@@ -314,7 +314,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("get_chat_room_product : ",responseJson);
+				console.log("get_chat_room_product : ",responseJson);
 				setItemInfo(responseJson);
 				setPhone(responseJson.mb_hp050);
 			}else{
@@ -581,7 +581,11 @@ const Room = (props) => {
 						{itemInfo.pd_sell_type == 3 ? (						
 							<Text style={styles.listInfoDescText}>입찰상품</Text>
 						) : (
-							<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>							
+							itemInfo.is_free == 1 ? (
+								<Text style={styles.listInfoDescText}>나눔</Text>							
+							) : (
+								<Text style={styles.listInfoDescText}>{itemInfo.pd_price}원</Text>							
+							)
 						)}
 					</View>
 					) : null}

@@ -856,7 +856,7 @@ const MatchWrite = ({navigation, route}) => {
 							</>
 							) : null}
 
-							{floorFile!="" && (cate==6 || cate==7) ? (
+							{floorFile=="" || (floorFile!="" && (cate==6 || cate==7)) ? (
 							<TouchableOpacity
 								style={[styles.floorBtn, call==1 ? styles.floorBtnOn : null]}
 								activeOpacity={opacityVal}

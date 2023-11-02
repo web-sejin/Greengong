@@ -201,9 +201,7 @@ const UsedBidList = ({navigation, route}) => {
           >
             {item.pd_image ? (
               <AutoHeightImage width={63} source={{uri: item.pd_image}} />
-            ) : (
-              <AutoHeightImage width={63} source={require("../../assets/img/not_profile.png")} />
-            )}
+            ) : null}
           </TouchableOpacity>
         </View>
         <View style={styles.matchPrice}>

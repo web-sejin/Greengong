@@ -232,8 +232,8 @@ const OtherUsed = ({navigation, route}) => {
               </View>
               ) : null }
             </View>
-            ) : null}					
-            
+            ) : null}
+
             {item.pd_status_org != 2 && item.pd_status_org != 3 && item.pd_sell_type == 3 ? (
             <View style={[styles.listInfoPriceArea]}>
               <View style={[styles.listInfoPriceState, styles.listInfoPriceState4]}>

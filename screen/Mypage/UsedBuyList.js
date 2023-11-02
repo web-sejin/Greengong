@@ -113,7 +113,7 @@ const UsedBuyList = (props) => {
             </View>
             <View style={styles.compInfoLoc}>
               <AutoHeightImage width={9} source={require("../../assets/img/icon_local3.png")} />
-              <Text style={styles.compInfoLocText}>중3동</Text>
+              <Text style={styles.compInfoLocText}>{item.pd_loc}</Text>
             </View>
           </TouchableOpacity>
           {item.pd_image ? (
