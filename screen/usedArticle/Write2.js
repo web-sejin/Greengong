@@ -83,33 +83,33 @@ const Write2 = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setFileConfirm(false);
-				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setShape('');
-				setChkMethod([]);
-        setSize1('');
-        setSize2('');
-        setSize3('');
-        setSize4('');
-        setSize5('');
-				setC3Etc('');
-				setPeriod('');
-				setDealMethod1('');
-				setDealMethod2('');
-				setPriceUnit(1);
-				setPrice('');
-				setPriceOpt(1);
-				setPayMethod('');
-				setContent('');
-				setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setShapeAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setFileConfirm(false);
+				// setFileList(fileListData);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setShape('');
+				// setChkMethod([]);
+        // setSize1('');
+        // setSize2('');
+        // setSize3('');
+        // setSize4('');
+        // setSize5('');
+				// setC3Etc('');
+				// setPeriod('');
+				// setDealMethod1('');
+				// setDealMethod2('');
+				// setPriceUnit(1);
+				// setPrice('');
+				// setPriceOpt(1);
+				// setPayMethod('');
+				// setContent('');
+				// setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setShapeAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{
 			setRouteLoad(true);

@@ -56,6 +56,7 @@ const MatchView = (props) => {
   const [swpCurr, setSwpCurr] = useState(0);
   const [popImgUrl, setPopImgUrl] = useState('');
   const [downReq, setDownReq] = useState(false); //도면 다운 권한 요청 여부 - false : 요청하지 않은 상태 / true : 요청한 상태
+  const [onlyView, setOnlyView] = useState(false);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -374,7 +375,13 @@ const MatchView = (props) => {
 			if(responseJson.result === 'success'){
 				console.log('성공 : ',responseJson);
         setVisible3(false);
-        chatDeal();
+        if(onlyView){
+          ToastMessage("회사소개서 제출이 완료되었습니다.");
+          setOnlyView(false);
+          getData();
+        }else{
+          chatDeal();
+        }
 			}else{
 				console.log('결과 출력 실패!', resultItem);
 				ToastMessage(responseJson.result_text);
@@ -622,6 +629,7 @@ const MatchView = (props) => {
                     <Text style={styles.nextBtnText}>도면 권한 요청 확인</Text>
                   </TouchableOpacity>
                 ):(
+                  <>
                   <TouchableOpacity 
                     style={[styles.nextBtn, dwgPmSt == 0 && (downReq == 1 || itemInfo.is_request_dwg==1) ? styles.nextBtnGray : null]}
                     activeOpacity={opacityVal}
@@ -638,25 +646,63 @@ const MatchView = (props) => {
                     }}
                   >
                     {itemInfo.mc_dwg_secure_org == 1 ? (
-                      <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                      <>
+                      <Text style={styles.nextBtnText}>도면</Text>
+                      <Text style={styles.nextBtnText}>다운로드</Text>
+                      </>
                     ) : (
                       dwgPmSt == 0 ? (
+                        <>
                         <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
-                          도면 권한 요청
+                          도면 권한
                         </Text>
+                        <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
+                          요청
+                        </Text>
+                        </>
                       ) : (
-                        <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                        <>
+                        <Text style={styles.nextBtnText}>도면</Text>
+                        <Text style={styles.nextBtnText}>다운로드</Text>
+                        </>
                       )
                     )}
                   </TouchableOpacity>
+                  
+                  {itemInfo.is_doc == 0 ? (
+                  <TouchableOpacity 
+                    style={[styles.nextBtn]}
+                    activeOpacity={opacityVal}
+                    onPress={() => { 
+                      setOnlyView(true);
+                      setVisible3(true);
+                    }}
+                  >
+                    <Text style={styles.nextBtnText}>회사소개서</Text>
+                    <Text style={styles.nextBtnText}>제출</Text>
+                  </TouchableOpacity>
+                  ) : null}
+                  
+                  {itemInfo.is_estimate == 0 ? (
+                  <TouchableOpacity 
+                    style={[styles.nextBtn]}
+                    activeOpacity={opacityVal}
+                    onPress={() => { navigation.navigate('Estimate', {idx:idx, mcMbIdx:mcMbIdx, backPage:'view'}); }}
+                  >
+                    <Text style={styles.nextBtnText}>견적서</Text>
+                    <Text style={styles.nextBtnText}>제출</Text>
+                  </TouchableOpacity>
+                  ) : null}
+                  </>
                 )
                 
-              ) : null}
+              ) : null}              
 
               <TouchableOpacity 
-                style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3]}
+                style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3, styles.chatBtn]}
                 activeOpacity={opacityVal}
                 onPress={() => {
+                  setOnlyView(false);
                   if(myInfo.mb_idx == itemInfo.mc_mb_idx){
                     navigation.navigate('MachChat', {idx:idx});
                   }else{
@@ -1056,12 +1102,13 @@ const styles = StyleSheet.create({
   swiperSlider: {height:220,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',},
   nextFix: {height:105,paddingHorizontal:20,paddingTop:15,backgroundColor:'#F3FAF8'},
   nextFixFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
-	nextBtn: {width:((innerWidth/2)-5),height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',
-  justifyContent:'center',},
+	nextBtn: {flex:1,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',
+  justifyContent:'center',marginRight:5,},
   nextBtn2: {backgroundColor:'#353636',},
   nextBtn3: {width:innerWidth},
+  chatBtn: {marginRight:0,},
   nextBtnGray: {backgroundColor:'#eaeaea'},
-	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
+	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:20,color:'#fff'},
   nextBtnGrayText: {color:'#bbb'},
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},

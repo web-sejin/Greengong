@@ -73,23 +73,23 @@ const Write4 = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setFileConfirm(false);
-				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setShape('');
-				setChkMethod([]);
-				setDealMethod1('');
-				setDealMethod2('');
-        setPeriod('');
-				setPayMethod('');
-				setContent('');
-				setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setFileConfirm(false);
+				// setFileList(fileListData);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setShape('');
+				// setChkMethod([]);
+				// setDealMethod1('');
+				// setDealMethod2('');
+        // setPeriod('');
+				// setPayMethod('');
+				// setContent('');
+				// setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{
 			setRouteLoad(true);

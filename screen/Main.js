@@ -82,9 +82,11 @@ import MatchReq from './Mypage/MatchReq'; //마이페이지 요청내역
 import MatchComparison from './Mypage/MatchComparison'; //마이페이지 비교내역
 import MatchComparisonView from './Mypage/MatchComparisonView'; //마이페이지 발주업체 비교내역
 import MatchOrder from './Mypage/MatchOrder'; //마이페이지 발주내역
+import MatchDownCert  from './Mypage/MatchDownCert' //마이페이지 완료
 import MatchDownUsed from './Mypage/MatchDownUsed'; //마이페이지 도면권한요청내역
 import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 요청 뷰
 import MatchDownUsedView2 from './Mypage/MatchDownUsedView2'; //마이페이지 도면권한요청내역 완료 뷰
+import MatchEstimate from './Mypage/MatchEstimate'; //마이페이지 견적서 확인
 import Keyword from './Mypage/Keyword'; //마이페이지 키워드 등록
 import Message from './Mypage/Message'; //마이페이지 자주쓰는메세지
 import MessageWrite from './Mypage/Message_write'; //마이페이지 자주쓰는메세지 작성
@@ -342,9 +344,11 @@ const StackNavigator = () => {
       <Stack.Screen name="MatchComparison" component={MatchComparison} />
       <Stack.Screen name="MatchComparisonView" component={MatchComparisonView} />
       <Stack.Screen name="MatchOrder" component={MatchOrder} />
+      <Stack.Screen name="MatchDownCert" component={MatchDownCert} />
       <Stack.Screen name="MatchDownUsed" component={MatchDownUsed} />
       <Stack.Screen name="MatchDownUsedView" component={MatchDownUsedView} />
       <Stack.Screen name="MatchDownUsedView2" component={MatchDownUsedView2} />
+      <Stack.Screen name="MatchEstimate" component={MatchEstimate} />      
       <Stack.Screen name="Keyword" component={Keyword} />
       <Stack.Screen name="Message" component={Message} />
       <Stack.Screen name="MessageWrite" component={MessageWrite} />

@@ -1110,8 +1110,8 @@ const MatchModify = ({navigation, route}) => {
 										setAdvice(value);
 									}}
 									placeholder={{
-										label: '결제방식을 선택해 주세요.',
-										inputLabel: '결제방식을 선택해 주세요.',
+										label: '상담방식을 선택해 주세요.',
+										inputLabel: '상담방식을 선택해 주세요.',
 										value: '',
 										color: '#8791A1',
 									}}

@@ -57,6 +57,12 @@ const Modify3 = ({navigation, route}) => {
 	const [dealMethod1, setDealMethod1] = useState(''); //거래방식1
 	const [dealMethod2, setDealMethod2] = useState(''); //거래방식2
 	const [period, setPeriod] = useState(''); //입찰기간
+	const [chkMethod, setChkMethod] = useState([]); //검수
+	const [size1, setSize1] = useState(''); //모델명
+  const [size2, setSize2] = useState(''); //제조사
+  const [size3, setSize3] = useState(''); //연식(제조년)
+  const [size4, setSize4] = useState(''); //기본사양
+  const [size5, setSize5] = useState(''); //위치
 	const [price, setPrice] = useState(''); //가격
 	const [priceOpt, setPriceOpt] = useState(1); //가격옵션
 	const [payMethod, setPayMethod] = useState(''); //결제방식
@@ -132,6 +138,42 @@ const Modify3 = ({navigation, route}) => {
         if(z){ setIngred(z); }
 			}else{
 				//console.log("성분 err :",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//검수
+	const check1 = async (testList) => {
+		await Api.send('GET', 'product_cate5', {is_api:1, cate1:3}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("검수 : ",responseJson);
+				//setChkMethod(responseJson.data);
+				let chkMetAry = [];
+				(responseJson.data).map((item, index)=>{
+					const subAry = {
+						'idx': item.val, 
+						'txt': item.txt, 
+						'isChecked': false
+					}
+					chkMetAry.push(subAry);
+				});
+
+				//console.log("chkMetAry ::::: ",testList[0]['txt']);
+
+        if(testList.length > 0 && testList[0]['txt']){
+					console.log("testList : ",testList);
+					testList.map((item) => {
+						const id = (item.val)-1;
+						chkMetAry[id].isChecked=true;
+					});
+				}
+				setChkMethod(chkMetAry);
+			}else{
+				console.log("검수 err : ",responseJson.result_text);
 			}
 		}); 
 	}
@@ -348,6 +390,17 @@ const Modify3 = ({navigation, route}) => {
 
 		//if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }		
 
+		let selectedList = '';
+		let selectedTotal = chkMethod.filter((item) => item.isChecked);
+		if(selectedTotal){
+			selectedTotal.map((item)=>{
+				if(selectedList != ''){
+					selectedList += ',';
+				}
+				selectedList += item.idx;			
+			});
+		}
+
 		if(dealMethod1 == ""){ ToastMessage('거래방식1을 선택해 주세요.'); return false; }
 		
 		if(dealMethod1 == 1){
@@ -391,6 +444,12 @@ const Modify3 = ({navigation, route}) => {
 			pd_trade2:dealMethod2, 
 			pd_method:payMethod, 
 			pd_bidding_day:period,
+			pd_test:selectedList,
+			ps_model:size1,
+			ps_company:size2,
+			ps_year:size3,
+			ps_spec:size4,
+			ps_loc:size5,
 		};
 
 		if(img1Path != ''){ 
@@ -506,7 +565,7 @@ const Modify3 = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("modify : ",responseJson);
+				console.log("modify : ",responseJson);
 				const imgList = responseJson.pf_data;				
 				if(imgList.length > 0){
 					let selectCon = fileList.map((item,index) => {
@@ -540,7 +599,16 @@ const Modify3 = ({navigation, route}) => {
 				select5();
 				setPayMethod(responseJson.pd_method);
 				setContent(responseJson.pd_contents);
+				setSize1(responseJson.ps_model);
+        setSize2(responseJson.ps_company);
+        setSize3(responseJson.ps_year);
+        setSize4(responseJson.ps_spec);
+        setSize5(responseJson.ps_loc);
 				setPeriod((responseJson.pd_bidding_day).toString());
+
+				//console.log("pd_test ::::::::::::::::: ",responseJson.pd_test[0]['txt']);
+				const testList = responseJson.pd_test;
+				check1(testList);
 
         setIsLoading(true);
 			}else{
@@ -680,6 +748,105 @@ const Modify3 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View> */}
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>검수</Text>
+							</View>
+							<View style={[styles.filterBtnList]}>
+								{chkMethod.map((item, index) => {
+									return(
+									<TouchableOpacity
+										key = {index}
+										style={[styles.filterChkBtn, item.isChecked ? styles.filterChkBtnOn : null]}
+										activeOpacity={opacityVal}
+										onPress={() => handleChange(item.idx)}
+									>
+										<Text style={[styles.filterChkBtnText, item.isChecked ? styles.filterChkBtnTextOn : null]}>{item.txt}</Text>
+									</TouchableOpacity>
+									)
+								})}
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>모델명</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size1}
+									onChangeText={(v) => {setSize1(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>제조사</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size2}
+									onChangeText={(v) => {setSize2(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>연식(제조년)</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size3}
+									keyboardType = 'numeric'
+									onChangeText={(v) => {setSize3(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+								<View style={styles.inputUnit}>
+									<Text style={styles.inputUnitText}>년</Text>
+								</View>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>기본사양</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size4}
+									onChangeText={(v) => {setSize4(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>위치</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size5}
+									onChangeText={(v) => {setSize5(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -967,10 +1134,12 @@ const styles = StyleSheet.create({
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},
 	typingInputBox2: {marginTop:5},
-	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',},
+	typingInputBox50: {width:((innerWidth/2)-5)},
+	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',flexWrap:'wrap',},
 	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
 	input2: {width:(innerWidth - 90),},
 	input3: {width:(innerWidth - 120),},
+	input4: {width:((innerWidth/2)-5)},
 	textarea: {height:230,borderRadius:12,textAlignVertical:"top",padding:12,},
 	inputContainer: {},
 	selectArr: {position:'absolute',top:25.5,right:20,},

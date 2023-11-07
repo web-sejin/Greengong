@@ -43,6 +43,7 @@ const Estimate = ({navigation, route}) => {
 
 	const idx = route.params.idx;
 	const mcMbIdx = route.params.mcMbIdx;
+	const backPage = route.params.backPage;
 	
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
@@ -104,7 +105,7 @@ const Estimate = ({navigation, route}) => {
 		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-			getData();
+			getData();			
 		}
 
 		return () => isSubscribed = false;
@@ -117,7 +118,7 @@ const Estimate = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("view_match : ",responseJson);
+				//console.log("view_match : ",responseJson);
 				//console.log("mc_chat_permit : ",responseJson.mc_chat_permit);
 				setItemInfo(responseJson);
 			}else{
@@ -399,7 +400,14 @@ const Estimate = ({navigation, route}) => {
 
 			if(responseJson.result === 'success'){
 				//console.log(responseJson);
-				chatDeal();
+				if(backPage == "view"){
+					ToastMessage('예상 견적서 등록이 완료되었습니다.');
+					setTimeout(function(){
+						navigation.goBack();
+					},1000);
+				}else{
+					chatDeal();
+				}
 			}else{
 				console.log(responseJson);
 				ToastMessage(responseJson.result_text);

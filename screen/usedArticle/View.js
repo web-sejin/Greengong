@@ -561,11 +561,56 @@ const UsedView = (props) => {
               ) : (
                 <Text  style={styles.viewSummText}>성분분석표 : 유</Text>
               )}
+
+              {itemInfo.pd_weight ? (
               <Text  style={styles.viewSummText}>중량 : {itemInfo.pd_weight}kg</Text>
+              ) : null}
+
+              {itemInfo.pd_thickness ? (
               <Text  style={styles.viewSummText}>두께 : {itemInfo.pd_thickness}t</Text>
+              ) : null}
+
+              {itemInfo.pd_outside ? (
               <Text  style={styles.viewSummText}>외경 : {itemInfo.pd_outside}∅</Text>
+              ) : null}
+
+              {itemInfo.pd_width ? (
               <Text  style={styles.viewSummText}>폭 : {itemInfo.pd_width}cm</Text>
+              ) : null}
+
+              {itemInfo.pd_length ? (
               <Text  style={styles.viewSummText}>길이 : {itemInfo.pd_length}cm</Text>
+              ) : null}
+            </View>
+            ) : null}
+
+            {itemInfo.c1_idx == 3 ? (
+            <View style={styles.viewSumm}>
+              {itemInfo.pd_test == 0 ? (
+                <Text  style={styles.viewSummText}>성분분석표 : 무</Text>
+              ) : (
+                <Text  style={styles.viewSummText}>성분분석표 : 유</Text>
+              )}
+
+              {itemInfo.ps_model ? (
+              <Text  style={styles.viewSummText}>모델명 : {itemInfo.ps_model}</Text>
+              ) : null}
+
+              {itemInfo.ps_company ? (
+              <Text  style={styles.viewSummText}>제조사 : {itemInfo.ps_company}</Text>
+              ) : null}
+
+              {itemInfo.ps_year ? (
+              <Text  style={styles.viewSummText}>연식(제조년) : {itemInfo.ps_year}년</Text>
+              ) : null}
+
+              {itemInfo.ps_spec ? (
+              <Text  style={styles.viewSummText}>기본사양 : {itemInfo.ps_spec}</Text>
+              ) : null}
+
+              {itemInfo.ps_loc ? (
+              <Text  style={styles.viewSummText}>위치 : {itemInfo.ps_loc}</Text>
+              ) : null}
             </View>
             ) : null}
 

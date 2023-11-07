@@ -277,6 +277,35 @@ const Mypage = (props) => {
 						</View>
 					</View>
 
+					<View style={[styles.mypage3, styles.paddTop30, styles.paddBot30, styles.borderBot]}>
+						<View style={styles.mypageTit}>
+							<Text style={styles.mypageTitText}>신청내역</Text>
+						</View>
+						<View style={styles.mypageLinkBox}>
+							<TouchableOpacity
+								style={styles.mypageLinkBoxBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {									
+									navigation.navigate('MatchDownCert', {});
+								}}			
+							>
+								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage10.png")} />
+								<Text style={styles.mypageLinkBoxBtnText}>도면요청내역</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={[styles.mypageLinkBoxBtn]}
+								activeOpacity={opacityVal}
+								onPress={() => {									
+									navigation.navigate('MatchEstimate', {});
+								}}			
+							>
+								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage9.png")} />
+								<Text style={styles.mypageLinkBoxBtnText}>견적서 확인</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+
 					<View style={[styles.mypage4, styles.paddTop30, styles.paddBot15, styles.borderBot]}>
 						<View style={styles.mypageTit}>
 							<Text style={styles.mypageTitText}>기타</Text>
@@ -509,8 +538,9 @@ const styles = StyleSheet.create({
 	myDealResultBox: {paddingVertical:11,paddingHorizontal:30,backgroundColor:'#F3FAF8',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:20,},
 	myDealResultBoxText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#323232',},
 	myDealResultBoxText2: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#31B481',},
-	mypageLinkBox: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:20,},
-	mypageLinkBoxBtn: {width:(innerWidth/4),display:'flex',alignItems:'center',},
+	mypageLinkBox: {display:'flex',flexDirection:'row',flexWrap:'wrap',marginTop:20},
+	mypageLinkBoxBtn: {width:(innerWidth/4),display:'flex',alignItems:'center'},
+	mypageLinkBoxBtn2: {marginTop:30,},
 	mypageLinkBoxBtnText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#000',marginTop:10,},
 	mypageLinkList: {marginTop:5},
 	mypageLinkListBtn: {paddingVertical:15,},

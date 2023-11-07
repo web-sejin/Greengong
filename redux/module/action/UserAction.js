@@ -54,7 +54,7 @@ export const actionCreators = {
   member_info: (user) => async (dispatch) => {
     try {      
       const response = await UserApi.member_info(user);
-      console.log('member_info api ::: ', response);
+      //console.log('member_info api ::: ', response);
 
       if (response.result) {
         await dispatch({
@@ -205,7 +205,7 @@ export const actionCreators = {
   member_logout: (data) => async (dispatch) => {
     try {
       const response = await UserApi.member_logout(data);
-      console.log('member_logout :::', response);
+      //console.log('member_logout :::', response);
       AsyncStorage.removeItem('mb_id');
 
       await dispatch({

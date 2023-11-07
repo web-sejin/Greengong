@@ -19,10 +19,14 @@ const MatchOrder = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [tabState, setTabState] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [odList, setOdList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
+  const [odList2, setOdList2] = useState([]);
+  const [nowPage2, setNowPage2] = useState(1);
+  const [totalPage2, setTotalPage2] = useState(1);
   const [initLoading, setInitLoading] = useState(false);
   const [mcIdx, setMcIdx] = useState();
   const [score, setScore] = useState(3);
@@ -171,9 +175,58 @@ const MatchOrder = ({navigation, route}) => {
 		});
   }
 
+  function fnTab(v){
+    setTabState(v);
+		setNowPage(1);
+    setNowPage2(1);
+		if(v == 1){
+      getData();
+      setTimeout(function(){
+        setOdList2([]);
+      },200);
+    }else if(v == 2){
+      //getData2();
+      setTimeout(function(){
+        setOdList([]);
+      },200);
+    }
+  }
+
 	return (
 		<SafeAreaView style={styles.safeAreaView}>      
 			<Header navigation={navigation} headertitle={'발주내역'} />
+
+      <View style={styles.tabBox}>
+        <TouchableOpacity
+          style={styles.tabBtn}
+          activeOpacity={opacityVal}
+          onPress={()=>{fnTab(1)}}
+        > 
+          {tabState == 1 ? (
+            <>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>발주요청회원</Text>
+            <View style={styles.tabLine}></View>
+            </>
+          ) : (
+            <Text style={styles.tabBtnText}>발주요청회원</Text>  
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabBtn}
+          activeOpacity={opacityVal}
+          onPress={()=>{fnTab(2)}}
+        >
+          {tabState == 2 ? (
+            <>
+            <Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>발주회원</Text>
+            <View style={styles.tabLine}></View>
+            </>
+          ) : (
+            <Text style={styles.tabBtnText}>발주회원</Text>  
+          )}
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={odList}
         renderItem={(getList)}
@@ -344,6 +397,13 @@ const styles = StyleSheet.create({
 
   notData: {height:widnowHeight-220,display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
+
+  tabBox: {display:'flex',flexDirection:'row',backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:'#E3E3E4'},
+  tabBtn: {width:(widnowWidth/2),height:45,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},
+  tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
+  tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
+  tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
+  indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
 })
 
 export default MatchOrder

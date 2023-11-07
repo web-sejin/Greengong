@@ -60,6 +60,12 @@ const Write3 = ({navigation, route}) => {
 	const [payMethod, setPayMethod] = useState(''); //결제방식
 	const [content, setContent] = useState(''); //내용
 	const [period, setPeriod] = useState(''); //입찰기간
+	const [chkMethod, setChkMethod] = useState([]); //검수
+	const [size1, setSize1] = useState(''); //모델명
+  const [size2, setSize2] = useState(''); //제조사
+  const [size3, setSize3] = useState(''); //연식(제조년)
+  const [size4, setSize4] = useState(''); //기본사양
+  const [size5, setSize5] = useState(''); //위치
 	const [isLoading, setIsLoading] = useState(true);
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
@@ -73,29 +79,30 @@ const Write3 = ({navigation, route}) => {
 
 		if(!isFocused){
 			if(!pageSt){
-				setFileConfirm(false);
-				setFileList(fileListData);
-				setSubject('');
-				setSort('');
-				setIngred('');
-				setDealMethod1('');
-				setDealMethod2('');
-				setPrice('');
-				setPriceOpt(1);
-				setPayMethod('');
-				setContent('');
-				setPeriod('');
-				setIsLoading(false);
-				setSortAry([]);
-				setIngreAry([]);
-				setDealMethod2Ary([]);
-				setPayMethodAry([]);
+				// setFileConfirm(false);
+				// setFileList(fileListData);
+				// setSubject('');
+				// setSort('');
+				// setIngred('');
+				// setDealMethod1('');
+				// setDealMethod2('');
+				// setPrice('');
+				// setPriceOpt(1);
+				// setPayMethod('');
+				// setContent('');
+				// setPeriod('');
+				// setIsLoading(false);
+				// setSortAry([]);
+				// setIngreAry([]);
+				// setDealMethod2Ary([]);
+				// setPayMethodAry([]);
 			}
 		}else{			
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 			select1();
 			select5();
+			check1();
 		}
 
 		return () => isSubscribed = false;
@@ -131,6 +138,32 @@ const Write3 = ({navigation, route}) => {
 				setIngreAry(responseJson.data);
 			}else{
 				//console.log("성분 err :",responseJson.result_text);
+			}
+		}); 
+	}
+
+	//검수
+	const check1 = async () => {
+		await Api.send('GET', 'product_cate5', {is_api:1, cate1:3}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("검수 : ",responseJson);
+				//setChkMethod(responseJson.data);
+				let chkMetAry = [];
+				(responseJson.data).map((item, index)=>{
+					const subAry = {
+						'idx': item.val, 
+						'txt': item.txt, 
+						'isChecked': false
+					}
+					chkMetAry.push(subAry);
+				});
+				setChkMethod(chkMetAry);
+			}else{
+				console.log("검수 err : ",responseJson.result_text);
 			}
 		}); 
 	}
@@ -266,7 +299,19 @@ const Write3 = ({navigation, route}) => {
 
 		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
 
-		//if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }		
+		//if(ingred == ""){ ToastMessage('성분을 선택해 주세요.'); return false; }
+
+		let selectedList = '';
+		let selectedTotal = chkMethod.filter((item) => item.isChecked);
+		if(selectedTotal){
+			selectedTotal.map((item)=>{
+				if(selectedList != ''){
+					selectedList += ',';
+				}
+				selectedList += item.idx;			
+			});
+		}
+		//if(selectedList == ''){ ToastMessage('검수를 선택해 주세요.'); return false; }
 
 		if(dealMethod1 == ""){ ToastMessage('거래방식1을 선택해 주세요.'); return false; }
 		
@@ -308,6 +353,12 @@ const Write3 = ({navigation, route}) => {
 			pd_trade2:dealMethod2, 
 			pd_method:payMethod, 	
 			pd_bidding_day:period,
+			pd_test:selectedList,
+			ps_model:size1,
+			ps_company:size2,
+			ps_year:size3,
+			ps_spec:size4,
+			ps_loc:size5,
 		};
 
 		if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
@@ -469,6 +520,105 @@ const Write3 = ({navigation, route}) => {
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
 						</View> */}
+
+						{/* <View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>검수</Text>
+							</View>
+							<View style={[styles.filterBtnList]}>
+								{chkMethod.map((item, index) => {
+									return(
+									<TouchableOpacity
+										key = {index}
+										style={[styles.filterChkBtn, item.isChecked ? styles.filterChkBtnOn : null]}
+										activeOpacity={opacityVal}
+										onPress={() => handleChange(item.idx)}
+									>
+										<Text style={[styles.filterChkBtnText, item.isChecked ? styles.filterChkBtnTextOn : null]}>{item.txt}</Text>
+									</TouchableOpacity>
+									)
+								})}
+							</View>
+						</View> */}
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>모델명</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size1}
+									onChangeText={(v) => {setSize1(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>제조사</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size2}
+									onChangeText={(v) => {setSize2(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>연식(제조년)</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size3}
+									keyboardType = 'numeric'
+									onChangeText={(v) => {setSize3(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+								<View style={styles.inputUnit}>
+									<Text style={styles.inputUnitText}>년</Text>
+								</View>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>기본사양</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size4}
+									onChangeText={(v) => {setSize4(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
+
+						<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={styles.typingTitle}>
+								<Text style={styles.typingTitleText}>위치</Text>
+							</View>
+							<View style={[styles.typingInputBox]}>
+								<TextInput
+									value={size5}
+									onChangeText={(v) => {setSize5(v);}}
+									placeholder={''}
+									placeholderTextColor="#8791A1"
+									style={[styles.input]}
+								/>
+							</View>
+						</View>
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
@@ -746,6 +896,7 @@ const Write3 = ({navigation, route}) => {
 
 const styles = StyleSheet.create({
 	safeAreaView: {flex:1,backgroundColor:'#fff'},	
+	mgTop20: {marginTop:20},
 	mgTop30: {marginTop:30},
 	mgTop35: {marginTop:35},
 	paddBot13: {paddingBottom:13},
@@ -757,11 +908,13 @@ const styles = StyleSheet.create({
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},
-	typingInputBox2: {marginTop:5},
-	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',},
+	typingInputBox2: {marginTop:5,},
+  typingInputBox50: {width:((innerWidth/2)-5)},
+	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',flexWrap:'wrap',},
 	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
 	input2: {width:(innerWidth - 90),},
 	input3: {width:(innerWidth - 120),},
+	input4: {width:((innerWidth/2)-5)},
 	textarea: {height:230,borderRadius:12,textAlignVertical:"top",padding:12,},
 	inputContainer: {},
 	selectArr: {position:'absolute',top:25.5,right:20,},
