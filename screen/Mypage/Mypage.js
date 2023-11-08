@@ -290,7 +290,7 @@ const Mypage = (props) => {
 								}}			
 							>
 								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage10.png")} />
-								<Text style={styles.mypageLinkBoxBtnText}>도면요청내역</Text>
+								<Text style={styles.mypageLinkBoxBtnText}>도면신청내역</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity

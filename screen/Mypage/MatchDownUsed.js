@@ -25,36 +25,7 @@ const MatchDownUsed = ({navigation, route}) => {
   const [totalPage, setTotalPage] = useState(1);
   const [itemList2, setItemList2] = useState([]);
   const [nowPage2, setNowPage2] = useState(1);
-  const [totalPage2, setTotalPage2] = useState(1);
-
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '견적 요청 드립니다.',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-      state:1,
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '견적 요청 드립니다.2',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-      state:2,
-		},
-	];
-
-  const dataLen = DATA.length;		
+  const [totalPage2, setTotalPage2] = useState(1);	
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -100,9 +71,10 @@ const MatchDownUsed = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_request_dwg_match : ",responseJson);
+				//console.log("list_request_dwg_match : ",responseJson);
 				setItemList(responseJson.data);
-        setTotalPage(responseJson.total_page);        
+        setTotalPage(responseJson.total_page);
+				setNowPage(1);
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -133,7 +105,7 @@ const MatchDownUsed = ({navigation, route}) => {
 	}
 	const getList = ({item, index}) => (		
 		<TouchableOpacity 
-			style={[styles.listLi, index!=0 ? styles.borderTop : null, index+1 != dataLen ? styles.borderBot : null, index==0 ? styles.listLiFst : null ]}
+			style={[styles.listLi, index!=0 ? styles.borderTop : null, index==0 ? styles.listLiFst : null ]}
 			activeOpacity={opacityVal}
 			onPress={() => {
 				navigation.navigate('MatchDownUsedView', {idx:item.mc_idx})
@@ -194,9 +166,10 @@ const MatchDownUsed = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_end_dwg_match : ",responseJson);
+				//console.log("list_end_dwg_match : ",responseJson);
 				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);        
+        setTotalPage2(responseJson.total_page);
+				setNowPage2(1);
 			}else{
 				setItemList2([]);
 				setNowPage2(1);
@@ -227,7 +200,7 @@ const MatchDownUsed = ({navigation, route}) => {
 	}
 	const getList2 = ({item, index}) => (		
 		<TouchableOpacity 
-			style={[styles.listLi, index!=0 ? styles.borderTop : null, index+1 != dataLen ? styles.borderBot : null, index==0 ? styles.listLiFst : null ]}
+			style={[styles.listLi, index!=0 ? styles.borderTop : null, index==0 ? styles.listLiFst : null ]}
 			activeOpacity={opacityVal}
 			onPress={() => {
 				navigation.navigate('MatchDownUsedView2', {idx:item.mc_idx})

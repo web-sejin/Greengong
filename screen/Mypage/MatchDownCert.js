@@ -27,35 +27,6 @@ const MatchDownUsed = ({navigation, route}) => {
   const [nowPage2, setNowPage2] = useState(1);
   const [totalPage2, setTotalPage2] = useState(1);
 
-  const DATA = [
-		{
-			id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-			title: '견적 요청 드립니다.',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-      state:1,
-		},
-		{
-			id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-			title: '견적 요청 드립니다.2',
-			desc: '김포시 고촌읍 · 3일전',
-			cate: '스크랩 / 고철 / 중량 / 금형 / 드럼',
-			score: 2,
-			review: 8,
-			like: 5,
-			price: '20,000',
-			category: 'CNC가공',
-      state:2,
-		},
-	];
-
-  const dataLen = DATA.length;		
-
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
@@ -94,15 +65,16 @@ const MatchDownUsed = ({navigation, route}) => {
 
 	const getData = async () => {
     setIsLoading(false);
-    await Api.send('GET', 'list_request_dwg_match', {'is_api': 1, page: 1}, (args)=>{
+    await Api.send('GET', 'wait_permit_dwg', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_request_dwg_match : ",responseJson);
+				//console.log("wait_permit_dwg : ",responseJson);
 				setItemList(responseJson.data);
-        setTotalPage(responseJson.total_page);        
+        setTotalPage(responseJson.total_page);
+				setNowPage(1);  
 			}else{
 				setItemList([]);
 				setNowPage(1);
@@ -114,7 +86,7 @@ const MatchDownUsed = ({navigation, route}) => {
   }
   const moreData = async () => {    
     if(totalPage > nowPage){
-      await Api.send('GET', 'list_request_dwg_match', {is_api: 1, page:nowPage+1}, (args)=>{
+      await Api.send('GET', 'wait_permit_dwg', {is_api: 1, page:nowPage+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -133,11 +105,9 @@ const MatchDownUsed = ({navigation, route}) => {
 	}
 	const getList = ({item, index}) => (		
 		<TouchableOpacity 
-			style={[styles.listLi, index!=0 ? styles.borderTop : null, index+1 != dataLen ? styles.borderBot : null, index==0 ? styles.listLiFst : null ]}
+			style={[styles.listLi, index!=0 ? styles.borderTop : null, index==0 ? styles.listLiFst : null ]}
 			activeOpacity={opacityVal}
-			onPress={() => {
-				navigation.navigate('MatchDownUsedView', {idx:item.mc_idx})
-			}}
+			onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
 		>
 			<>
 			{item.mc_image ? (
@@ -158,29 +128,6 @@ const MatchDownUsed = ({navigation, route}) => {
 				<View style={styles.listInfoCate}>
 					<Text style={styles.listInfoCateText}>{item.mc_summary}</Text>
 				</View>
-				<View style={styles.listInfoCnt}>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
-					</View>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
-					</View>
-					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mc_like_cnt}</Text>
-					</View>
-				</View>
-
-				<View style={styles.listInfoState}>
-					<Text style={styles.listInfoStateText}>내가 쓴글 요청내역</Text>
-					{item.request_cnt_org > 0 ? (
-					<View style={styles.listInfoStateCnt}>
-						<Text style={styles.listInfoStateCntText}>{item.request_cnt}</Text>
-					</View>
-					) : null}
-				</View>
 			</View>
 			</>
 		</TouchableOpacity>
@@ -188,15 +135,16 @@ const MatchDownUsed = ({navigation, route}) => {
 
 	const getData2 = async () => {
 		setIsLoading(false);
-    await Api.send('GET', 'list_end_dwg_match', {'is_api': 1, page: 1}, (args)=>{
+    await Api.send('GET', 'approval_permit_dwg', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("list_end_dwg_match : ",responseJson);
+				console.log("approval_permit_dwg : ",responseJson);
 				setItemList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);        
+        setTotalPage2(responseJson.total_page);
+				setNowPage2(1);
 			}else{
 				setItemList2([]);
 				setNowPage2(1);
@@ -208,7 +156,7 @@ const MatchDownUsed = ({navigation, route}) => {
 	}
 	const moreData2 = async () => {    
     if(totalPage > nowPage){
-      await Api.send('GET', 'list_end_dwg_match', {is_api: 1, page:nowPage2+1}, (args)=>{
+      await Api.send('GET', 'approval_permit_dwg', {is_api: 1, page:nowPage2+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -227,11 +175,9 @@ const MatchDownUsed = ({navigation, route}) => {
 	}
 	const getList2 = ({item, index}) => (		
 		<TouchableOpacity 
-			style={[styles.listLi, index!=0 ? styles.borderTop : null, index+1 != dataLen ? styles.borderBot : null, index==0 ? styles.listLiFst : null ]}
+			style={[styles.listLi, index!=0 ? styles.borderTop : null, index==0 ? styles.listLiFst : null ]}
 			activeOpacity={opacityVal}
-			onPress={() => {
-				navigation.navigate('MatchDownUsedView2', {idx:item.mc_idx})
-			}}
+			onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
 		>
 			<>
 			{item.mc_image ? (
@@ -252,29 +198,6 @@ const MatchDownUsed = ({navigation, route}) => {
 				<View style={styles.listInfoCate}>
 					<Text style={styles.listInfoCateText}>{item.mc_summary}</Text>
 				</View>
-				<View style={styles.listInfoCnt}>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
-					</View>
-					<View style={styles.listInfoCntBox}>
-						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
-					</View>
-					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
-						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mc_like_cnt}</Text>
-					</View>
-				</View>
-
-				<View style={[styles.listInfoState, styles.listInfoState2]}>
-					<Text style={[styles.listInfoStateText, styles.listInfoStateText2]}>완료내역</Text>					
-					{item.request_cnt_org > 0 ? (
-					<View style={styles.listInfoStateCnt}>
-						<Text style={styles.listInfoStateCntText}>{item.request_cnt}</Text>
-					</View>
-					) : null}
-				</View>
 			</View>
 			</>
 		</TouchableOpacity>
@@ -282,7 +205,7 @@ const MatchDownUsed = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>			
-			<Header navigation={navigation} headertitle={'도면권한 요청내역'} />
+			<Header navigation={navigation} headertitle={'도면권한 신청내역'} />
       <View style={styles.tabBox}>
         <TouchableOpacity
           style={styles.tabBtn}
@@ -371,7 +294,7 @@ const styles = StyleSheet.create({
   tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
   indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
-  listLi: {display:'flex',flexDirection:'row',flexWrap:'wrap',paddingHorizontal:20,paddingVertical:30,},
+  listLi: {display:'flex',alignItems:'center',flexDirection:'row',flexWrap:'wrap',paddingHorizontal:20,paddingVertical:30,},
   listLiFst: {paddingTop:20,},
 	listLiBorder: {borderTopWidth:1,borderTopColor:'#E9EEF6'},
 	pdImage: {width:131,height:131,borderRadius:12,overflow:'hidden',alignItems:'center',justifyContent:'center'},

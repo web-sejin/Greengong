@@ -98,7 +98,9 @@ const UsedView = (props) => {
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!', responseJson);
-        navigation.navigate('Home', {isSubmit: true});
+        ToastMessage("삭제된 글입니다.");
+        //navigation.navigate('Home', {isSubmit: true});
+        navigation.goBack();
 			}
 		});
     

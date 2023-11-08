@@ -121,7 +121,9 @@ const MatchView = (props) => {
 			}else{
 				//setItemList([]);				
 				console.log('결과 출력 실패!', responseJson);
-        navigation.navigate('Match', {isSubmit: true});
+        ToastMessage("삭제된 글입니다.");
+        //navigation.navigate('Match', {isSubmit: true});
+        navigation.goBack();
 			}
 		});
 
@@ -646,10 +648,7 @@ const MatchView = (props) => {
                     }}
                   >
                     {itemInfo.mc_dwg_secure_org == 1 ? (
-                      <>
-                      <Text style={styles.nextBtnText}>도면</Text>
-                      <Text style={styles.nextBtnText}>다운로드</Text>
-                      </>
+                      <Text style={styles.nextBtnText}>도면 다운로드</Text>
                     ) : (
                       dwgPmSt == 0 ? (
                         <>
@@ -661,10 +660,14 @@ const MatchView = (props) => {
                         </Text>
                         </>
                       ) : (
-                        <>
-                        <Text style={styles.nextBtnText}>도면</Text>
-                        <Text style={styles.nextBtnText}>다운로드</Text>
-                        </>
+                        dwgPmSt == 1 && itemInfo.is_doc == 1 ? (
+                        <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                        ) : (
+                          <>
+                          <Text style={styles.nextBtnText}>도면</Text>
+                          <Text style={styles.nextBtnText}>다운로드</Text>
+                          </>
+                        )
                       )
                     )}
                   </TouchableOpacity>
