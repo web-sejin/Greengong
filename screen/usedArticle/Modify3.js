@@ -751,26 +751,6 @@ const Modify3 = ({navigation, route}) => {
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
 							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>검수</Text>
-							</View>
-							<View style={[styles.filterBtnList]}>
-								{chkMethod.map((item, index) => {
-									return(
-									<TouchableOpacity
-										key = {index}
-										style={[styles.filterChkBtn, item.isChecked ? styles.filterChkBtnOn : null]}
-										activeOpacity={opacityVal}
-										onPress={() => handleChange(item.idx)}
-									>
-										<Text style={[styles.filterChkBtnText, item.isChecked ? styles.filterChkBtnTextOn : null]}>{item.txt}</Text>
-									</TouchableOpacity>
-									)
-								})}
-							</View>
-						</View>
-
-						<View style={[styles.typingBox, styles.mgTop35]}>
-							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>모델명</Text>
 							</View>
 							<View style={[styles.typingInputBox]}>

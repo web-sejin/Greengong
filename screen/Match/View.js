@@ -648,31 +648,43 @@ const MatchView = (props) => {
                     }}
                   >
                     {itemInfo.mc_dwg_secure_org == 1 ? (
-                      <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                      <>
+                      <Text style={styles.nextBtnText}>도면</Text>
+                      <Text style={styles.nextBtnText}>다운로드</Text>
+                      </>
                     ) : (
                       dwgPmSt == 0 ? (
-                        <>
-                        <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
-                          도면 권한
-                        </Text>
-                        <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
-                          요청
-                        </Text>
-                        </>
+                        
+                        itemInfo.mc_chat_permit == 3 ? (
+                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>도면 권한요청</Text>
+                        ) : (
+                          <>
+                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
+                            도면 권한
+                          </Text>
+                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
+                            요청
+                          </Text>
+                          </>
+                        )                        
                       ) : (
                         dwgPmSt == 1 && itemInfo.is_doc == 1 ? (
                         <Text style={styles.nextBtnText}>도면 다운로드</Text>
                         ) : (
-                          <>
-                          <Text style={styles.nextBtnText}>도면</Text>
-                          <Text style={styles.nextBtnText}>다운로드</Text>
-                          </>
+                          itemInfo.mc_chat_permit == 3 ? (
+                            <Text style={styles.nextBtnText}>도면 다운로드</Text>
+                          ) : (
+                            <>
+                            <Text style={styles.nextBtnText}>도면</Text>
+                            <Text style={styles.nextBtnText}>다운로드</Text>
+                            </>
+                          )
                         )
                       )
                     )}
                   </TouchableOpacity>
                   
-                  {itemInfo.is_doc == 0 ? (
+                  {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? (
                   <TouchableOpacity 
                     style={[styles.nextBtn]}
                     activeOpacity={opacityVal}
@@ -686,7 +698,7 @@ const MatchView = (props) => {
                   </TouchableOpacity>
                   ) : null}
                   
-                  {itemInfo.is_estimate == 0 ? (
+                  {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? (
                   <TouchableOpacity 
                     style={[styles.nextBtn]}
                     activeOpacity={opacityVal}
@@ -699,7 +711,46 @@ const MatchView = (props) => {
                   </>
                 )
                 
-              ) : null}              
+              ) : (
+                <>
+                {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? (
+                <TouchableOpacity 
+                  style={[styles.nextBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={() => { 
+                    setOnlyView(true);
+                    setVisible3(true);
+                  }}
+                >
+                  {itemInfo.is_estimate == 0 ? (
+                    <>
+                    <Text style={styles.nextBtnText}>회사소개서</Text>
+                    <Text style={styles.nextBtnText}>제출</Text>
+                    </>
+                  ) : (
+                    <Text style={styles.nextBtnText}>회사소개서 제출</Text>
+                  )}
+                </TouchableOpacity>
+                ) : null}
+                
+                {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? (
+                <TouchableOpacity 
+                  style={[styles.nextBtn]}
+                  activeOpacity={opacityVal}
+                  onPress={() => { navigation.navigate('Estimate', {idx:idx, mcMbIdx:mcMbIdx, backPage:'view'}); }}
+                >
+                  {itemInfo.is_doc == 0 ? (
+                    <>
+                    <Text style={styles.nextBtnText}>견적서</Text>
+                    <Text style={styles.nextBtnText}>제출</Text>
+                    </>
+                  ) : (
+                    <Text style={styles.nextBtnText}>견적서 제출</Text>
+                  )}
+                </TouchableOpacity>
+                ) : null}
+                </>
+              )}              
 
               <TouchableOpacity 
                 style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3, styles.chatBtn]}

@@ -15,7 +15,7 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MatchDownUsed = ({navigation, route}) => {
+const MatchDownCert = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -328,4 +328,4 @@ const styles = StyleSheet.create({
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},
 })
 
-export default MatchDownUsed
+export default MatchDownCert

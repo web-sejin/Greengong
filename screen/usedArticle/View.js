@@ -553,7 +553,7 @@ const UsedView = (props) => {
               </View>
             </View>
             <View style={styles.viewSumm}>
-              <Text  style={styles.viewSummText}>{itemInfo.pd_summary}</Text>
+              <Text  style={[styles.viewSummText, styles.viewSummText2]}>{itemInfo.pd_summary}</Text>
             </View>
             
             {itemInfo.c1_idx == 2 ? (
@@ -588,12 +588,6 @@ const UsedView = (props) => {
 
             {itemInfo.c1_idx == 3 ? (
             <View style={styles.viewSumm}>
-              {itemInfo.pd_test == 0 ? (
-                <Text  style={styles.viewSummText}>성분분석표 : 무</Text>
-              ) : (
-                <Text  style={styles.viewSummText}>성분분석표 : 유</Text>
-              )}
-
               {itemInfo.ps_model ? (
               <Text  style={styles.viewSummText}>모델명 : {itemInfo.ps_model}</Text>
               ) : null}
@@ -1194,7 +1188,8 @@ const styles = StyleSheet.create({
   viewOptLabel2: {marginRight:0,},
   viewOptLabelText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:16,color:'#353636'},
   viewSumm: {paddingTop:15,paddingBottom:13,borderBottomWidth:1,borderBottomColor:'#E9EEF6'},
-  viewSummText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:20,color:'#000'},
+  viewSummText: {fontFamily:Font.NotoSansMedium,fontSize:15,lineHeight:20,color:'#000',marginTop:5,},
+  viewSummText2: {marginTop:0},
   viewContent: {paddingTop:20,paddingBottom:15,},
   viewContentText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#000'},
   viewSubInfoBox: {display:'flex',flexDirection:'row',alignItems:'center',paddingBottom:30,position:'relative'},
