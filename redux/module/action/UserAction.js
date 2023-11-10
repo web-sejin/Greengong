@@ -238,7 +238,7 @@ export const actionCreators = {
   member_chatCnt: (user) => async (dispatch) => {
     try {
       const response = await UserApi.member_chatCnt(user);
-       //console.log('member_chatCnt action ::: ', response);
+       console.log('member_chatCnt action ::: ', response);
 
       if (response.result) {
         await dispatch({

@@ -41,28 +41,18 @@ const MatchEstimate = (props) => {
 			delete params?.isSubmit
 		}
 
-		AsyncStorage.getItem('matchCompReload', (err, result) => {
-			//console.log("result : ",result);
-			if(result == 'on'){
-				setNowPage(1);
-				getItemList();
-				delete params?.isSubmit;
-				AsyncStorage.removeItem('matchCompReload');
-			}
-		});
-
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
 	const getItemList = async () => {
 		setIsLoading(false);
-		await Api.send('GET', 'list_diff_match', {'is_api': 1, page: 1}, (args)=>{
+		await Api.send('GET', 'list_estimate_match', {'is_api': 1, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('list_diff_match', responseJson);
+				console.log('list_estimate_match', responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 				setTotalCnt(responseJson.total_count);
@@ -148,23 +138,17 @@ const MatchEstimate = (props) => {
 					</View>
 					) : null}
         </View>
-        <View style={styles.completeBox}>
-					{item.mc_status_org == 1 ? (
-					<Text style={styles.completeBoxText}>발주업체 : {item.mc_chat_cnt}곳</Text>
-					) : null}
-
-					{item.mc_status_org == 2 ? (
-					<Text style={styles.completeBoxText}>발주완료업체 : {item.order_name}</Text>
-					) : null}
-        </View>
       </TouchableOpacity>
+			<View style={styles.completeBox}>
+				<Text style={styles.completeBoxText}>견적발송일 : {item.me_date_org}</Text>
+			</View>
       <View style={styles.comparisonBtnBox}>
         <TouchableOpacity 
-          style={[styles.comparisonBtn, item.mc_status_org == 2 ? styles.comparisonBtn2 : null]}
+          style={[styles.comparisonBtn]}
           activeOpacity={opacityVal}
-          onPress={() => {navigation.navigate('MatchComparisonView', {idx:item.mc_idx})}}
+					onPress={()=>{navigation.navigate('EstimateResult', {idx:item.me_idx})}}
         >
-          <Text style={[styles.comparisonBtnText, item.mc_status_org == 2 ? styles.comparisonBtn2Text : null]}>업체비교</Text>
+          <Text style={[styles.comparisonBtnText, item.mc_status_org == 2 ? styles.comparisonBtn2Text : null]}>견적서 보기</Text>
         </TouchableOpacity>
       </View>
 			</>
@@ -230,7 +214,7 @@ const styles = StyleSheet.create({
 	listInfoState2: {backgroundColor:'#31B481'},
   listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
   listInfoStateText2: {},
-  completeBox : {width:innerWidth,marginTop:15,paddingTop:10,borderTopWidth:1,borderColor:'#E3E3E4'},
+  completeBox: {width:innerWidth,marginTop:15,paddingTop:10,borderTopWidth:1,borderColor:'#E3E3E4',marginLeft:20,},
   completeBoxText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000',},
   comparisonBtnBox: {paddingHorizontal:20,paddingTop:10,paddingBottom:30,},
   comparisonBtn: {width:innerWidth,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},

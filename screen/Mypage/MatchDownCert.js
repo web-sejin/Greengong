@@ -128,6 +128,20 @@ const MatchDownCert = ({navigation, route}) => {
 				<View style={styles.listInfoCate}>
 					<Text style={styles.listInfoCateText}>{item.mc_summary}</Text>
 				</View>
+				<View style={styles.listInfoCnt}>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
+					</View>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
+					</View>
+					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+					</View>
+				</View>
 			</View>
 			</>
 		</TouchableOpacity>
@@ -197,6 +211,20 @@ const MatchDownCert = ({navigation, route}) => {
 				</View>
 				<View style={styles.listInfoCate}>
 					<Text style={styles.listInfoCateText}>{item.mc_summary}</Text>
+				</View>
+				<View style={styles.listInfoCnt}>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={15} source={require("../../assets/img/icon_star.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_score}</Text>
+					</View>
+					<View style={styles.listInfoCntBox}>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_review.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mc_chat_cnt}</Text>
+					</View>
+					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
+						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
+						<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+					</View>
 				</View>
 			</View>
 			</>

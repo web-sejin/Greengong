@@ -401,10 +401,8 @@ const Estimate = ({navigation, route}) => {
 			if(responseJson.result === 'success'){
 				//console.log(responseJson);
 				if(backPage == "view"){
-					ToastMessage('예상 견적서 등록이 완료되었습니다.');
-					setTimeout(function(){
-						navigation.goBack();
-					},1000);
+					ToastMessage('예상 견적서 등록이 완료되었습니다.');					
+					navigation.goBack();					
 				}else{
 					chatDeal();
 				}
