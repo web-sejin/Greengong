@@ -44,8 +44,8 @@ const MatchOrder = ({navigation, route}) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-      setNowPage(1);
-			getData();
+      setNowPage2(1);
+			getData2();
 		}
 
 		return () => isSubscribed = false;
@@ -60,9 +60,10 @@ const MatchOrder = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('order_list_match2 : ',responseJson);
+				//console.log('order_list_match2 : ',responseJson);
 				setOdList(responseJson.data);
         setTotalPage(responseJson.total_page);  
+        setNowPage(1);
 			}else{
 				setOdList([]);
 				setNowPage(1);
@@ -147,6 +148,90 @@ const MatchOrder = ({navigation, route}) => {
     </View>
 	);
 
+  const getData2 = async () =>{
+		setIsLoading(false);
+
+		await Api.send('GET', 'order_list_match3', {is_api: 1, page:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', args);
+			if(responseJson.result === 'success' && responseJson){
+				console.log('order_list_match3 : ',responseJson);
+				setOdList2(responseJson.data);
+        setTotalPage2(responseJson.total_page);  
+        setNowPage2(1);
+			}else{
+				setOdList2([]);
+				setNowPage2(1);
+				console.log('결과 출력 실패!', responseJson);
+			}
+		});
+
+		setIsLoading(true);
+	}
+  const moreData2 = async () => {
+		if(totalPage > nowPage){
+			await Api.send('GET', 'order_list_match3', {is_api: 1, page:nowPage+1}, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+				let arrItems = args.arrItems;
+				//console.log('args ', args);
+				if(responseJson.result === 'success' && responseJson){
+					//console.log(responseJson.data);				
+					const addItem = odList.concat(responseJson.data);				
+					setOdList2(addItem);			
+					setNowPage2(nowPage+1);
+				}else{
+					console.log(responseJson);
+					console.log('결과 출력 실패!');
+				}
+			});
+		}
+	}
+  const getList2 = ({item, index}) => (     
+    <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
+      <View style={[styles.compBtn]}>
+        <TouchableOpacity 
+          style={[styles.compWrap, styles.compWrapFst]}
+          activeOpacity={opacityVal}
+          onPress={() => {navigation.navigate('MatchView', {idx:item.mc_idx})}}
+        >
+          <View style={styles.compInfo}>                  
+            <View style={styles.compInfoName}>
+              <Text style={styles.compInfoNameText}>{item.mc_name}{item.mc_status_org}</Text>
+            </View>
+            <View style={styles.compInfoDate}>
+              <Text style={styles.compInfoDateText}>{item.mc_loc} · {item.mc_regdate}</Text>
+            </View>
+            <View style={styles.compInfoLoc}>
+              <Text style={styles.compInfoLocText}>{item.mc_summary}</Text>
+            </View>
+          </View>
+          {item.mf_image ? (
+          <View style={styles.compThumb}>
+            <AutoHeightImage width={70} source={{uri:item.mf_image}} />
+          </View>
+          ) : null}
+        </TouchableOpacity>
+        {item.is_estimate == 1 ? (
+        <View style={styles.matchPrice}>
+          <Text style={styles.matchPriceText}>발주금액</Text>
+          <Text style={styles.matchPriceText2}>{item.me_total_price}원</Text>
+        </View>
+        ) : null}
+      </View>
+      <View style={styles.btnBox}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
+          activeOpacity={1}
+        >
+          <Text style={[styles.btnText, styles.btnText2]}>{item.mb_nick}님이 발주되었습니다.</Text>
+        </TouchableOpacity>
+      </View>  
+    </View>
+	);
+
   const submitEndMatch = async () => {
     const formData = {
 			is_api:1,
@@ -179,13 +264,13 @@ const MatchOrder = ({navigation, route}) => {
     setTabState(v);
 		setNowPage(1);
     setNowPage2(1);
-		if(v == 1){
+		if(v == 2){
       getData();
       setTimeout(function(){
         setOdList2([]);
       },200);
-    }else if(v == 2){
-      //getData2();
+    }else if(v == 1){
+      getData2();
       setTimeout(function(){
         setOdList([]);
       },200);
@@ -226,19 +311,20 @@ const MatchOrder = ({navigation, route}) => {
           )}
         </TouchableOpacity>
       </View>
-
-      <FlatList
-        data={odList}
-        renderItem={(getList)}
+      
+      {tabState == 1 ? (
+        <FlatList
+        data={odList2}
+        renderItem={(getList2)}
         keyExtractor={(item, index) => index.toString()}
         onEndReachedThreshold={0.6}
-        onEndReached={moreData}
+        onEndReached={moreData2}
         disableVirtualization={false}
         ListEmptyComponent={
           isLoading ? (
             <View style={styles.notData}>
               <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-              <Text style={styles.notDataText}>발주내역이 없습니다.</Text>
+              <Text style={styles.notDataText}>발주요청회원내역이 없습니다.</Text>
             </View>
           ):(
             <View style={[styles.indicator]}>
@@ -247,6 +333,28 @@ const MatchOrder = ({navigation, route}) => {
           )
         }
       />
+      ) : (
+        <FlatList
+          data={odList}
+          renderItem={(getList)}
+          keyExtractor={(item, index) => index.toString()}
+          onEndReachedThreshold={0.6}
+          onEndReached={moreData}
+          disableVirtualization={false}
+          ListEmptyComponent={
+            isLoading ? (
+              <View style={styles.notData}>
+                <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+                <Text style={styles.notDataText}>발주회원내역이 없습니다.</Text>
+              </View>
+            ):(
+              <View style={[styles.indicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            )
+          }
+        />
+      )}
 
       <Modal
         visible={visible}

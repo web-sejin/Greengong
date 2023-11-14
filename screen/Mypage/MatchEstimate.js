@@ -67,7 +67,7 @@ const MatchEstimate = (props) => {
 	}
 	const moreData = async () => {    
     if(totalPage > nowPage){
-      await Api.send('GET', 'list_diff_match', {is_api: 1, page:nowPage+1}, (args)=>{
+      await Api.send('GET', 'list_estimate_match', {is_api: 1, page:nowPage+1}, (args)=>{
         let resultItem = args.resultItem;
         let responseJson = args.responseJson;
         let arrItems = args.arrItems;
@@ -148,7 +148,7 @@ const MatchEstimate = (props) => {
           activeOpacity={opacityVal}
 					onPress={()=>{navigation.navigate('EstimateResult', {idx:item.me_idx})}}
         >
-          <Text style={[styles.comparisonBtnText, item.mc_status_org == 2 ? styles.comparisonBtn2Text : null]}>견적서 보기</Text>
+          <Text style={[styles.comparisonBtnText]}>견적서 보기</Text>
         </TouchableOpacity>
       </View>
 			</>
