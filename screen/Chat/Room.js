@@ -178,13 +178,15 @@ const Room = (props) => {
 				if(content != ''){ formData.ch_msg = content; }
 				if(imgUrl != ''){ formData.ch_file = {'uri': imgUrl, 'type': 'image/png', 'name': 'chatFile.png'}; }
 				
+				console.log("채팅 send formData : ",formData);
+				
 				if(userInfo?.mb_idx !== recv_idx){
 					Api.send('POST', 'send_chat', formData, (args)=>{
 						let resultItem = args.resultItem;
 						let responseJson = args.responseJson;
 			
 						if(responseJson.result === 'success'){
-							//console.log('send_chat : ',responseJson);
+							console.log('send_chat : ',responseJson);
 							getRoomData();
 							fireRemove(doc.id);
 							setImg({});
@@ -350,7 +352,7 @@ const Room = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("in_chat : ",responseJson);
+				console.log("in_chat : ",responseJson);
 				setRoomInfo(responseJson);
 
 				AsyncStorage.setItem("roomPage", 'on');

@@ -649,8 +649,7 @@ const MatchView = (props) => {
                   >
                     {itemInfo.mc_dwg_secure_org == 1 ? (
                       <>
-                      <Text style={styles.nextBtnText}>도면</Text>
-                      <Text style={styles.nextBtnText}>다운로드</Text>
+                      <Text style={styles.nextBtnText}>도면 다운로드</Text>
                       </>
                     ) : (
                       dwgPmSt == 0 ? (
@@ -659,12 +658,7 @@ const MatchView = (props) => {
                           <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>도면 권한요청</Text>
                         ) : (
                           <>
-                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
-                            도면 권한
-                          </Text>
-                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>
-                            요청
-                          </Text>
+                          <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>도면 권한요청</Text>
                           </>
                         )                        
                       ) : (
@@ -675,8 +669,7 @@ const MatchView = (props) => {
                             <Text style={styles.nextBtnText}>도면 다운로드</Text>
                           ) : (
                             <>
-                            <Text style={styles.nextBtnText}>도면</Text>
-                            <Text style={styles.nextBtnText}>다운로드</Text>
+                            <Text style={styles.nextBtnText}>도면 다운로드</Text>
                             </>
                           )
                         )
@@ -684,7 +677,8 @@ const MatchView = (props) => {
                     )}
                   </TouchableOpacity>
                   
-                  {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? (
+                  {/* {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? ( */}
+                  {itemInfo.mc_chat_permit != 2 && itemInfo.mc_chat_permit != 3 ? (
                   <TouchableOpacity 
                     style={[styles.nextBtn]}
                     activeOpacity={opacityVal}
@@ -693,19 +687,18 @@ const MatchView = (props) => {
                       setVisible3(true);
                     }}
                   >
-                    <Text style={styles.nextBtnText}>회사소개서</Text>
-                    <Text style={styles.nextBtnText}>제출</Text>
+                    <Text style={styles.nextBtnText}>회사소개서 제출</Text>
                   </TouchableOpacity>
                   ) : null}
                   
-                  {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? (
+                  {/* {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? ( */}
+                  {itemInfo.mc_chat_permit != 1 && itemInfo.mc_chat_permit != 3 ? (
                   <TouchableOpacity 
                     style={[styles.nextBtn]}
                     activeOpacity={opacityVal}
                     onPress={() => { navigation.navigate('Estimate', {idx:idx, mcMbIdx:mcMbIdx, backPage:'view'}); }}
                   >
-                    <Text style={styles.nextBtnText}>견적서</Text>
-                    <Text style={styles.nextBtnText}>제출</Text>
+                    <Text style={styles.nextBtnText}>견적서 제출</Text>
                   </TouchableOpacity>
                   ) : null}
                   </>
@@ -713,7 +706,8 @@ const MatchView = (props) => {
                 
               ) : (
                 <>
-                {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? (
+                {/* {itemInfo.mc_chat_permit != 3 && itemInfo.is_doc == 0 ? ( */}
+                {itemInfo.mc_chat_permit != 2 && itemInfo.mc_chat_permit != 3 ? (
                 <TouchableOpacity 
                   style={[styles.nextBtn]}
                   activeOpacity={opacityVal}
@@ -724,8 +718,7 @@ const MatchView = (props) => {
                 >
                   {itemInfo.is_estimate == 0 ? (
                     <>
-                    <Text style={styles.nextBtnText}>회사소개서</Text>
-                    <Text style={styles.nextBtnText}>제출</Text>
+                    <Text style={styles.nextBtnText}>회사소개서 제출</Text>
                     </>
                   ) : (
                     <Text style={styles.nextBtnText}>회사소개서 제출</Text>
@@ -733,7 +726,8 @@ const MatchView = (props) => {
                 </TouchableOpacity>
                 ) : null}
                 
-                {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? (
+                {/* {itemInfo.mc_chat_permit != 3 && itemInfo.is_estimate == 0 ? ( */}
+                {itemInfo.mc_chat_permit != 1 && itemInfo.mc_chat_permit != 3 ? (
                 <TouchableOpacity 
                   style={[styles.nextBtn]}
                   activeOpacity={opacityVal}
@@ -741,8 +735,7 @@ const MatchView = (props) => {
                 >
                   {itemInfo.is_doc == 0 ? (
                     <>
-                    <Text style={styles.nextBtnText}>견적서</Text>
-                    <Text style={styles.nextBtnText}>제출</Text>
+                    <Text style={styles.nextBtnText}>견적서 제출</Text>
                     </>
                   ) : (
                     <Text style={styles.nextBtnText}>견적서 제출</Text>
@@ -750,7 +743,7 @@ const MatchView = (props) => {
                 </TouchableOpacity>
                 ) : null}
                 </>
-              )}              
+              )}          
 
               <TouchableOpacity 
                 style={[styles.nextBtn, styles.nextBtn2, itemInfo.mc_file ? null : styles.nextBtn3, styles.chatBtn]}
@@ -1157,7 +1150,7 @@ const styles = StyleSheet.create({
   nextFix: {height:105,paddingHorizontal:20,paddingTop:15,backgroundColor:'#F3FAF8'},
   nextFixFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	nextBtn: {flex:1,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',
-  justifyContent:'center',marginRight:5,textAlign:'center'},
+  justifyContent:'center',marginRight:10,textAlign:'center'},
   nextBtn2: {backgroundColor:'#353636',},
   nextBtn3: {width:innerWidth},
   chatBtn: {marginRight:0,},
