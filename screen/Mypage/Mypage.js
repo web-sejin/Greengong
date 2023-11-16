@@ -303,6 +303,17 @@ const Mypage = (props) => {
 								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage9.png")} />
 								<Text style={styles.mypageLinkBoxBtnText}>견적서 확인</Text>
 							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={styles.mypageLinkBoxBtn}
+								activeOpacity={opacityVal}
+								onPress={() => {
+									navigation.navigate('MatchOrder2', {});
+								}}			
+							>
+								<AutoHeightImage width={27} source={require("../../assets/img/icon_mypage11.png")} />
+								<Text style={styles.mypageLinkBoxBtnText}>수주내역</Text>
+							</TouchableOpacity>
 						</View>
 					</View>
 

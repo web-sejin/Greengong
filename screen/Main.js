@@ -82,6 +82,7 @@ import MatchReq from './Mypage/MatchReq'; //마이페이지 요청내역
 import MatchComparison from './Mypage/MatchComparison'; //마이페이지 비교내역
 import MatchComparisonView from './Mypage/MatchComparisonView'; //마이페이지 발주업체 비교내역
 import MatchOrder from './Mypage/MatchOrder'; //마이페이지 발주내역
+import MatchOrder2 from './Mypage/MatchOrder2'; //마이페이지 수주내역
 import MatchDownCert  from './Mypage/MatchDownCert' //마이페이지 완료
 import MatchDownUsed from './Mypage/MatchDownUsed'; //마이페이지 도면권한요청내역
 import MatchDownUsedView from './Mypage/MatchDownUsedView'; //마이페이지 도면권한요청내역 요청 뷰
@@ -344,6 +345,7 @@ const StackNavigator = () => {
       <Stack.Screen name="MatchComparison" component={MatchComparison} />
       <Stack.Screen name="MatchComparisonView" component={MatchComparisonView} />
       <Stack.Screen name="MatchOrder" component={MatchOrder} />
+      <Stack.Screen name="MatchOrder2" component={MatchOrder2} />
       <Stack.Screen name="MatchDownCert" component={MatchDownCert} />
       <Stack.Screen name="MatchDownUsed" component={MatchDownUsed} />
       <Stack.Screen name="MatchDownUsedView" component={MatchDownUsedView} />

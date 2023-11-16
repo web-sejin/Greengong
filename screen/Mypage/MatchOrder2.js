@@ -15,7 +15,7 @@ const innerWidth = widnowWidth - 40;
 const widnowHeight = Dimensions.get('window').height;
 const opacityVal = 0.8;
 
-const MatchOrder = ({navigation, route}) => {
+const MatchOrder2 = ({navigation, route}) => {
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -24,9 +24,6 @@ const MatchOrder = ({navigation, route}) => {
   const [odList, setOdList] = useState([]);
 	const [nowPage, setNowPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [odList2, setOdList2] = useState([]);
-  const [nowPage2, setNowPage2] = useState(1);
-  const [totalPage2, setTotalPage2] = useState(1);
   const [initLoading, setInitLoading] = useState(false);
   const [mcIdx, setMcIdx] = useState();
   const [score, setScore] = useState(3);
@@ -44,38 +41,38 @@ const MatchOrder = ({navigation, route}) => {
 		}else{
 			setRouteLoad(true);
 			setPageSt(!pageSt);
-      setNowPage2(1);
-			getData2();
+      setNowPage(1);
+			getData();
 		}
 
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
-  const getData2 = async () =>{
+  const getData = async () =>{
 		setIsLoading(false);
 
-		await Api.send('GET', 'order_list_match3', {is_api: 1, page:1}, (args)=>{
+		await Api.send('GET', 'order_list_match2', {is_api: 1, page:1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				console.log('order_list_match3 : ',responseJson);
-				setOdList2(responseJson.data);
-        setTotalPage2(responseJson.total_page);  
-        setNowPage2(1);
+				//console.log('order_list_match2 : ',responseJson);
+				setOdList(responseJson.data);
+        setTotalPage(responseJson.total_page);  
+        setNowPage(1);
 			}else{
-				setOdList2([]);
-				setNowPage2(1);
+				setOdList([]);
+				setNowPage(1);
 				console.log('결과 출력 실패!', responseJson);
 			}
 		});
 
 		setIsLoading(true);
 	}
-  const moreData2 = async () => {
+  const moreData = async () => {
 		if(totalPage > nowPage){
-			await Api.send('GET', 'order_list_match3', {is_api: 1, page:nowPage+1}, (args)=>{
+			await Api.send('GET', 'order_list_match2', {is_api: 1, page:nowPage+1}, (args)=>{
 				let resultItem = args.resultItem;
 				let responseJson = args.responseJson;
 				let arrItems = args.arrItems;
@@ -83,8 +80,8 @@ const MatchOrder = ({navigation, route}) => {
 				if(responseJson.result === 'success' && responseJson){
 					//console.log(responseJson.data);				
 					const addItem = odList.concat(responseJson.data);				
-					setOdList2(addItem);			
-					setNowPage2(nowPage+1);
+					setOdList(addItem);			
+					setNowPage(nowPage+1);
 				}else{
 					console.log(responseJson);
 					console.log('결과 출력 실패!');
@@ -92,7 +89,7 @@ const MatchOrder = ({navigation, route}) => {
 			});
 		}
 	}
-  const getList2 = ({item, index}) => (     
+  const getList = ({item, index}) => (     
     <View style={[styles.matchCompleteMb, index==0 ? styles.matchCompleteMbFst : null, styles.borderBot]}>
       <View style={[styles.compBtn]}>
         <TouchableOpacity 
@@ -125,12 +122,25 @@ const MatchOrder = ({navigation, route}) => {
         ) : null}
       </View>
       <View style={styles.btnBox}>
-        <TouchableOpacity
-          style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
-          activeOpacity={1}
-        >
-          <Text style={[styles.btnText, styles.btnText2]}>{item.mb_nick}님이 발주되었습니다.</Text>
-        </TouchableOpacity>
+        {item.so_score > 0 ? (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3, styles.btn4]}
+            activeOpacity={1}
+          >
+            <Text style={[styles.btnText, styles.btnText2]}>거래평가를 완료했습니다.</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btn, styles.btn2, styles.btn3]}
+            activeOpacity={opacityVal}
+            onPress={()=>{
+              setMcIdx(item.mc_idx);
+              setVisible(true);
+            }}
+          >
+            <Text style={styles.btnText}>거래평가 작성</Text>
+          </TouchableOpacity>
+        )}
       </View>  
     </View>
 	);
@@ -165,28 +175,28 @@ const MatchOrder = ({navigation, route}) => {
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>      
-			<Header navigation={navigation} headertitle={'발주내역'} /> 
+			<Header navigation={navigation} headertitle={'수주내역'} />
       <FlatList
-      data={odList2}
-      renderItem={(getList2)}
-      keyExtractor={(item, index) => index.toString()}
-      onEndReachedThreshold={0.6}
-      onEndReached={moreData2}
-      disableVirtualization={false}
-      ListEmptyComponent={
-        isLoading ? (
-          <View style={styles.notData}>
-            <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
-            <Text style={styles.notDataText}>발주요청회원내역이 없습니다.</Text>
-          </View>
-        ):(
-          <View style={[styles.indicator]}>
-            <ActivityIndicator size="large" />
-          </View>
-        )
-      }
-    />
-    
+        data={odList}
+        renderItem={(getList)}
+        keyExtractor={(item, index) => index.toString()}
+        onEndReachedThreshold={0.6}
+        onEndReached={moreData}
+        disableVirtualization={false}
+        ListEmptyComponent={
+          isLoading ? (
+            <View style={styles.notData}>
+              <AutoHeightImage width={74} source={require("../../assets/img/not_data.png")} />
+              <Text style={styles.notDataText}>수주내역이 없습니다.</Text>
+            </View>
+          ):(
+            <View style={[styles.indicator]}>
+              <ActivityIndicator size="large" />
+            </View>
+          )
+        }
+      />
+
       <Modal
         visible={visible}
 				transparent={true}
@@ -345,4 +355,4 @@ const styles = StyleSheet.create({
   indicator: {width:widnowWidth,height:widnowHeight-280,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center'},
 })
 
-export default MatchOrder
+export default MatchOrder2
