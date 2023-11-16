@@ -1157,7 +1157,7 @@ const styles = StyleSheet.create({
   nextFix: {height:105,paddingHorizontal:20,paddingTop:15,backgroundColor:'#F3FAF8'},
   nextFixFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	nextBtn: {flex:1,height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',
-  justifyContent:'center',marginRight:5,},
+  justifyContent:'center',marginRight:5,textAlign:'center'},
   nextBtn2: {backgroundColor:'#353636',},
   nextBtn3: {width:innerWidth},
   chatBtn: {marginRight:0,},

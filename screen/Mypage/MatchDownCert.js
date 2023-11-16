@@ -139,7 +139,7 @@ const MatchDownCert = ({navigation, route}) => {
 					</View>
 					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
 						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.mc_like_cnt}</Text>
 					</View>
 				</View>
 			</View>
@@ -223,7 +223,7 @@ const MatchDownCert = ({navigation, route}) => {
 					</View>
 					<View style={[styles.listInfoCntBox, styles.listInfoCntBox2]}>
 						<AutoHeightImage width={16} source={require("../../assets/img/icon_heart.png")}/>
-						<Text style={styles.listInfoCntBoxText}>{item.mb_scrap_cnt}</Text>
+						<Text style={styles.listInfoCntBoxText}>{item.mc_like_cnt}</Text>
 					</View>
 				</View>
 			</View>
