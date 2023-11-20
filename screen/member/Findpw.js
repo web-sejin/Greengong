@@ -56,8 +56,9 @@ const Find_pw = ({navigation, route}) => {
 				setPw('');
 				setPw2('');
 				setToastModal(false);
-				setToastText('');
+				setToastText('');				
 			}
+			timer_stop();
 		}else{
 			//console.log("isFocused");
 			if(route.params){

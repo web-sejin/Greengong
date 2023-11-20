@@ -59,8 +59,9 @@ const MyInfo = (props) => {
         setTimeStamp('');
         setPhoneInterval(false);
 				setRansoo('');
-				clearInterval(t1);
+				clearInterval(t1);				
 			}
+			timer_stop();
 		}else{
 			//console.log('userInfo : ',userInfo);			
 			setRouteLoad(true);

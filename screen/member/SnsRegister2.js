@@ -124,8 +124,9 @@ const SnsRegister2 = ({navigation, route}) => {
 				setFactAddr2('');
 				setFactAddrDt2('');
 				setFactActive();
-				setRansoo('');
+				setRansoo('');				
 			}
+			timer_stop();
 		}else{
 			//console.log("isFocused");
 			if(route.params){

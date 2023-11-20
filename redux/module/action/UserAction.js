@@ -17,7 +17,7 @@ export const actionCreators = {
   member_login: (user) => async (dispatch) => {
     try {
       const response = await UserApi.member_login(user);
-      //console.log('member_login ::: ', response);
+      console.log('member_login ::: ', response);
 
       if (response.result === 'success') {
         //console.log('success : ',response);

@@ -48,8 +48,9 @@ const Find_id = ({navigation, route}) => {
 				setRansoo('');
 				clearInterval(t1);
 				setResultId('');
-				setResultDate('');
+				setResultDate('');				
 			}
+			timer_stop();
 		}else{
 			//console.log("isFocused");
 			if(route.params){

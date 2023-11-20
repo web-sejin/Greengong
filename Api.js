@@ -9,7 +9,7 @@ class Api {
 
 		this.state = {
 			isLoading   : false,
-			url         : 'https://cnj0005.cafe24.com',
+			url         : 'https://greengong.co.kr',
 			path        : '/app/',
 			option  : {
 				method: 'POST',

@@ -652,8 +652,7 @@ const MatchView = (props) => {
                       <Text style={styles.nextBtnText}>도면 다운로드</Text>
                       </>
                     ) : (
-                      dwgPmSt == 0 ? (
-                        
+                      dwgPmSt == 0 ? (                        
                         itemInfo.mc_chat_permit == 3 ? (
                           <Text style={[styles.nextBtnText, downReq || itemInfo.is_request_dwg==1 ? styles.nextBtnGrayText : null]}>도면 권한요청</Text>
                         ) : (
@@ -687,6 +686,7 @@ const MatchView = (props) => {
                       setVisible3(true);
                     }}
                   >
+
                     <Text style={styles.nextBtnText}>회사소개서 제출</Text>
                   </TouchableOpacity>
                   ) : null}
@@ -1155,7 +1155,7 @@ const styles = StyleSheet.create({
   nextBtn3: {width:innerWidth},
   chatBtn: {marginRight:0,},
   nextBtnGray: {backgroundColor:'#eaeaea'},
-	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:20,color:'#fff'},
+	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:14,lineHeight:20,color:'#fff',textAlign:'center',paddingHorizontal:5,},
   nextBtnGrayText: {color:'#bbb'},
   swiperDotBox: {bottom:15},
   swiperDot: {width:7,height:7,backgroundColor:'#fff',borderRadius:50,opacity:0.5,marginHorizontal:5,},
