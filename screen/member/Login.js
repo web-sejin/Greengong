@@ -12,6 +12,7 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
+import Toast from 'react-native-toast-message';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -50,7 +51,7 @@ const Login = (props) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
-
+		setIndi(false);
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

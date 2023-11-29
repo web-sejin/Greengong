@@ -450,7 +450,7 @@ const Modify2 = ({navigation, route}) => {
 				selectedList += item.idx;			
 			});
 		}
-		if(selectedList == ''){ ToastMessage('검수를 선택해 주세요.'); return false; }
+		//if(selectedList == ''){ ToastMessage('검수를 선택해 주세요.'); return false; }
 
 		// if(size1 == ""){ ToastMessage('중량을 입력해 주세요.'); return false; }
 		// if(size2 == ""){ ToastMessage('두께를 입력해 주세요.'); return false; }
