@@ -662,7 +662,6 @@ const Modify4 = ({navigation, route}) => {
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={sortAry}
 									fixAndroidTouchableBug={true}
@@ -695,7 +694,6 @@ const Modify4 = ({navigation, route}) => {
 										label: '성분을 선택해 주세요.',
 										inputLabel: '성분을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={ingreAry}
 									fixAndroidTouchableBug={true}
@@ -816,7 +814,6 @@ const Modify4 = ({navigation, route}) => {
 										label: '거래방식2를 선택해 주세요.',
 										inputLabel: '거래방식2를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={dealMethod2Ary}
 									fixAndroidTouchableBug={true}
@@ -849,7 +846,6 @@ const Modify4 = ({navigation, route}) => {
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={periodAry}
 									fixAndroidTouchableBug={true}
@@ -881,7 +877,6 @@ const Modify4 = ({navigation, route}) => {
 										label: '결제방식을 선택해 주세요.',
 										inputLabel: '결제방식을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={payMethodAry}
 									fixAndroidTouchableBug={true}

@@ -186,7 +186,7 @@ const MatchModify = ({navigation, route}) => {
 	const matt1Chk = async () => {
 		//console.log("matt1Chk : ",cate+"//"+matt1);
 		if(matt1){
-			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
+			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
 				console.log('재료2 X');
 				setMatt2('');
 				setMatt2Ary([]);
@@ -488,7 +488,7 @@ const MatchModify = ({navigation, route}) => {
 			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
 		}
 
-		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
+		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
 		}else{
 			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
 			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
@@ -807,7 +807,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '카테고리를 선택해 주세요.',
 										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={cateAry.map(item => ({
 										label: item.txt,
@@ -843,7 +842,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={sortAry.map(item => ({
 										label: item.c2_name,
@@ -883,7 +881,6 @@ const MatchModify = ({navigation, route}) => {
 											label: '재료1을 선택해 주세요.',
 											inputLabel: '재료1을 선택해 주세요.',
 											value: '',
-											color: '#8791A1',
 										}}
 										items={matt1Ary.map(item => ({
 											label: item.c3_name,
@@ -906,12 +903,12 @@ const MatchModify = ({navigation, route}) => {
 						) : null}
 
 						{cate!='' && matt1!='' ? (		
-							matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) ? (
+							matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50) ? (
 								null
 							) : (
 								<View style={[styles.typingBox, styles.mgTop35]}>
 									<View style={styles.typingTitle}>
-										<Text style={styles.typingTitleText}>재료2</Text>
+										<Text style={styles.typingTitleText}>재료2//{cate}</Text>
 									</View>
 									<View style={[styles.typingInputBox]}>
 										<RNPickerSelect
@@ -929,7 +926,6 @@ const MatchModify = ({navigation, route}) => {
 												label: '재료2를 선택해 주세요.',
 												inputLabel: '재료2를 선택해 주세요.',
 												value: '',
-												color: '#8791A1',
 											}}
 											items={matt2Ary.map(item => ({
 												label: item.c4_name,
@@ -1077,7 +1073,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '도면보안설정을 확인해 주세요.',
 										inputLabel: '도면보안설정을 확인해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list1.map(item => ({
 										label: item.txt,
@@ -1113,7 +1108,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '상담방식을 선택해 주세요.',
 										inputLabel: '상담방식을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list2.map(item => ({
 										label: item.txt,
@@ -1166,7 +1160,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '제품용도를 선택해 주세요.',
 										inputLabel: '제품용도를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list3.map(item => ({
 										label: item.txt,
@@ -1202,7 +1195,6 @@ const MatchModify = ({navigation, route}) => {
 										label: '카테고리를 선택해 주세요.',
 										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list4.map(item => ({
 										label: item.txt,

@@ -216,7 +216,7 @@ const MatchWrite = ({navigation, route}) => {
 	const matt1Chk = async () => {
 		console.log(cate+"//"+matt1);
 		if(matt1){
-			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
+			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
 				console.log('재료2 X');
 				setMatt2('');
 				setMatt2Ary([]);
@@ -234,7 +234,7 @@ const MatchWrite = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("재료2 : ",responseJson);
+				console.log("재료2 : ",responseJson);
 				setMatt2Ary(responseJson.data);
 			}else{
 				//console.log("재료2 err : ",responseJson.result_text);
@@ -450,7 +450,7 @@ const MatchWrite = ({navigation, route}) => {
 			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
 		}
 
-		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
+		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
 		}else{
 			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
 			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
@@ -627,7 +627,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '카테고리를 선택해 주세요.',
 										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={cateAry.map(item => ({
 										label: item.txt,
@@ -663,7 +662,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '분류를 선택해 주세요.',
 										inputLabel: '분류를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={sortAry.map(item => ({
 										label: item.c2_name,
@@ -702,7 +700,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '재료1을 선택해 주세요.',
 										inputLabel: '재료1을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={matt1Ary.map(item => ({
 										label: item.c3_name,
@@ -723,7 +720,7 @@ const MatchWrite = ({navigation, route}) => {
 						</View>
 						)}
 												
-						{matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) ? (
+						{matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50) ? (
 							null
 						) : (
 							<View style={[styles.typingBox, styles.mgTop35]}>
@@ -743,8 +740,7 @@ const MatchWrite = ({navigation, route}) => {
 										placeholder={{
 											label: '재료2를 선택해 주세요.',
 											inputLabel: '재료2를 선택해 주세요.',
-											value: '',
-											color: '#8791A1',
+											value: '',									
 										}}
 										items={matt2Ary.map(item => ({
 											label: item.c4_name,
@@ -891,7 +887,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '도면보안설정을 확인해 주세요.',
 										inputLabel: '도면보안설정을 확인해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list1.map(item => ({
 										label: item.txt,
@@ -927,7 +922,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '상담방식을 선택해 주세요.',
 										inputLabel: '상담방식을 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list2.map(item => ({
 										label: item.txt,
@@ -980,7 +974,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '제품용도를 선택해 주세요.',
 										inputLabel: '제품용도를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list3.map(item => ({
 										label: item.txt,
@@ -1016,7 +1009,6 @@ const MatchWrite = ({navigation, route}) => {
 										label: '카테고리를 선택해 주세요.',
 										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
-										color: '#8791A1',
 									}}
 									items={list4.map(item => ({
 										label: item.txt,
