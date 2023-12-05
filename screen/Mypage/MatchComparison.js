@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
 	listInfoPriceText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:24,color:'#000'},
   listInfoState: {alignItems:'center',justifyContent:'center',marginTop:8,width:64,height:24,backgroundColor:'#797979',borderRadius:12,},
 	listInfoState2: {backgroundColor:'#31B481'},
-  listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
+  listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',paddingTop:2,},
   listInfoStateText2: {},
   completeBox : {width:innerWidth,marginTop:15,paddingTop:10,borderTopWidth:1,borderColor:'#E3E3E4'},
   completeBoxText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:17,color:'#000',},

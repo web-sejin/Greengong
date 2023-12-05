@@ -149,7 +149,7 @@ const Mypage = (props) => {
 									</View>
 									{userInfo?.mb_is_sso == 1 ? (
 									<View style={styles.mypage1InfoKakaoSt}>
-										<AutoHeightImage width={13} source={require("../../assets/img/kakao_login2.png")} />
+										<AutoHeightImage width={14} source={require("../../assets/img/kakao_login2.png")} />
 										<Text style={styles.mypage1InfoKakaoStText}>카카오 로그인</Text>
 									</View>
 									// <View style={[styles.mypage1InfoAppleSt]}>
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
 	mypage1InfoEmail: {},
 	mypage1InfoEmailText: {fontFamily:Font.NotoSansMedium,fontSize:14,lineHeight:16,color:'#323232'},
 	mypage1InfoKakaoSt: {width:120,height:24,backgroundColor:'#FFE812',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:10,},
-	mypage1InfoKakaoStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:16,color:'#3C1E1E',marginLeft:7,},
+	mypage1InfoKakaoStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:16,color:'#3C1E1E',marginLeft:7,paddingTop:1,},
 	mypage1InfoAppleSt: {width:120,height:24,backgroundColor:'#000',borderRadius:12,display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center',marginTop:10,},
 	mypage1InfoAppleStText: {fontFamily:Font.NotoSansBold,fontSize:13,lineHeight:16,color:'#fff',marginLeft:7,},
 	mypage1InfoBtn: {width:75,height:26,backgroundColor:'#F2F2F2',borderRadius:13,display:'flex',alignItems:'center',justifyContent:'center'},

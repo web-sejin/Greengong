@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
 	listInfoDescText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:19,color:'#888'},		
   listInfoState: {alignItems:'center',justifyContent:'center',position:'absolute',top:-5,right:0,width:64,height:24,backgroundColor:'#797979',borderRadius:12,},
   listInfoState2: {backgroundColor:'#31B481'},
-  listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',},
+  listInfoStateText: {fontFamily:Font.NotoSansMedium,fontSize:12,lineHeight:14,color:'#fff',paddingTop:2,},
   listInfoStateText2: {},
   salesAlert: {paddingHorizontal:20,paddingTop:15,},
   alertBox: {width:innerWidth,padding:15,paddingLeft:45,backgroundColor:'#F3FAF8',borderRadius:12,position:'relative',},

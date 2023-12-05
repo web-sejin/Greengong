@@ -216,7 +216,7 @@ const MatchWrite = ({navigation, route}) => {
 	const matt1Chk = async () => {
 		console.log(cate+"//"+matt1);
 		if(matt1){
-			if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
+			if(matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
 				console.log('재료2 X');
 				setMatt2('');
 				setMatt2Ary([]);
@@ -450,7 +450,7 @@ const MatchWrite = ({navigation, route}) => {
 			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
 		}
 
-		if(matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50)){
+		if(matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
 		}else{
 			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
 			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
@@ -720,7 +720,7 @@ const MatchWrite = ({navigation, route}) => {
 						</View>
 						)}
 												
-						{matt1==10 || matt1==20 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) || (cate==1 && matt1==50) ? (
+						{matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) ? (
 							null
 						) : (
 							<View style={[styles.typingBox, styles.mgTop35]}>
