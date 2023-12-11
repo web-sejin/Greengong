@@ -49,7 +49,7 @@ const MatchReq = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', args);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log('request_my_list_match', responseJson);
+				console.log('request_my_list_match', responseJson);
 				setItemList(responseJson.data);
 				setTotalPage(responseJson.total_page);
 				setTotalCnt(responseJson.total_count);
@@ -135,7 +135,8 @@ const MatchReq = ({navigation, route}) => {
 
       <View style={styles.completeBox}>
         {item.mc_status_org == 1 ? (
-        <Text style={styles.completeBoxText}>발주업체 : {item.mc_chat_cnt}곳</Text>
+        // <Text style={styles.completeBoxText}>발주업체 : {item.mc_chat_cnt}곳</Text>
+				<Text style={styles.completeBoxText}>발주업체 : {item.order_cnt}곳</Text>
         ) : null}
 
         {item.mc_status_org == 2 ? (

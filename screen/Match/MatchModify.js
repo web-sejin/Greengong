@@ -11,8 +11,9 @@ import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
-import {Avatar2} from '../../components/Avatar2';
+//import {Avatar2} from '../../components/Avatar2';
 import PushChk from "../../components/Push";
+import ImageCropPicker from 'react-native-image-crop-picker';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -53,13 +54,14 @@ const MatchModify = ({navigation, route}) => {
 
   const idx = route.params.idx;
 	const scrollRef = useRef();
+	const scrollViewRef = useRef(null);
 	const [routeLoad, setRouteLoad] = useState(false);
 	const [pageSt, setPageSt] = useState(false);
 	const [fileCnt, setFileCnt] = useState(0);
 	const [fileOrder, setFileOrder] = useState();
 	const [fileConfirm, setFileConfirm] = useState(false);
 	const [calendarVisible, setCalendarVisible] = useState(false);
-	const [fileList, setFileList] = useState(fileListData);
+	const [fileList, setFileList] = useState([]);
 	const [subject, setSubject] = useState(''); //글제목
 	const [cate, setCate] = useState(''); //카테고리
 	const [sort, setSort] = useState(''); //분류
@@ -93,6 +95,66 @@ const MatchModify = ({navigation, route}) => {
 	const [list3, setList3] = useState([]); //제품용도 리스트
 	const [list4, setList4] = useState([]); //제품용도 세부 리스트
 
+	const [state0, setState0] = useState(true);
+	const [state1, setState1] = useState(true);
+	const [state2, setState2] = useState(true);
+	const [state3, setState3] = useState(true);
+	const [state4, setState4] = useState(true);
+	const [state5, setState5] = useState(true);
+	const [state6, setState6] = useState(true);
+	const [state7, setState7] = useState(true);
+	const [state8, setState8] = useState(true);
+	const [state9, setState9] = useState(true);
+	const [state10, setState10] = useState(true);
+	const [state11, setState11] = useState(true);
+	const [state12, setState12] = useState(true);
+	const [state13, setState13] = useState(true);
+	const [state14, setState14] = useState(true);
+	const [state15, setState15] = useState(true);
+	const [state16, setState16] = useState(true);
+	
+	const [layout, setLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout2, setLayout2] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout3, setLayout3] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout4, setLayout4] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout5, setLayout5] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout6, setLayout6] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout7, setLayout7] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout8, setLayout8] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout9, setLayout9] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout10, setLayout10] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout11, setLayout11] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout12, setLayout12] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout13, setLayout13] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout14, setLayout14] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout15, setLayout15] = useState({ x: 0, y: 0, width: 0, height: 0 });
+	const [layout16, setLayout16] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
+	const handleLayout = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout({ x, y, width, height }); };
+	const handleLayout2 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout2({ x, y, width, height }); };
+	const handleLayout3 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout3({ x, y, width, height }); };
+	const handleLayout4 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout4({ x, y, width, height }); };
+	const handleLayout5 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout5({ x, y, width, height }); };
+	const handleLayout6 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout6({ x, y, width, height }); };
+	const handleLayout7 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout7({ x, y, width, height }); };
+	const handleLayout8 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout8({ x, y, width, height }); };
+	const handleLayout9 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout9({ x, y, width, height }); };
+	const handleLayout10 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout10({ x, y, width, height }); };
+	const handleLayout11 = (event) => { const { x, y, width, height } = event.nativeEvent.layout; setLayout11({ x, y, width, height }); };
+	const handleLayout12 = (event) => { const { x, y, width, height } = event.
+	nativeEvent.layout; setLayout12({ x, y, width, height }); };
+	const handleLayout13 = (event) => { const { x, y, width, height } = event.
+		nativeEvent.layout; setLayout13({ x, y, width, height });
+	};
+	const handleLayout14 = (event) => { const { x, y, width, height } = event.
+		nativeEvent.layout; setLayout14({ x, y, width, height });
+	};
+	const handleLayout15 = (event) => { const { x, y, width, height } = event.
+		nativeEvent.layout; setLayout15({ x, y, width, height });
+	};
+	const handleLayout16 = (event) => { const { x, y, width, height } = event.
+	nativeEvent.layout; setLayout16({ x, y, width, height }); };
+
 	const isFocused = useIsFocused();
 	useEffect(() => {
 		let isSubscribed = true;
@@ -100,7 +162,7 @@ const MatchModify = ({navigation, route}) => {
 		if(!isFocused){
 			if(!pageSt){
 				setFileConfirm(false);
-				setFileList(fileListData);
+				setFileList([]);
 			}
 		}else{
 			setRouteLoad(true);
@@ -304,7 +366,8 @@ const MatchModify = ({navigation, route}) => {
 			}
 		});
 		setFileList(selectCon);
-    getFileCount(selectCon, 'add');
+		getFileCount(selectCon, 'add');
+		setState0(true);
   };
 
 	function deleteFile(v){
@@ -376,6 +439,17 @@ const MatchModify = ({navigation, route}) => {
 		let img9Path = '';
 		let img10Path = '';
 
+		let img1Chk = 0;
+		let img2Chk = 0;
+		let img3Chk = 0;
+		let img4Chk = 0;
+		let img5Chk = 0;
+		let img6Chk = 0;
+		let img7Chk = 0;
+		let img8Chk = 0;
+		let img9Chk = 0;
+		let img10Chk = 0;
+
 		let img1Idx = '';
 		let img2Idx = '';
 		let img3Idx = '';
@@ -413,33 +487,43 @@ const MatchModify = ({navigation, route}) => {
 			if(item.idx == 1 && item.path != ''){ 
 				img1Path = item.path;
 				img1Idx = item.mf_idx;
+				img1Chk = item.signature;
 			}else if(item.idx == 2 && item.path != ''){ 
 				img2Path = item.path;
 				img2Idx = item.mf_idx;
+				img2Chk = item.signature;
 			}else if(item.idx == 3 && item.path != ''){ 
 				img3Path = item.path;
 				img3Idx = item.mf_idx;
+				img3Chk = item.signature;
 			}else if(item.idx == 4 && item.path != ''){ 
 				img4Path = item.path;
 				img4Idx = item.mf_idx;
+				img4Chk = item.signature;
 			}else if(item.idx == 5 && item.path != ''){ 
 				img5Path = item.path;
 				img5Idx = item.mf_idx;
+				img5Chk = item.signature;
 			}else if(item.idx == 6 && item.path != ''){ 
 				img6Path = item.path;
 				img6Idx = item.mf_idx;
+				img6Chk = item.signature;
 			}else if(item.idx == 7 && item.path != ''){ 
 				img7Path = item.path;
 				img7Idx = item.mf_idx;
+				img7Chk = item.signature;
 			}else if(item.idx == 8 && item.path != ''){ 
 				img8Path = item.path;
 				img8Idx = item.mf_idx;
+				img8Chk = item.signature;
 			}else if(item.idx == 9 && item.path != ''){ 
 				img9Path = item.path;
 				img9Idx = item.mf_idx;
+				img9Chk = item.signature;
 			}else if(item.idx == 10 && item.path != ''){ 
 				img10Path = item.path;
 				img10Idx = item.mf_idx;
+				img10Chk = item.signature;
 			}
 
 			if(item.idx == 1 && item.del == 1){
@@ -475,46 +559,147 @@ const MatchModify = ({navigation, route}) => {
 			}
 		});
 	
-		if(img1Path == ""){ ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); return false; }
+		if (img1Path == "") {
+			//ToastMessage('사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.'); 
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, 0, true);		
+			setState0(false);
+			return false;
+		}
 
-		if(subject == ""){ ToastMessage('글 제목을 입력해 주세요.'); return false; }
+		if (subject == "") {
+			//ToastMessage('글 제목을 입력해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout.y, true);
+			setState1(false);
+			return false;
+		}
 
-		if(cate == ""){ ToastMessage('카테고리를 선택해 주세요.'); return false; }
+		if (cate == "") {
+			//ToastMessage('카테고리를 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout2.y, true);
+			setState2(false);
+			return false;
+		}
 
-		if(sort == ""){ ToastMessage('분류를 선택해 주세요.'); return false; }
+		if (sort == "") {
+			//ToastMessage('분류를 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout3.y, true);
+			setState3(false);
+			return false;
+		}
 
 		if(sort==40 || cate==6 || cate==7){
 		}else{
-			if(matt1 == ""){ ToastMessage('재료1을 선택해 주세요.'); return false; }
-		}
-
-		if(matt1==10 || matt1==20  || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
-		}else{
-			if(matt2 == ""){ ToastMessage('재료2를 선택해 주세요.'); return false; }
-			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
-				if(matt2Direct==""){ ToastMessage('재료2를 직접 입력해 주세요.'); return false; }
+			if (matt1 == "") {
+				//ToastMessage('재료1을 선택해 주세요.');
+				Keyboard.dismiss();
+				scrollViewRef.current?.scrollToPosition(0, layout4.y, true);
+				setState4(false);
+				return false;
 			}
 		}
 
-		if(cnt == ""){ ToastMessage('수량을 입력해 주세요.'); return false; }
-		
-		if((call != 1 || (call==1 && (cate==6 || cate==7))) && security == ""){ 
-			ToastMessage('도면보안설정을 선택해 주세요.'); return false; 
+		if(matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
+		}else{
+			if (matt2 == "") {
+				//ToastMessage('재료2를 선택해 주세요.');
+				Keyboard.dismiss();
+				scrollViewRef.current?.scrollToPosition(0, layout5.y, true);
+				setState5(false);
+				return false;
+			}
+			if(matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70){
+				if (matt2Direct == "") {
+					//ToastMessage('재료2를 직접 입력해 주세요.');
+					Keyboard.dismiss();
+					scrollViewRef.current?.scrollToPosition(0, layout5.y, true);
+					setState5(false);
+					return false;
+				}
+			}
 		}
 
-		if(advice == ""){ ToastMessage('상담방식(견적서)을 선택해 주세요.'); return false; }
+		if (cnt == "") {
+			//ToastMessage('수량을 입력해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout7.y, true);
+			setState7(false);
+			return false;
+		}
+		
+		if((call != 1 || (call==1 && (cate==6 || cate==7))) && security == ""){ 
+			//ToastMessage('도면보안설정을 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout8.y, true);
+			setState8(false);
+			return false; 
+		}
 
-		if(projectName == ""){ ToastMessage('프로젝트명을 입력해 주세요.'); return false; }
+		if (advice == "") {
+			//ToastMessage('상담방식(견적서)을 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout9.y, true);
+			setState9(false);
+			return false;
+		}
 
-		if(useInfo == ""){ ToastMessage('제품용도를 선택해 주세요.'); return false; }
+		if (projectName == "") {
+			//ToastMessage('프로젝트명을 입력해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout10.y, true);
+			setState10(false);
+			return false;
+		}
 
-		if(indCate == ""){ ToastMessage('[산업] 카테고리를 선택해 주세요.'); return false; }		
-		if(useInfo==3 && indCate==1 && indCateDirect==""){ ToastMessage('[산업] 카테고리를 직접 입력해 주세요.'); return false; }
+		if (useInfo == "") {
+			//ToastMessage('제품용도를 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout11.y, true);
+			setState11(false);
+			return false;
+		}
 
-		if(endDateMethod == ""){ ToastMessage('납기일방식을 선택해 주세요.'); return false; }
-		if(endDateMethod == 2 && endDate == ""){ ToastMessage('납기일을 선택해 주세요.'); return false; }
+		if (indCate == "") {
+			//ToastMessage('[산업] 카테고리를 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout12.y, true);
+			setState12(false);
+			return false;
+		}		
+		if (useInfo == 3 && indCate == 1 && indCateDirect == "") {
+			//ToastMessage('[산업] 카테고리를 직접 입력해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout12.y, true);
+			//setState13(false);
+			setState12(false);
+			return false;
+		}
 
-		if(content == ""){ ToastMessage('도면상세정보를 입력해 주세요.'); return false; }
+		if (endDateMethod == "") {
+			//ToastMessage('납기일방식을 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout14.y, true);
+			setState14(false);
+			return false;
+		}
+		if (endDateMethod == 2 && endDate == "") {
+			//ToastMessage('납기일을 선택해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout14.y, true);
+			setState14(false);
+			return false;
+		}
+
+		if (content == "") {
+			//ToastMessage('도면상세정보를 입력해 주세요.');
+			Keyboard.dismiss();
+			scrollViewRef.current?.scrollToPosition(0, layout16.y, true);
+			setState16(false);
+			return false;
+		}
 
 		let calcCnt = 0;
 		if(cnt != ''){
@@ -543,7 +728,17 @@ const MatchModify = ({navigation, route}) => {
 			mc_end_date:endDate,
 			mc_option1:call,
 			mc_option2:endDateMethod,
-			mc_price:price
+			mc_price: price,
+			mf_img1_signature:img1Chk,
+			mf_img2_signature:img2Chk,
+			mf_img3_signature:img3Chk,
+			mf_img4_signature:img4Chk,
+			mf_img5_signature:img5Chk,
+			mf_img6_signature:img6Chk,
+			mf_img7_signature:img7Chk,
+			mf_img8_signature:img8Chk,
+			mf_img9_signature:img9Chk,
+			mf_img10_signature:img10Chk,
 		};
 
 		//console.log(formData);
@@ -660,16 +855,18 @@ const MatchModify = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("modify : ",responseJson);
+				//console.log("modify : ",responseJson);
 				const imgList = responseJson.mf_data;
+				//console.log('imgList : ', imgList);
 				if(imgList.length > 0){
-					let selectCon = fileList.map((item,index) => {					
+					let selectCon = imgList.map((item,index) => {					
 						if(imgList[index]){
-							return {...item, path: imgList[index].mf_name, mf_idx:imgList[index].mf_idx};
+							return {...item, idx: (index+1), path: imgList[index].mf_name, mf_idx:imgList[index].mf_idx, signature:imgList[index].mf_signature};
 						}else{
-							return {...item, path: item.path, mf_idx:''};
+							return {...item, idx: (index+1), path: item.path, mf_idx:'', signature:0};
 						}
 					});
+					console.log('selectCon : ', selectCon);
 					setFileList(selectCon);
 					getFileCount(selectCon);
 				}
@@ -720,75 +917,240 @@ const MatchModify = ({navigation, route}) => {
 				console.log('결과 출력 실패!', responseJson);
 			}
 		});
-  }
+	}
+	
+	const imgSelectHandler = () => {
+		ImageCropPicker.openPicker({
+			// width: deviceSize.deviceWidth,
+			// height: deviceSize.deviceWidth,
+			// cropping: true,
+			// compressImageMaxWidth: deviceSize.deviceWidth * 1.5,
+			// compressImageMaxHeight: deviceSize.deviceWidth * 1.5,
+			// compressImageQuality: 0.7,
+			multiple: true,
+		})
+		.then(image => {
+			//console.log('이미지 선택....', image);
+			let selectPhoto = [...fileList];			
+			//{'idx': 1, 'txt': '파일1', 'path': ''},
+			image.map((item, index) => {
+				let addCnt = fileCnt + index;
+				let chk = 0;
+				//console.log('addCnt ::: ', addCnt);
+				if (addCnt == 0) {
+					addCnt = index;
+					chk = 1;
+				}
+				if (selectPhoto.length < 11) {
+					return selectPhoto.push({
+						idx: addCnt + 1,
+						txt: '파일'+(addCnt + 1),
+						path: item.path,
+						signature: chk,
+						//type: item.mime,
+						//data: item.data,
+						//name: 'spotImage.png',
+					});
+				} else {
+					ToastMessage('이미지는 10개까지 등록가능합니다.');
+				}
+			});
+			
+			setFileCnt(selectPhoto.length);
+			setFileConfirm(false);
+			console.log(selectPhoto);
+			setFileList(selectPhoto);
+			setState0(true);
+		})
+		.catch(e => {
+			ToastMessage('갤러리 선택을 취소하셨습니다.');
+		});
+	};
+
+	const openCamera = () => {
+    ImageCropPicker.openCamera({
+      // width: 300,
+      // height: 400,
+      // cropping: true,
+    })
+		.then(image => {
+			//console.log(image.path);
+			//setUri(image.path);
+			//props.onChange?.(image);
+
+			const len = fileList.length;
+			if (len >= 10) {
+				setFileConfirm(false);
+				ToastMessage('이미지는 10개까지 등록가능합니다.');
+			} else {
+				let selectPhoto = [...fileList];		
+				let chk = 0;
+				if (len == 0) {
+					chk = 1;
+				}
+				selectPhoto.push({
+					idx: len + 1,
+					txt: '파일'+(len + 1),
+					path: image.path,
+					signature: chk,
+				});
+
+				setFileCnt(selectPhoto.length);
+				setFileConfirm(false);
+				setFileList(selectPhoto);
+				setState0(true);
+			}
+		})
+		.catch(e => {
+			ToastMessage('카메라 촬영을 취소하셨습니다.');
+		});
+		//.finally(close);
+	};
+	
+	function deleteFile(v) {
+		//console.log('signature :::: ',fileList[v].signature);
+		let firstChk = 0;
+		if (fileList[v].signature == 1) {
+			firstChk = 1;
+		}
+		fileList.splice(v, 1);		
+
+		let selectCon = fileList.map((item, i) => {
+			if (i == 0) {				
+				if(firstChk == 1){
+					return { ...item, idx: i + 1, txt: '파일' + (i + 1), path: item.path, signature: 1, };
+				} else {
+					return { ...item, idx: i + 1, txt: '파일' + (i + 1), path: item.path, signature: 0, };	
+				}
+			}else{
+				return { ...item, idx: i + 1, txt: '파일' + (i + 1), path: item.path, signature: 0, };
+			}	
+		});
+		setFileList(selectCon);
+		getFileCount(selectCon, 'del');	
+	}
+
+	const chkSignature = (idx) => {
+		//console.log(idx);
+		let selectCon = fileList.map((item) => {
+			if(item.idx === idx){
+				return {...item, signature: 1};
+			}else{
+				return {...item, signature: 0};
+			}
+		});	
+		setFileList(selectCon);
+	}
 
 	return (
 		<SafeAreaView style={styles.safeAreaView}>			
 			<Header navigation={navigation} headertitle={'매칭 글수정'} />
-			<KeyboardAwareScrollView>
+			<KeyboardAwareScrollView ref={scrollViewRef}>
 				<View style={styles.registArea}>
 					<View style={[styles.registBox]}>
 						<View style={[styles.typingBox, styles.typingBox2]}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>사진첨부({fileCnt}/10)</Text>
 							</View>
-							<ScrollView
-								ref={scrollRef}
-								horizontal={true}
-								showsHorizontalScrollIndicator = {false}
-								onMomentumScrollEnd ={() => {}}
-							>
-								{fileList.map((item, index) => {
-									return(
-										<View key={index} style={styles.photoBox}>							
-											<TouchableOpacity												
-												style={styles.photoBtn}
-												activeOpacity={opacityVal}
-												onPress={() => {
-													//console.log(fileList[index])
-													setFileOrder((index+1));
-													setFileConfirm(true);
-												}}
-											>
-												{item.path ? (
-													<AutoHeightImage width={79} source={{uri: item.path}} />												
-												) : (
-													<AutoHeightImage width={79} source={require("../../assets/img/icon_plus3.png")} />
-												)}
-											</TouchableOpacity>
-											{item.path ? (
-												<TouchableOpacity
-													style={styles.photoDel}
-													activeOpacity={opacityVal}
-													onPress={() => {deleteFile((index+1))}}
-												>
-													<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
-												</TouchableOpacity>
-											) : null}
+							<View style={[styles.inputAlert, styles.inputAlert]}>
+								<AutoHeightImage width={14} source={require("../../assets/img/icon_alert2.png")} />
+								<Text style={styles.inputAlertText2}>대표이미지를 선택해 주세요.</Text>
+							</View>
+
+							<View style={styles.photoFlexBox}>
+								<View style={[styles.photoBox, styles.photoBox2]}>							
+									<TouchableOpacity												
+										style={styles.photoBtn}
+										activeOpacity={opacityVal}
+										onPress={() => {
+											setFileConfirm(true);
+										}}
+									>
+										<View style={styles.photoImg}>
+											<AutoHeightImage width={79} source={require("../../assets/img/icon_plus3.png")} />
 										</View>
-									)								
-								})}
-										{/* <AutoHeightImage width={79} source={{uri: picture}} /> */}
-							
-							</ScrollView>
+									</TouchableOpacity>
+								</View>
+								<View style={styles.photoBoxScroll}>
+									<ScrollView
+										ref={scrollRef}
+										horizontal={true}
+										showsHorizontalScrollIndicator = {false}
+										onMomentumScrollEnd ={() => {}}
+									>
+										{fileList.map((item, index) => {
+											return(
+												<View key={index} style={[styles.photoBox, index==0 ? styles.photoBox2 : null]}>						
+													<TouchableOpacity												
+														style={styles.photoBtn}
+														activeOpacity={opacityVal}
+														onPress={() => {chkSignature(item.idx)}}
+													>
+														{item.path ? (
+															<>
+															<View style={styles.photoImg}>
+																<AutoHeightImage width={79} source={{ uri: item.path }} />
+															</View>
+															<View style={[styles.photoRadio, item.signature == 1 ? styles.photoRadioOn : null]}>
+																{item.signature == 1 ? (																																	
+																	<AutoHeightImage width={12} source={require("../../assets/img/icon_chk_on.png")} />
+																) : null}		
+															</View>
+															</>
+														) : (
+															<AutoHeightImage width={79} source={require("../../assets/img/icon_plus3.png")} />
+														)}			
+													</TouchableOpacity>
+													{item.path ? (
+														<TouchableOpacity
+															style={styles.photoDel}
+															activeOpacity={opacityVal}
+															onPress={() => {deleteFile((index+1))}}
+														>
+															<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
+														</TouchableOpacity>
+													) : null}
+												</View>
+											)								
+										})}
+												{/* <AutoHeightImage width={79} source={{uri: picture}} /> */}
+									
+									</ScrollView>
+								</View>
+							</View>
+							{!state0 ? (
+							<View style={[styles.typingAlert, styles.typingAlert2]}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />					
+								<Text style={styles.typingAlertText}>사진 첨부 목록 중 첫번째 영역에 사진을 첨부해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>글 제목</Text>
 							</View>
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TextInput
 									value={subject}
-									onChangeText={(v) => {setSubject(v)}}
+									onChangeText={(v) => {
+										setSubject(v);
+										if(v){setState1(true);}
+									}}
 									placeholder={'글 제목을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
 									style={[styles.input]}
 								/>
 							</View>
+							{!state1 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>글 제목을 입력해 주세요.</Text>
+							</View>
+						) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout2}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>카테고리</Text>
 							</View>
@@ -802,15 +1164,18 @@ const MatchModify = ({navigation, route}) => {
 										if(floorFile && (cate==6 || cate==7) && call==1){
 											setCall(0);
 										}
+										if(value){setState2(true);}
 									}}
 									placeholder={{
 										label: '카테고리를 선택해 주세요.',
-										inputLabel: '카테고리를 선택해 주세요.',
 										value: '',
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={cateAry.map(item => ({
 										label: item.txt,
 										value: item.val,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -824,9 +1189,15 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!state2 ? (
+								<View style={styles.typingAlert}>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+									<Text style={styles.typingAlertText}>카테고리를 선택해 주세요.</Text>
+								</View>
+							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout3}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>분류</Text>
 							</View>
@@ -837,15 +1208,18 @@ const MatchModify = ({navigation, route}) => {
 										Keyboard.dismiss();
 										setSort(value);
 										sortChk();
+										if(value){setState3(true);}
 									}}
 									placeholder={{
 										label: '분류를 선택해 주세요.',
-										inputLabel: '분류를 선택해 주세요.',
 										value: '',
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={sortAry.map(item => ({
 										label: item.c2_name,
 										value: item.c2_idx,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -859,13 +1233,19 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!state3 ? (
+								<View style={styles.typingAlert}>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+									<Text style={styles.typingAlertText}>분류를 선택해 주세요.</Text>
+								</View>
+							) : null}
 						</View>
 						
 						{cate!='' && sort!='' ? (
 							(sort==40 || cate==6 || cate==7) ?
 								null 
 							: (
-							<View style={[styles.typingBox, styles.mgTop35]}>
+							<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout4}>
 								<View style={styles.typingTitle}>
 									<Text style={styles.typingTitleText}>재료1</Text>
 								</View>
@@ -876,15 +1256,18 @@ const MatchModify = ({navigation, route}) => {
 											Keyboard.dismiss();
 											setMatt1(value);
 											matt1Chk();
+											if(value){setState4(true);}
 										}}
 										placeholder={{
 											label: '재료1을 선택해 주세요.',
-											inputLabel: '재료1을 선택해 주세요.',
 											value: '',
-										}}
+											color: '#8791A1'
+										}}										
+										placeholderTextColor="8791A1"
 										items={matt1Ary.map(item => ({
 											label: item.c3_name,
 											value: item.c3_idx,
+											color: '#000',
 										}))}
 										fixAndroidTouchableBug={true}
 										useNativeAndroidPickerStyle={false}
@@ -898,6 +1281,12 @@ const MatchModify = ({navigation, route}) => {
 									/>
 									<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 								</View>
+								{!state4 ? (
+								<View style={styles.typingAlert}>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+									<Text style={styles.typingAlertText}>재료1을 선택해 주세요.</Text>
+								</View>
+							) : null}
 							</View>
 							)
 						) : null}
@@ -906,7 +1295,7 @@ const MatchModify = ({navigation, route}) => {
 							matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162) ? (
 								null
 							) : (
-								<View style={[styles.typingBox, styles.mgTop35]}>
+								<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout5}>
 									<View style={styles.typingTitle}>
 										<Text style={styles.typingTitleText}>재료2</Text>
 									</View>
@@ -917,19 +1306,23 @@ const MatchModify = ({navigation, route}) => {
 												Keyboard.dismiss();
 												setMatt2(value);
 												if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
-													
-												}else{
 													setMatt2Direct(''); 
+												}else{
+													//setMatt2Direct(''); 
 												}
+												if(value){setState5(true);}
 											}}
 											placeholder={{
 												label: '재료2를 선택해 주세요.',
-												inputLabel: '재료2를 선택해 주세요.',
-												value: '',
+												//inputLabel: '재료2를 선택해 주세요.',
+												value: null,
+												color: '#8791A1'
 											}}
+											placeholderTextColor="8791A1"
 											items={matt2Ary.map(item => ({
 												label: item.c4_name,
 												value: item.c4_idx,
+												color: '#000',
 											}))}
 											fixAndroidTouchableBug={true}
 											useNativeAndroidPickerStyle={false}
@@ -942,17 +1335,32 @@ const MatchModify = ({navigation, route}) => {
 											}}
 										/>
 										<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
-									</View>
+										</View>
+										{!matt2 && !state5 ? (
+											<View style={styles.typingAlert}>
+												<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+												<Text style={styles.typingAlertText}>재료2를 선택해 주세요.</Text>
+											</View>
+										) : null}
 
 									{matt2==12 || matt2==22 || matt2==32 || matt2==40 || matt2==47 || matt2==59 || matt2==62 || matt2==65 || matt2==70 ? (
 									<View style={[styles.typingInputBox]}>
 										<TextInput
 											value={matt2Direct}
-											onChangeText={(v) => {setMatt2Direct(v)}}
+											onChangeText={(v) => {
+												setMatt2Direct(v);
+												if(v){setState5(true);}
+											}}
 											placeholder={'재료2를 직접 입력을 입력해 주세요.'}
 											placeholderTextColor="#8791A1"
 											style={[styles.input]}
 										/>
+										{!matt2Direct && !state5 ? (
+										<View style={styles.typingAlert}>
+											<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+											<Text style={styles.typingAlertText}>재료2를 입력해 주세요.</Text>
+										</View>
+										) : null}
 									</View>
 									) : null}
 
@@ -960,7 +1368,7 @@ const MatchModify = ({navigation, route}) => {
 							)
 						) : null}
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout7}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>수량</Text>
 							</View>
@@ -972,12 +1380,19 @@ const MatchModify = ({navigation, route}) => {
 										let comma = (v).split(',').join('');
 										comma = String(comma).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 										setCnt(comma);
+										if(v){setState7(true);}
 									}}
 									placeholder={'수량을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
 									style={[styles.input]}
 								/>
 							</View>
+							{!state7 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>수량을 입력해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
 						<View style={[styles.typingBox, styles.mgTop35]}>
@@ -1058,7 +1473,7 @@ const MatchModify = ({navigation, route}) => {
 						</View>
 						
 						{call != 1 || (call==1 && (cate==6 || cate==7)) ? (
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout8}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>도면보안설정</Text>
 							</View>
@@ -1068,15 +1483,19 @@ const MatchModify = ({navigation, route}) => {
 									onValueChange={(value) => {
 										Keyboard.dismiss();
 										setSecurity(value);
+										if(value){setState8(true);}
 									}}
 									placeholder={{
 										label: '도면보안설정을 확인해 주세요.',
-										inputLabel: '도면보안설정을 확인해 주세요.',
-										value: '',
+										//inputLabel: '도면보안설정을 확인해 주세요.',
+										value: null,
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={list1.map(item => ({
 										label: item.txt,
 										value: item.val,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -1090,10 +1509,16 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!state8 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>도면보안설정을 확인해 주세요.</Text>
+							</View>
+							) : null}
 						</View>				
 						) : null}		
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout9}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>상담방식(견적서)</Text>
 							</View>
@@ -1103,15 +1528,19 @@ const MatchModify = ({navigation, route}) => {
 									onValueChange={(value) => {
 										Keyboard.dismiss();
 										setAdvice(value);
+										if(value){setState9(true);}
 									}}
 									placeholder={{
 										label: '상담방식을 선택해 주세요.',
-										inputLabel: '상담방식을 선택해 주세요.',
-										value: '',
+										//inputLabel: '상담방식을 선택해 주세요.',
+										value: null,
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={list2.map(item => ({
 										label: item.txt,
 										value: item.val,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -1125,9 +1554,15 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!state9 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>상담방식을 선택해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout10}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>프로젝트명</Text>
 							</View>
@@ -1136,15 +1571,22 @@ const MatchModify = ({navigation, route}) => {
 									value={projectName}
 									onChangeText={(v) => {
 										setProjectName(v);
+										if(v){setState10(true);}
 									}}
 									placeholder={'프로젝트명을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
 									style={[styles.input]}
 								/>
 							</View>
+							{!state10 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>프로젝트명을 입력해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout11}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>제품용도</Text>
 							</View>
@@ -1155,15 +1597,19 @@ const MatchModify = ({navigation, route}) => {
 										Keyboard.dismiss();
 										setUseInfo(value);
 										select8();
+										if(value){setState11(true);}
 									}}
 									placeholder={{
 										label: '제품용도를 선택해 주세요.',
-										inputLabel: '제품용도를 선택해 주세요.',
-										value: '',
+										//inputLabel: '제품용도를 선택해 주세요.',
+										value: null,
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={list3.map(item => ({
 										label: item.txt,
 										value: item.val,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -1177,9 +1623,15 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!state11 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>제품용도를 선택해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout12}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>[산업] 카테고리</Text>
 							</View>
@@ -1190,15 +1642,19 @@ const MatchModify = ({navigation, route}) => {
 										Keyboard.dismiss();
 										setIndCate(value);
 										setIndCateDirect('');
+										if(value){setState12(true);}
 									}}
 									placeholder={{
 										label: '카테고리를 선택해 주세요.',
-										inputLabel: '카테고리를 선택해 주세요.',
-										value: '',
+										//inputLabel: '카테고리를 선택해 주세요.',
+										value: null,
+										color: '#8791A1'
 									}}
+									placeholderTextColor="8791A1"
 									items={list4.map(item => ({
 										label: item.txt,
 										value: item.val,
+										color: '#000',
 								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
@@ -1212,6 +1668,12 @@ const MatchModify = ({navigation, route}) => {
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
 							</View>
+							{!indCate && !state12 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>[산업] 카테고리를 선택해 주세요.</Text>
+							</View>
+							) : null}
 							{useInfo==3 && indCate==1 ? (
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TextInput
@@ -1223,11 +1685,17 @@ const MatchModify = ({navigation, route}) => {
 									placeholderTextColor="#8791A1"
 									style={[styles.input]}
 								/>
+								{!indCateDirect && !state12 ? (
+								<View style={styles.typingAlert}>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+									<Text style={styles.typingAlertText}>기타/미분류를 입력해 주세요.</Text>
+								</View>
+								) : null}
 							</View>
 							) : null}
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout14}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>납기일</Text>
 							</View>
@@ -1243,6 +1711,7 @@ const MatchModify = ({navigation, route}) => {
 											setEndDate('');
 											setEndDateObj();
 										}
+										setState14(true);
 									}}
 								>
 									<Text style={[styles.dealBtnText, endDateMethod == 1 ? styles.dealBtnTextOn : null]}>협의 후 결정</Text>
@@ -1258,6 +1727,7 @@ const MatchModify = ({navigation, route}) => {
 										}else{
 											setEndDateMethod(2);
 										}
+										setState14(true);
 									}}
 								>
 									<Text style={[styles.dealBtnText, endDateMethod == 2 ? styles.dealBtnTextOn : null]}>납기일 작성</Text>
@@ -1273,17 +1743,27 @@ const MatchModify = ({navigation, route}) => {
 											setEndDate('');
 											setEndDateObj();
 										}
+										setState14(true);
 									}}
 								>
 									<Text style={[styles.dealBtnText, endDateMethod == 3 ? styles.dealBtnTextOn : null]}>기한 없음</Text>
 								</TouchableOpacity>
 							</View>
+							{!endDateMethod && !state14 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>납기일을 선택해 주세요.</Text>
+							</View>
+							) : null}
 							{endDateMethod == 2 ? (
 							<View style={[styles.typingInputBox, styles.typingFlexBox]}>
 								<TouchableOpacity
 									style={styles.calendarBtn}
 									activeOpacity={opacityVal}
-									onPress={()=>{setCalendarVisible(true)}}
+										onPress={() => {
+											setCalendarVisible(true);
+											setState14(true);
+										}}
 								>									
 									<AutoHeightImage width={17} source={require("../../assets/img/icon_calendar.png")} style={styles.icon_calendar}/>
 									{endDate ? (
@@ -1292,7 +1772,13 @@ const MatchModify = ({navigation, route}) => {
 										<Text style={styles.calendarBtnText}>납기일을 선택해 주세요.</Text>
 									)}
 									<AutoHeightImage width={7} source={require("../../assets/img/icon_arrow2.png")} style={styles.icon_calendar_arr}/>
-								</TouchableOpacity>								
+								</TouchableOpacity>
+								{!endDate && !state14 ? (
+								<View style={styles.typingAlert}>
+									<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+									<Text style={styles.typingAlertText}>납기일을 선택해 주세요.</Text>
+								</View>
+								) : null}				
 							</View>
 							) : null}
 						</View>
@@ -1317,7 +1803,7 @@ const MatchModify = ({navigation, route}) => {
 							</View>
 						</View>
 
-						<View style={[styles.typingBox, styles.mgTop35]}>
+						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout16}>
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>도면상세정보</Text>
 							</View>
@@ -1326,6 +1812,7 @@ const MatchModify = ({navigation, route}) => {
 									value={content}
 									onChangeText={(v) => {
 										setContent(v);
+										if (v) { setState16(true); }
 									}}
 									placeholder={'물품에 대한 자세한 정보를 작성하면 판매확률이 올라갑니다.'}
 									placeholderTextColor="#8791A1"
@@ -1333,6 +1820,12 @@ const MatchModify = ({navigation, route}) => {
 									style={[styles.input, styles.textarea]}
 								/>
 							</View>
+							{!state16 ? (
+							<View style={styles.typingAlert}>
+								<AutoHeightImage width={17} source={require("../../assets/img/icon_alert3.png")} style={styles.typingAlertImg} />
+								<Text style={styles.typingAlertText}>도면상세정보를 입력해 주세요.</Text>
+							</View>
+							) : null}
 						</View>
 
 					</View>
@@ -1358,9 +1851,28 @@ const MatchModify = ({navigation, route}) => {
 					onPress={() => {setFileConfirm(false)}}
 				></Pressable>
 				<View style={styles.modalCont}>
-					<Avatar2 
+					<View style={styles.avatarTitle}>
+						<Text style={styles.avatarTitleText}>매칭상품 사진 업로드</Text>
+					</View>
+					<View style={[styles.avatarBtnBox, styles.avatarBtnBox2]}>
+						<TouchableOpacity 
+							style={styles.avatarBtn}
+							activeOpacity={opacityVal}
+							onPress={openCamera}
+						>
+							<Text style={styles.avatarBtnText}>카메라</Text>
+						</TouchableOpacity>
+						<TouchableOpacity 
+							style={[styles.avatarBtn, styles.avatarBtn2]}
+							activeOpacity={opacityVal}
+							onPress={imgSelectHandler}
+						>
+							<Text style={[styles.avatarBtnText, styles.avatarBtnText2]}>앨범</Text>
+						</TouchableOpacity>
+					</View> 
+					{/* <Avatar2 
 						onChange={onAvatarChange} 
-					/>
+					/> */}
 				</View>
       </Modal>
 
@@ -1413,7 +1925,7 @@ const styles = StyleSheet.create({
 	typingTitleFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
 	typingTitleText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#000',},
 	typingInputBox: {marginTop:10,position:'relative'},
-	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',},
+	typingFlexBox: {display:'flex',flexDirection:'row',justifyContent:'space-between',flexWrap:'wrap'},
 	input: {width:innerWidth,height:58,backgroundColor:'#fff',borderWidth:1,borderColor:'#E5EBF2',borderRadius:12,paddingLeft:12,fontSize:15,color:'#000'},
 	input2: {width:(innerWidth - 90),},
 	input3: {width:(innerWidth - 120),},
@@ -1429,12 +1941,27 @@ const styles = StyleSheet.create({
 	certChkBtnText3: {fontFamily:Font.NotoSansBold,fontSize:15,color:'#fff'},
 	certChkBtn4: {width:58,},
 	certChkBtnDelete: {height:58,backgroundColor:'#666',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
-	photoBox: {width:79,height:79,marginTop:10,marginRight:10,position:'relative'},
-	photoBtn: {width:79,height:79,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden',
-	display:'flex',alignItems:'center',justifyContent:'center',},
+	photoFlexBox: { flexDirection: 'row' },
+	photoBoxScroll: {width:innerWidth-89,marginLeft:10,},
+	photoBox: { width: 79, marginTop: 10, marginLeft: 10, position: 'relative', },
+	photoBox2: { marginLeft: 0, },
+	photoBtn: {alignItems:'center'},
+	photoImg: {width:79,height:79,borderWidth:1,borderColor:'#E1E1E1',borderRadius:12,overflow:'hidden',display: 'flex', alignItems: 'center', justifyContent: 'center',},
+	photoRadio: { alignItems:'center', justifyContent:'center', width: 20, height: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#E1E1E1', borderRadius:12, marginTop: 10, },
+	photoRadioOn: {backgroundColor:'#31B481',borderColor:'#31B481'},
 	photoDel: {position:'absolute',top:5,right:5,zIndex:10},
 	modalBack: {width:widnowWidth,height:widnowHeight,backgroundColor:'#000',opacity:0.5},
-	modalCont: {width:innerWidth,height:154,padding:30,paddingLeft:20,paddingRight:20,backgroundColor:'#fff',borderRadius:10,position:'absolute',left:20,top:((widnowHeight/2)-88)},
+	modalCont: { width: innerWidth, height: 154, padding: 30, paddingLeft: 20, paddingRight: 20, backgroundColor: '#fff', borderRadius: 10, position: 'absolute', left: 20, top: ((widnowHeight / 2) - 88) },
+	modalCont3: { width: innerWidth, padding: 20, paddingBottom: 30, backgroundColor: '#fff', borderRadius: 10, position: 'absolute', left: 20, top: ((widnowHeight / 2) - 160) },
+	avatarTitle: {paddingBottom:15,borderBottomWidth:1,borderColor:'#CCCCCC'},
+	avatarTitleText: {textAlign:'center',fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:18,color:'#191919'},
+  avatarDesc: {marginTop:20,},
+  avatarDescText: {textAlign:'center',fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:22,color:'#191919',paddingHorizontal:20,},
+	avatarBtnBox: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: 30, },
+	avatarBtnBox2: {marginTop:15,},
+	avatarBtn: {width:((widnowWidth/2)-45),height:58,backgroundColor:'#C5C5C6',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center'},
+	avatarBtn2: {backgroundColor:'#31B481'},
+	avatarBtnText: {fontFamily:Font.NotoSansBold,fontSize:15,lineHeight:58,color:'#fff'},
 	filterBtnList: {display:'flex',flexDirection:'row',alignItems:'center',flexWrap:'wrap',paddingTop:5,},
 	filterChkBtn: {height:34,paddingHorizontal:15,borderWidth:1,borderColor:'#E5EBF2',borderRadius:16,display:'flex',alignItems:'center',justifyContent:'center',marginTop:10,marginRight:10,},
 	filterChkBtnText: {fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:17,color:'#8791A1'},
@@ -1463,7 +1990,14 @@ const styles = StyleSheet.create({
 	nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
-	indicator: {width:widnowWidth,height:widnowHeight,backgroundColor:'rgba(255,255,255,0.5)',display:'flex', alignItems:'center', justifyContent:'center',position:'absolute',left:0,top:0,},
+	indicator: { width: widnowWidth, height: widnowHeight, backgroundColor: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', left: 0, top: 0, },
+	typingAlert: { flexDirection: 'row', marginTop: 10, position: 'relative', paddingLeft: 22, },
+	typingAlert2: {paddingRight:20,},
+	typingAlertImg: { position: 'absolute',left:0,top:2,},
+	typingAlertText: { fontFamily: Font.NotoSansMedium, fontSize: 14, lineHeight: 20, color: '#ED0000' },
+	inputAlert: {display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,},
+	inputAlert2: {marginTop:5},
+	inputAlertText2: {width:(innerWidth-14),paddingLeft:5,fontFamily:Font.NotoSansRegular,fontSize:13,lineHeight:16,color:'#6C6C6C'},
 })
 
 export default MatchModify

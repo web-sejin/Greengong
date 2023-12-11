@@ -59,7 +59,8 @@ const MatchComparisonView = (props) => {
 
   const getItemList = async () => {    
 		setIsLoading(false);
-		await Api.send('GET', 'list_diff_detail_match', {'is_api': 1, mc_idx:idx, page: 1}, (args)=>{
+    //await Api.send('GET', 'list_diff_detail_match', {'is_api': 1, mc_idx:idx, page: 1}, (args)=>{
+    await Api.send('GET', 'list_diff_detail_match2', {'is_api': 1, mc_idx:idx, page: 1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;

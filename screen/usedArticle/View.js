@@ -72,7 +72,7 @@ const UsedView = (props) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("view_product : ",responseJson);
+				console.log("view_product : ",responseJson);
 				setItemInfo(responseJson);
         setSwp(responseJson.pf_data);
         setLatest(responseJson.mb_latest);
@@ -1141,7 +1141,19 @@ const styles = StyleSheet.create({
 	borderBot: {borderBottomWidth:1,borderBottomColor:'#E1E8F0'},
   swiper: {height:220,position:'relative'},
   swiperSlider: {height:220,overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',},
-  nextFix: {height:105,paddingHorizontal:20,paddingTop:15,backgroundColor:'#F3FAF8'},
+  nextFix: {
+    height: 105, paddingHorizontal: 20, paddingTop: 15,
+    //backgroundColor: '#F3FAF8',
+    backgroundColor:'#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.6,
+    shadowRadius: 16.00,
+    elevation: 20,
+  },
   nextFixFlex: {display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',},
   fixPriceBox: {},
   fixPrice: {display:'flex',flexDirection:'row',alignItems:'center'},
@@ -1260,7 +1272,6 @@ const styles = StyleSheet.create({
 	icon_alert: {position:'absolute',left:15,top:15},
 	alertBoxText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:20,color:'#000',},
 	alertBoxText2: {marginTop:3,},
-  nextFix: {height:105,padding:20,paddingTop:12,},
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 

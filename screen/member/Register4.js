@@ -633,28 +633,13 @@ const Register4 = (props) => {
 									<TouchableOpacity 
 										style={[styles.certChkBtn, styles.certChkBtn3]}
 										activeOpacity={opacityVal}
-										onPress={() => {setPostcodeOn(!postcodeOn)}}
+										onPress={() => {
+											setPostcodeOn(!postcodeOn);
+										}}
 									>
 										<Text style={styles.certChkBtnText3}>주소 검색</Text>
 									</TouchableOpacity>
-								</View>
-
-								{postcodeOn ? (
-								<View style={[styles.postcodeBox]}>
-									<Postcode
-										style={{ width: innerWidth, height: 430, marginTop:10, }}
-										jsOptions={{ animation: true }}
-										onSelected={data => {
-											//console.log(JSON.stringify(data))
-											const kakaoAddr = data;												
-											setFactCode1(kakaoAddr.zonecode);
-											setFactAddr1(kakaoAddr.address);
-											setFactAddrDt1(kakaoAddr.buildingName);
-											setPostcodeOn(false);
-										}}
-									/>
-								</View>
-								) : null}
+								</View>							
 
 								<View style={[styles.typingInputBox]}>
 									<TextInput
@@ -690,7 +675,44 @@ const Register4 = (props) => {
 						<Text style={styles.nextBtnText}>확인</Text>
 					</TouchableOpacity>
 				</View>						
-			</Modal>			
+			</Modal>		
+			
+			<Modal
+        visible={postcodeOn}
+				animationType={"slide"}
+				onRequestClose={() => {
+					setPostcodeOn(false);
+				}}
+			>	
+				<View style={[styles.header, styles.header2]}>
+					<>
+					<TouchableOpacity
+						style={styles.headerBackBtn}
+						activeOpacity={opacityVal}
+						onPress={() => {
+							setPostcodeOn(false);
+						}}
+					>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_close.png")} />
+					</TouchableOpacity>
+					<Text style={styles.headerTitle}>내 공장1 주소 찾기</Text>
+					</>
+				</View>
+				<View style={styles.postcodeBox}>
+					<Postcode
+						style={{ width: widnowWidth, height: widnowHeight-50}}
+						jsOptions={{ animation: true }}
+						onSelected={data => {
+							//console.log(JSON.stringify(data))
+							const kakaoAddr = data;												
+							setFactCode1(kakaoAddr.zonecode);
+							setFactAddr1(kakaoAddr.address);
+							setFactAddrDt1(kakaoAddr.buildingName);
+							setPostcodeOn(false);
+						}}
+					/>
+				</View>														
+			</Modal>
 		
 			<Modal
         visible={modal4}
@@ -834,23 +856,7 @@ const Register4 = (props) => {
 									>
 										<Text style={styles.certChkBtnText3}>주소 검색</Text>
 									</TouchableOpacity>
-								</View>
-								{postcodeOn2 ? (
-								<View style={[styles.postcodeBox]}>
-									<Postcode
-										style={{ width: innerWidth, height: 430, marginTop:10, }}
-										jsOptions={{ animation: true }}
-										onSelected={data => {
-											//console.log(JSON.stringify(data))
-											const kakaoAddr = data;												
-											setFactCode2(kakaoAddr.zonecode);
-											setFactAddr2(kakaoAddr.address);
-											setFactAddrDt2(kakaoAddr.buildingName);
-											setPostcodeOn2(false);
-										}}
-									/>
-								</View>
-								) : null}
+								</View>								
 								<View style={[styles.typingInputBox]}>
 									<TextInput
 										value={factAddr2}									
@@ -885,6 +891,43 @@ const Register4 = (props) => {
 						<Text style={styles.nextBtnText}>확인</Text>
 					</TouchableOpacity>
 				</View>
+			</Modal>
+
+			<Modal
+        visible={postcodeOn2}
+				animationType={"slide"}
+				onRequestClose={() => {
+					setPostcodeOn2(false);
+				}}
+			>	
+				<View style={[styles.header, styles.header2]}>
+					<>
+					<TouchableOpacity
+						style={styles.headerBackBtn}
+						activeOpacity={opacityVal}
+						onPress={() => {
+							setPostcodeOn2(false);
+						}}
+					>
+						<AutoHeightImage width={14} source={require("../../assets/img/icon_close.png")} />
+					</TouchableOpacity>
+					<Text style={styles.headerTitle}>내 공장2 주소 찾기</Text>
+					</>
+				</View>
+				<View style={styles.postcodeBox}>
+					<Postcode
+						style={{ width: widnowWidth, height: widnowHeight-50}}
+						jsOptions={{ animation: true }}
+						onSelected={data => {
+							//console.log(JSON.stringify(data))
+							const kakaoAddr = data;												
+							setFactCode2(kakaoAddr.zonecode);
+							setFactAddr2(kakaoAddr.address);
+							setFactAddrDt2(kakaoAddr.buildingName);
+							setPostcodeOn2(false);
+						}}
+					/>
+				</View>														
 			</Modal>
 
 			<Modal
@@ -1020,7 +1063,8 @@ const styles = StyleSheet.create({
 	nextBtn: {height:58,backgroundColor:'#31B481',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',},
 	nextBtnText: {fontFamily:Font.NotoSansBold,fontSize:16,lineHeight:58,color:'#fff'},
 
-	header: {height:50,backgroundColor:'#fff',position:'relative',display:'flex',justifyContent:'center',paddingLeft:20, paddingRight:20},
+	header: { height: 50, backgroundColor: '#fff', position: 'relative', display: 'flex', justifyContent: 'center', paddingLeft: 20, paddingRight: 20 },
+	header2: {borderBottomWidth:1,borderBottomColor:'#ccc'},
 	headerBackBtn: {width:30,height:50,position:'absolute',left:20,top:0,zIndex:10,display:'flex',justifyContent:'center'},
 	headerTitle: {fontFamily:Font.NotoSansMedium,textAlign:'center',fontSize:17,lineHeight:50,color:'#000'},
 

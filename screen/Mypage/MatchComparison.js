@@ -150,7 +150,8 @@ const MatchComparison = (props) => {
         </View>
         <View style={styles.completeBox}>
 					{item.mc_status_org == 1 ? (
-					<Text style={styles.completeBoxText}>발주업체 : {item.mc_chat_cnt}곳</Text>
+					// <Text style={styles.completeBoxText}>발주업체 : {item.mc_chat_cnt}곳</Text>
+					<Text style={styles.completeBoxText}>발주업체 : {item.order_cnt}곳</Text>
 					) : null}
 
 					{item.mc_status_org == 2 ? (
