@@ -80,6 +80,8 @@ const Write1 = ({navigation, route}) => {
 	const [dealMethod2Ary, setDealMethod2Ary] = useState([]); //거래방식2 리스트
 	const [payMethodAry, setPayMethodAry] = useState([]); //결제방식 리스트
 
+	const [saveState, setSaveState] = useState(false);
+
 	const [state0, setState0] = useState(true);
 	const [state1, setState1] = useState(true);
 	const [state2, setState2] = useState(true);
@@ -154,7 +156,8 @@ const Write1 = ({navigation, route}) => {
 			setPageSt(!pageSt);
 			select1();
 			select5();
-			check1();			
+			check1();
+			getSaveState();
 		}
 
 		return () => isSubscribed = false;
@@ -528,22 +531,19 @@ const Write1 = ({navigation, route}) => {
 			is_api:1,				
 			pd_name:subject,
 			pd_contents:content,
-			c1_idx:3,
+			c1_idx:1,
 			c2_idx:sort,
 			c3_idx:ingred,
+			c4_idx:shape,
 			pd_price:resPrice,
+			pd_unit:priceUnit, 
 			pd_sell_type:sellType, 
 			pd_option1:option1, 
 			pd_trade1:dealMethod1, 
 			pd_trade2:dealMethod2, 
-			pd_method:payMethod, 	
-			pd_bidding_day:period,
+			pd_method:payMethod, 			
 			pd_test:selectedList,
-			ps_model:size1,
-			ps_company:size2,
-			ps_year:size3,
-			ps_spec:size4,
-			ps_loc: size5,
+			pd_bidding_day:period,
 			pf_img1_signature:img1Chk,
 			pf_img2_signature:img2Chk,
 			pf_img3_signature:img3Chk,
