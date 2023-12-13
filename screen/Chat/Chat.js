@@ -35,6 +35,8 @@ const Chat = (props) => {
 	const [roomAry, setRoomAry] = useState([]);
 	const [roomChg, setRoomChg] = useState(false);
 	const [alimCnt, setAlimCnt] = useState(params?.alimCnt);
+	const [unreadCnt1, setUnreadCnt1] = useState(0);
+	const [unreadCnt2, setUnreadCnt2] = useState(0);
 
 	const isFocused = useIsFocused();
 	useEffect(() => {
@@ -108,6 +110,8 @@ const Chat = (props) => {
 				//console.log('list_chat_product_room : ',responseJson);
 				setPrdList(responseJson.data);
 				setTotalPage(responseJson.total_page);
+				setUnreadCnt1(responseJson.total_product_unread);
+				setUnreadCnt2(responseJson.total_match_unread);
 
 				const crIdxAry = [];
 				(responseJson.data).map((item, index) => {
@@ -136,10 +140,10 @@ const Chat = (props) => {
         let arrItems = args.arrItems;
         //console.log('args ', args);
         if(responseJson.result === 'success' && responseJson){
-          //console.log(responseJson.data);				
+          //console.log('list_chat_product_room more ::: ',responseJson.data);				
           const addItem = prdList.concat(responseJson.data);				
           setPrdList(addItem);			
-          setNowPage(nowPage+1);
+					setNowPage(nowPage + 1);					
         }else{
           console.log(responseJson.result_text);
           //console.log('결과 출력 실패!');
@@ -200,7 +204,7 @@ const Chat = (props) => {
 
 	const getMatchList = async (v) => {
 		setIsLoading(false);
-		console.log('inputText : ',v);
+		//console.log('inputText : ',v);
 
 		const formData = {
 			is_api:1,				
@@ -220,6 +224,8 @@ const Chat = (props) => {
 				//console.log('list_chat_match_room : ',responseJson);
 				setMatchList(responseJson.data);
 				setTotalPage2(responseJson.total_page);
+				setUnreadCnt1(responseJson.total_product_unread);
+				setUnreadCnt2(responseJson.total_match_unread);
 
 				const crIdxAry = [];
 				(responseJson.data).map((item, index) => {					
@@ -426,11 +432,25 @@ const Chat = (props) => {
 				> 
 					{tabState == 1 ? (
 						<>
-						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
+						<View style={styles.tabUnreadWrap}>
+							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>중고거래</Text>
+							{unreadCnt1 != 0 ? (
+							<View style={styles.tabUnreadCricle}>
+								<Text style={styles.tabUnreadText}>{unreadCnt1}</Text>
+							</View>								
+							) : null}
+						</View>
 						<View style={styles.tabLine}></View>
 						</>
-					) : (
-						<Text style={styles.tabBtnText}>중고거래</Text>  
+					) : (							
+						<View style={styles.tabUnreadWrap}>
+							<Text style={styles.tabBtnText}>중고거래</Text>  
+							{unreadCnt1 != 0 ? (
+							<View style={styles.tabUnreadCricle}>
+								<Text style={styles.tabUnreadText}>{unreadCnt1}</Text>
+							</View>								
+							) : null}
+						</View>
 					)}
 				</TouchableOpacity>
 				<TouchableOpacity
@@ -440,11 +460,25 @@ const Chat = (props) => {
 				>
 					{tabState == 2 ? (
 						<>
-						<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
+						<View style={styles.tabUnreadWrap}>
+							<Text style={[styles.tabBtnText, styles.tabBtnTextOn]}>매칭</Text>
+							{unreadCnt2 != 0 ? (
+							<View style={styles.tabUnreadCricle}>
+								<Text style={styles.tabUnreadText}>{unreadCnt2}</Text>
+							</View>								
+							) : null}
+						</View>
 						<View style={styles.tabLine}></View>
 						</>
 					) : (
-						<Text style={styles.tabBtnText}>매칭</Text>  
+						<View style={styles.tabUnreadWrap}>
+							<Text style={styles.tabBtnText}>매칭</Text>  
+							{unreadCnt2 != 0 ? (
+							<View style={styles.tabUnreadCricle}>
+								<Text style={styles.tabUnreadText}>{unreadCnt2}</Text>
+							</View>								
+							) : null}
+						</View>
 					)}
 				</TouchableOpacity>
 			</View>
@@ -511,9 +545,12 @@ const styles = StyleSheet.create({
 	schBtn: {width:34,height:44,display:'flex',alignItems:'center',justifyContent:'center',position:'absolute',left:5,top:0,},
 	schDelBtn: {position:'absolute',top:10,right:10,},
 	tabBox: {display:'flex',flexDirection:'row',backgroundColor:'#fff',borderBottomWidth:1,borderBottomColor:'#E3E3E4',marginTop:5,},
-  tabBtn: {width:(widnowWidth/2),height:45,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',},
-  tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:17,color:'#C5C5C6',},
-  tabBtnTextOn: {fontFamily:Font.NotoSansBold,color:'#31B481'},
+	tabBtn: { width: (widnowWidth / 2), height: 45, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', },
+	tabUnreadWrap: {flexDirection:'row',alignItems:'center',position:'relative'},
+  tabBtnText: {fontFamily:Font.NotoSansRegular,fontSize:15,lineHeight:20,color:'#C5C5C6',},
+	tabBtnTextOn: {fontFamily: Font.NotoSansBold, color: '#31B481'},
+	tabUnreadCricle: { alignItems: 'center', justifyContent: 'center', width: 18, height: 18, backgroundColor: '#DF4339', borderRadius: 50, marginLeft:5,},
+	tabUnreadText: {fontFamily:Font.NotoSansRegular,fontSize:8,lineHeight:20.5,color:'#fff'},
   tabLine: {width:(widnowWidth/2),height:3,backgroundColor:'#31B481',position:'absolute',left:0,bottom:-1,},
 	notData: {height:(widnowHeight-320),display:'flex',alignItems:'center',justifyContent:'center',},
 	notDataText: {fontFamily:Font.NotoSansRegular,fontSize:14,lineHeight:16,color:'#353636',marginTop:17,},

@@ -11,7 +11,8 @@ import ToastMessage from "../../components/ToastMessage";
 import Header from '../../components/Header';
 //import {Avatar2} from '../../components/Avatar2';
 import PushChk from "../../components/Push";
-import  ImageCropPicker from 'react-native-image-crop-picker';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -128,7 +129,7 @@ const Modify1 = ({navigation, route}) => {
 			setPageSt(!pageSt);
 			getData();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 	
@@ -714,7 +715,7 @@ const Modify1 = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("modify : ",responseJson.pf_data);
+				//console.log("view_product : ",responseJson.pf_data);
 				const imgList = responseJson.pf_data;			
 				//console.log(imgList);	
 				if(imgList.length > 0){

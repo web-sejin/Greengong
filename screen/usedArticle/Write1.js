@@ -14,7 +14,8 @@ import Header from '../../components/Header';
 import PushChk from "../../components/Push";
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import  ImageCropPicker from 'react-native-image-crop-picker';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -81,6 +82,7 @@ const Write1 = ({navigation, route}) => {
 	const [payMethodAry, setPayMethodAry] = useState([]); //결제방식 리스트
 
 	const [saveState, setSaveState] = useState(false);
+	const [saveModal, setSaveModal] = useState(false);
 
 	const [state0, setState0] = useState(true);
 	const [state1, setState1] = useState(true);
@@ -159,7 +161,7 @@ const Write1 = ({navigation, route}) => {
 			check1();
 			getSaveState();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
@@ -183,26 +185,257 @@ const Write1 = ({navigation, route}) => {
 	const eventBack = (v) => {
 		if (v == 'save') {
 			//임시 저장 프로세스
-		} else if (v == 'cancel') {
-			setConfirm(false);
+			saveUpdate();
+
+		} else if (v == 'cancel') {			
 			setPreventBack(false);
 			setIsLoading(false);
 			setTimeout(function () {
 				setIsLoading(true);
 				navigation.goBack();
-			}, 1000);	
+			}, 200);	
 		}		
 	}
 
+	const getSaveState = async () => {
+		await Api.send('GET', 'get_temp_product', {'is_api': 1, c1_idx:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_temp_product : ", responseJson);
+				if (responseJson.is_data == 1) {					
+					setSaveState(1);
+					setSaveModal(true);
+				}
+			}else{	
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
+
+	const getSaveState2 = async () => {
+		setIsLoading(false);
+		await Api.send('GET', 'get_temp_product', {'is_api': 1, c1_idx:1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_temp_product2 : ", responseJson);
+				const imgList = responseJson.pf_data;
+				if(imgList.length > 0){
+					//let selectCon = fileList.map((item,index) => {					
+					let selectCon = imgList.map((item,index) => {					
+						if(imgList[index]){
+							return {...item, idx: (index+1), path: imgList[index].pf_name, pf_idx:imgList[index].pf_idx, signature:imgList[index].pf_signature};
+						}else{
+							return {...item, idx: (index+1), path: item.path, pf_idx:'', signature:0};
+						}
+					});
+					setFileList(selectCon);
+					getFileCount(selectCon);
+				}
+
+				if(responseJson.pd_name) { setSubject(responseJson.pd_name); }
+				select1();
+				if(responseJson.c2_idx && responseJson.c2_idx != 0){
+					setSort((responseJson.c2_idx).toString());
+				}	
+				if(responseJson.c2_idx && responseJson.c2_idx != 0 && responseJson.c3_idx && responseJson.c3_idx != 0){
+					select2(responseJson.c2_idx, (responseJson.c3_idx).toString());
+				}
+				if(responseJson.c3_idx && responseJson.c3_idx != 0 && responseJson.c4_idx && responseJson.c4_idx != 0) {
+					select3(responseJson.c3_idx, (responseJson.c4_idx).toString());
+				}
+				
+				const testList = responseJson.pd_test;
+				check1(testList);
+				
+				if(responseJson.pd_trade1 && responseJson.pd_trade1 != 0){ setDealMethod1(responseJson.pd_trade1); }
+				if(responseJson.pd_trade1 == 1){
+					select4(1);
+					setDealMethod2(responseJson.pd_trade2*1);
+				}
+				setPriceUnit(responseJson.pd_unit_org);
+				if(responseJson.pd_option1 == 1){
+					setPriceOpt(4);				
+				}else{
+					setPriceOpt(responseJson.pd_sell_type);				
+				}
+				if(responseJson.pd_price && responseJson.pd_price != 0){ setPrice(responseJson.pd_price); }
+				select5();
+				if(responseJson.pd_method && responseJson.pd_method != 0){ setPayMethod(responseJson.pd_method*1); }	
+				if(responseJson.pd_contents){ setContent(responseJson.pd_contents); }
+				if(responseJson.pd_bidding_day){ setPeriod((responseJson.pd_bidding_day).toString()); }
+				
+				setIsLoading(true);
+			}else{	
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
+
+	const saveUpdate = async (type='') => {
+		setIsLoading(false);
+		setConfirm(false);
+		setTimeout(function () {
+			let img1Path = '';
+			let img2Path = '';
+			let img3Path = '';
+			let img4Path = '';
+			let img5Path = '';
+			let img6Path = '';
+			let img7Path = '';
+			let img8Path = '';
+			let img9Path = '';
+			let img10Path = '';
+
+			let img1Chk = 0;
+			let img2Chk = 0;
+			let img3Chk = 0;
+			let img4Chk = 0;
+			let img5Chk = 0;
+			let img6Chk = 0;
+			let img7Chk = 0;
+			let img8Chk = 0;
+			let img9Chk = 0;
+			let img10Chk = 0;
+			
+			fileList.map((item, index) => {
+				if (item.idx == 1 && item.path != '') {
+					img1Path = item.path;
+					img1Chk = item.signature;
+				} else if (item.idx == 2 && item.path != '') {
+					img2Path = item.path;
+					img2Chk = item.signature;
+				} else if (item.idx == 3 && item.path != '') {
+					img3Path = item.path;
+					img3Chk = item.signature;
+				} else if (item.idx == 4 && item.path != '') {
+					img4Path = item.path;
+					img4Chk = item.signature;
+				} else if (item.idx == 5 && item.path != '') {
+					img5Path = item.path;
+					img5Chk = item.signature;
+				} else if (item.idx == 6 && item.path != '') {
+					img6Path = item.path;
+					img6Chk = item.signature;
+				} else if (item.idx == 7 && item.path != '') {
+					img7Path = item.path;
+					img7Chk = item.signature;
+				} else if (item.idx == 8 && item.path != '') {
+					img8Path = item.path;
+					img8Chk = item.signature;
+				} else if (item.idx == 9 && item.path != '') {
+					img9Path = item.path;
+					img9Chk = item.signature;
+				} else if (item.idx == 10 && item.path != '') {
+					img10Path = item.path;
+					img10Chk = item.signature;
+				}
+			});
+
+			let selectedList = '';
+			let selectedTotal = chkMethod.filter((item) => item.isChecked);
+			if(selectedTotal){
+				selectedTotal.map((item)=>{
+					if(selectedList != ''){
+						selectedList += ',';
+					}
+					selectedList += item.idx;			
+				});
+			}
+
+			let sellType = 1;
+			let option1 = 0;
+			if(priceOpt == 1 || priceOpt == 2 || priceOpt == 3){
+				sellType = priceOpt;
+				option1 = 0;
+			}else{
+				sellType = 1;
+				option1 = 1;
+			}
+
+			let resPrice = (price).split(',').join('');		
+
+			const formData = {
+				is_api:1,				
+				pd_name:subject,
+				pd_contents:content,
+				c1_idx:1,
+				c2_idx:sort,
+				c3_idx:ingred,
+				c4_idx:shape,
+				pd_price:resPrice,
+				pd_unit:priceUnit, 
+				pd_sell_type:sellType, 
+				pd_option1:option1, 
+				pd_trade1:dealMethod1, 
+				pd_trade2:dealMethod2, 
+				pd_method:payMethod, 			
+				pd_test:selectedList,
+				pd_bidding_day:period,
+				pf_img1_signature:img1Chk,
+				pf_img2_signature:img2Chk,
+				pf_img3_signature:img3Chk,
+				pf_img4_signature:img4Chk,
+				pf_img5_signature:img5Chk,
+				pf_img6_signature:img6Chk,
+				pf_img7_signature:img7Chk,
+				pf_img8_signature:img8Chk,
+				pf_img9_signature:img9Chk,
+				pf_img10_signature:img10Chk,
+			};
+
+			if(img1Path != ''){ formData.pf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'pf_img1.png'}; }
+			if(img2Path != ''){ formData.pf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'pf_img2.png'}; }
+			if(img3Path != ''){ formData.pf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'pf_img3.png'}; }
+			if(img4Path != ''){ formData.pf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'pf_img4.png'}; }
+			if(img5Path != ''){ formData.pf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'pf_img5.png'}; }
+			if(img6Path != ''){ formData.pf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'pf_img6.png'}; }
+			if(img7Path != ''){ formData.pf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'pf_img7.png'}; }
+			if(img8Path != ''){ formData.pf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'pf_img8.png'}; }
+			if(img9Path != ''){ formData.pf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'pf_img9.png'}; }
+			if(img10Path != ''){ formData.pf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'pf_img10.png'}; }
+
+			console.log("save formData : ",formData);
+
+			Api.send('POST', 'save_temp_product', formData, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+
+				if(responseJson.result === 'success'){
+					//console.log('성공 : ',responseJson);										
+					if (type != 'stay') { setPreventBack(false); }
+					setIsLoading(false);
+					ToastMessage('임시저장이 완료되었습니다.');
+					setTimeout(function () {
+						setIsLoading(true);
+						Toast.hide();
+						if(type != 'stay'){
+							navigation.goBack();
+						}
+					}, 1000);	
+				}else{
+					console.log('결과 출력 실패!', resultItem);
+					setIsLoading(true);
+					ToastMessage(responseJson.result_text);
+				}
+			});
+		}, 200);	
+	}
+
 	//분류
-	const select1 = async () => {
+	const select1 = async (mo_idx) => {
 		await Api.send('GET', 'product_cate2', {is_api:1, cate1:1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("분류 : ",responseJson);
+				//console.log("분류 : ",responseJson);				
 				setSortAry(responseJson.data);
 			}else{
 				console.log("분류 err : ",responseJson.result_text);
@@ -211,8 +444,8 @@ const Write1 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v) => {
-		setIngred('');
+	const select2 = async (v, z) => {
+		if(!z || z==''){ setIngred(''); }
 		setIngreAry([]);
 		if(v == 7 || v == 8){
 			setShape('');
@@ -225,16 +458,17 @@ const Write1 = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				//console.log("성분 : ",responseJson);
+				//console.log("성분 : ",responseJson);				
 				setIngreAry(responseJson.data);
+				if(z){ setIngred(z); }
 			}else{
 				//console.log("성분 err :",responseJson.result_text);
 			}
-		});
+		}); 
 	}
 
 	//형태
-	const select3 = async (v) => {		
+	const select3 = async (v, z) => {		
 		if((sort!=7 && sort!=8) && (v!=32 && v!=33 )){
 			await Api.send('GET', 'product_cate4', {is_api:1, cate3:v}, (args)=>{
 				let resultItem = args.resultItem;
@@ -244,15 +478,16 @@ const Write1 = ({navigation, route}) => {
 				if(responseJson.result === 'success' && responseJson){
 					//console.log(responseJson);
 					setShapeAry(responseJson.data);
+					if(z){ setShape(z); }
 				}else{
-					console.log("형태 err : ",responseJson.result_text);
+					//console.log("형태 err : ",responseJson.result_text);
 				}
 			}); 
 		}
 	}
 
 	//검수
-	const check1 = async () => {
+	const check1 = async (testList) => {
 		await Api.send('GET', 'product_cate5', {is_api:1, cate1:1}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -270,6 +505,14 @@ const Write1 = ({navigation, route}) => {
 					}
 					chkMetAry.push(subAry);
 				});
+				
+				if(testList && testList.length > 0){
+					//console.log("testList : ",testList);
+					testList.map((item) => {
+						const id = (item.val)-1;
+						chkMetAry[id].isChecked=true;
+					});
+				}
 				setChkMethod(chkMetAry);
 			}else{
 				console.log("검수 err : ",responseJson.result_text);
@@ -714,6 +957,7 @@ const Write1 = ({navigation, route}) => {
 			<TouchableOpacity
 				style={styles.transitStorage}
 				activeOpacity={opacityVal}
+				onPress={() => saveUpdate('stay')}
 			>
 				<Text style={styles.transitStorageText}>임시저장</Text>
 			</TouchableOpacity>
@@ -1141,7 +1385,7 @@ const Write1 = ({navigation, route}) => {
 										if(priceOpt == 2){											
 											setPriceOpt(1);											
 										}
-										if(v){setState9(true);}
+										//if(v){setState9(true);}
 									}}
 									placeholder={'가격을 입력해 주세요.'}
 									placeholderTextColor="#8791A1"
@@ -1199,13 +1443,15 @@ const Write1 = ({navigation, route}) => {
 						{priceOpt != 2 ? (
 						<View style={[styles.typingBox, styles.mgTop35]} onLayout={handleLayout11}>
 							<View style={styles.typingTitle}>
-								<Text style={styles.typingTitleText}>결제방식</Text>
+									<Text style={styles.typingTitleText}>결제방식</Text>
 							</View>
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
+									value={payMethod}
 									onValueChange={(value) => {
 										Keyboard.dismiss();
 										setPayMethod(value);
+										console.log('!!!');
 										if(value){setState11(true);}
 									}}
 									placeholder={{
@@ -1330,13 +1576,50 @@ const Write1 = ({navigation, route}) => {
               style={styles.avatarBtn}
               onPress={() => {eventBack('cancel');}}
             >
-              <Text style={styles.avatarBtnText}>취소</Text>
+              <Text style={styles.avatarBtnText}>아니오</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.avatarBtn, styles.avatarBtn2]}
               onPress={() => {eventBack('save');}}
             >
-              <Text style={styles.avatarBtnText}>확인</Text>
+              <Text style={styles.avatarBtnText}>예</Text>
+            </TouchableOpacity>
+          </View>
+				</View>
+			</Modal>
+			
+			<Modal
+        visible={saveModal}
+				transparent={true}
+				onRequestClose={() => {setSaveModal(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setSaveModal(false)}}
+				></Pressable>
+				<View style={styles.modalCont3}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>임시저장</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>기존에 작성한 페이지가 있습니다.</Text>
+            <Text style={styles.avatarDescText}>이어서 하시겠습니까?</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {setSaveModal(false);}}
+            >
+              <Text style={styles.avatarBtnText}>아니오</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+							onPress={() => {
+								setSaveModal(false);
+								getSaveState2();
+							}}
+            >
+              <Text style={styles.avatarBtnText}>예</Text>
             </TouchableOpacity>
           </View>
 				</View>

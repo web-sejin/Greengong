@@ -14,6 +14,7 @@ import Header from '../../components/Header';
 //import {Avatar2} from '../../components/Avatar2';
 import PushChk from "../../components/Push";
 import ImageCropPicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -173,7 +174,7 @@ const MatchModify = ({navigation, route}) => {
       select7();
 			getData();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
@@ -866,7 +867,7 @@ const MatchModify = ({navigation, route}) => {
 							return {...item, idx: (index+1), path: item.path, mf_idx:'', signature:0};
 						}
 					});
-					console.log('selectCon : ', selectCon);
+					//console.log('selectCon : ', selectCon);
 					setFileList(selectCon);
 					getFileCount(selectCon);
 				}

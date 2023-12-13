@@ -15,7 +15,8 @@ import Header from '../../components/Header';
 import PushChk from "../../components/Push";
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import  ImageCropPicker from 'react-native-image-crop-picker';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import Toast from 'react-native-toast-message';
 
 const widnowWidth = Dimensions.get('window').width;
 const innerWidth = widnowWidth - 40;
@@ -80,6 +81,7 @@ const MatchWrite = ({navigation, route}) => {
 	const [matt1, setMatt1] = useState(''); //재료1
 	const [matt2, setMatt2] = useState(''); //재료2
 	const [matt2Direct, setMatt2Direct] = useState(''); //재료2-직접입력
+	const [matt2Direct2, setMatt2Direct2] = useState(''); //재료2-직접입력-임시저장
 	const [cnt, setCnt] = useState(''); //수량
 	const [floorFile, setFloorFile] = useState(''); //도면 파일
 	const [floorFileType, setFloorFileType] = useState(''); //도면 파일
@@ -107,6 +109,9 @@ const MatchWrite = ({navigation, route}) => {
 	const [list2, setList2] = useState([]); //도면상담방식 리스트
 	const [list3, setList3] = useState([]); //제품용도 리스트
 	const [list4, setList4] = useState([]); //제품용도 세부 리스트
+
+	const [saveState, setSaveState] = useState(false);
+	const [saveModal, setSaveModal] = useState(false);
 
 	const [state0, setState0] = useState(true);
 	const [state1, setState1] = useState(true);
@@ -206,9 +211,10 @@ const MatchWrite = ({navigation, route}) => {
 			select1();
 			select5();
 			select6();
-			select7();			
+			select7();
+			getSaveState();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 	
@@ -232,15 +238,244 @@ const MatchWrite = ({navigation, route}) => {
 	const eventBack = (v) => {
 		if (v == 'save') {
 			//임시 저장 프로세스
-		} else if (v == 'cancel') {
-			setConfirm(false);
+			saveUpdate();
+
+		} else if (v == 'cancel') {			
 			setPreventBack(false);
 			setIsLoading(false);
 			setTimeout(function () {
 				setIsLoading(true);
 				navigation.goBack();
-			}, 1000);	
+			}, 100);	
 		}		
+	}
+
+	const getSaveState = async () => {
+		await Api.send('GET', 'get_temp_match', {'is_api': 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				//console.log("get_temp_match : ", responseJson.is_data);
+				if (responseJson.is_data == 1) {					
+					setSaveState(1);
+					setSaveModal(true);
+				}
+			}else{	
+				console.log('결과 출력 실패!');
+			}
+		});
+	}
+
+	const getSaveState2 = async () => {
+		setIsLoading(false);
+		await Api.send('GET', 'get_temp_match', {'is_api': 1}, (args)=>{
+			let resultItem = args.resultItem;
+			let responseJson = args.responseJson;
+			let arrItems = args.arrItems;
+			//console.log('args ', responseJson);
+			if(responseJson.result === 'success' && responseJson){
+				console.log("get_temp_match2 : ", responseJson);
+				setTimeout(function () {
+					const imgList = responseJson.mf_data;
+					if (imgList.length > 0) {
+						//let selectCon = fileList.map((item,index) => {					
+						let selectCon = imgList.map((item, index) => {
+							if (imgList[index]) {
+								return { ...item, idx: (index + 1), path: imgList[index].mf_name, mf_idx: imgList[index].mf_idx, signature: imgList[index].mf_signature };
+							} else {
+								return { ...item, idx: (index + 1), path: item.path, mf_idx: '', signature: 0 };
+							}
+						});
+						setFileList(selectCon);
+						getFileCount(selectCon);
+					}
+
+					setSubject(responseJson.mc_name);
+        
+					const apiCate = responseJson.c1_idx;
+					const apiSort = responseJson.c2_idx;
+					const apiMatt1 = responseJson.c3_idx;
+					const apiMatt2 = responseJson.c4_idx;					
+					setMatt1('');
+					setMatt2('');
+					setCate(parseInt(apiCate));
+					setSort(apiSort.toString());
+					setMatt1(apiMatt1.toString());
+					setMatt2(apiMatt2.toString());
+					if (apiMatt2 == 12 || apiMatt2 == 22 || apiMatt2 == 32 || apiMatt2 == 40 || apiMatt2 == 47 || apiMatt2 == 59 || apiMatt2 == 62 || apiMatt2 == 65 || apiMatt2 == 70) {
+						console.log('etc ::::::: ', responseJson.c4_etc);
+						setMatt2Direct(responseJson.c4_etc);
+						setMatt2Direct2(responseJson.c4_etc);
+					}
+        
+					let totalComma = String(responseJson.mc_total).replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+					setCnt(totalComma);
+					console.log(responseJson.mc_file);
+					if (responseJson.mc_file_org) {
+						setFloorFile(responseJson.mc_file_org);
+						setFloorFileType('application/zip');
+						setFloorFileUri(responseJson.mc_file);
+					}
+
+					setCall(responseJson.mc_option1)
+					setSecurity(parseInt(responseJson.mc_dwg_secure));
+					setAdvice(parseInt(responseJson.mc_chat_permit));
+					setProjectName(responseJson.mc_project_name);
+					setUseInfo(parseInt(responseJson.mc_use_type));
+					select8();
+					setIndCate(parseInt(responseJson.mc_use_type2))
+					setEndDateMethod(responseJson.mc_option2);
+					if (responseJson.mc_option2 == 2) {
+						const endDate = (responseJson.mc_end_date).split('.').join('-');
+						setEndDate(endDate);
+					}
+					setPrice((responseJson.mc_price).toString());
+					setContent(responseJson.mc_contents);
+				
+					setIsLoading(true);
+				}, 500);
+			}else{	
+				console.log('결과 출력 실패!!!', args);
+			}
+		});
+	}
+
+	const saveUpdate = async (type='') => {
+		setIsLoading(false);
+		setConfirm(false);
+		setTimeout(function(){
+			let img1Path = '';
+			let img2Path = '';
+			let img3Path = '';
+			let img4Path = '';
+			let img5Path = '';
+			let img6Path = '';
+			let img7Path = '';
+			let img8Path = '';
+			let img9Path = '';
+			let img10Path = '';
+			
+			let img1Chk = 0;
+			let img2Chk = 0;
+			let img3Chk = 0;
+			let img4Chk = 0;
+			let img5Chk = 0;
+			let img6Chk = 0;
+			let img7Chk = 0;
+			let img8Chk = 0;
+			let img9Chk = 0;
+			let img10Chk = 0;
+
+			fileList.map((item, index)=>{
+				if(item.idx == 1 && item.path != ''){ 
+					img1Path = item.path;
+					img1Chk = item.signature;
+				}else if(item.idx == 2 && item.path != ''){ 
+					img2Path = item.path;
+					img2Chk = item.signature;
+				}else if(item.idx == 3 && item.path != ''){ 
+					img3Path = item.path;
+					img3Chk = item.signature;
+				}else if(item.idx == 4 && item.path != ''){ 
+					img4Path = item.path;
+					img4Chk = item.signature;
+				}else if(item.idx == 5 && item.path != ''){ 
+					img5Path = item.path;
+					img5Chk = item.signature;
+				}else if(item.idx == 6 && item.path != ''){ 
+					img6Path = item.path;
+					img6Chk = item.signature;
+				}else if(item.idx == 7 && item.path != ''){ 
+					img7Path = item.path;
+					img7Chk = item.signature;
+				}else if(item.idx == 8 && item.path != ''){ 
+					img8Path = item.path;
+					img8Chk = item.signature;
+				}else if(item.idx == 9 && item.path != ''){ 
+					img9Path = item.path;
+					img9Chk = item.signature;
+				}else if(item.idx == 10 && item.path != ''){ 
+					img10Path = item.path;
+					img10Chk = item.signature;
+				}
+			})
+
+			let calcCnt = 0;
+			if(cnt != ''){
+				calcCnt = (cnt).split(',').join('');
+			}
+
+			const formData = {
+				is_api:1,				
+				mc_name:subject,
+				mc_contents:content,
+				c1_idx:cate,
+				c2_idx:sort,
+				c3_idx:matt1,
+				c4_idx:matt2,
+				c4_etc:matt2Direct,
+				mc_total:calcCnt,
+				mc_project_name:projectName,
+				mc_dwg_secure:security,
+				mc_chat_permit:advice,
+				mc_use_type:useInfo,
+				mc_use_type_etc:indCateDirect,
+				mc_use_type2:indCate,
+				mc_end_date:endDate,
+				mc_option1:call,
+				mc_option2:endDateMethod,
+				mc_price: price,
+				mf_img1_signature:img1Chk,
+				mf_img2_signature:img2Chk,
+				mf_img3_signature:img3Chk,
+				mf_img4_signature:img4Chk,
+				mf_img5_signature:img5Chk,
+				mf_img6_signature:img6Chk,
+				mf_img7_signature:img7Chk,
+				mf_img8_signature:img8Chk,
+				mf_img9_signature:img9Chk,
+				mf_img10_signature:img10Chk,
+			};
+
+			if(floorFile != ''){ formData.mc_file =  {'uri': floorFileUri, 'type': floorFileType, 'name': floorFile}; }
+			if(img1Path != ''){ formData.mf_img1 =  {'uri': img1Path, 'type': 'image/png', 'name': 'mf_img1.png'}; }
+			if(img2Path != ''){ formData.mf_img2 =  {'uri': img2Path, 'type': 'image/png', 'name': 'mf_img2.png'}; }
+			if(img3Path != ''){ formData.mf_img3 =  {'uri': img3Path, 'type': 'image/png', 'name': 'mf_img3.png'}; }
+			if(img4Path != ''){ formData.mf_img4 =  {'uri': img4Path, 'type': 'image/png', 'name': 'mf_img4.png'}; }
+			if(img5Path != ''){ formData.mf_img5 =  {'uri': img5Path, 'type': 'image/png', 'name': 'mf_img5.png'}; }
+			if(img6Path != ''){ formData.mf_img6 =  {'uri': img6Path, 'type': 'image/png', 'name': 'mf_img6.png'}; }
+			if(img7Path != ''){ formData.mf_img7 =  {'uri': img7Path, 'type': 'image/png', 'name': 'mf_img7.png'}; }
+			if(img8Path != ''){ formData.mf_img8 =  {'uri': img8Path, 'type': 'image/png', 'name': 'mf_img8.png'}; }
+			if(img9Path != ''){ formData.mf_img9 =  {'uri': img9Path, 'type': 'image/png', 'name': 'mf_img9.png'}; }
+			if(img10Path != ''){ formData.mf_img10 =  {'uri': img10Path, 'type': 'image/png', 'name': 'mf_img10.png'}; }
+
+			console.log("formData : ",formData);
+
+			Api.send('POST', 'save_temp_match', formData, (args)=>{
+				let resultItem = args.resultItem;
+				let responseJson = args.responseJson;
+
+				if(responseJson.result === 'success'){
+					console.log('성공 : ',responseJson);									
+					if (type != 'stay') { setPreventBack(false); }
+					setIsLoading(false);
+					ToastMessage('임시저장이 완료되었습니다.');
+					setTimeout(function () {
+						setIsLoading(true);
+						Toast.hide();
+						if(type != 'stay'){
+							navigation.goBack();
+						}
+					}, 1000);	
+				}else{
+					console.log('결과 출력 실패!', resultItem);
+					setIsLoading(true);
+					ToastMessage(responseJson.result_text);
+				}
+			});
+		}, 200)
 	}
 
 	//카테고리
@@ -261,7 +496,6 @@ const MatchWrite = ({navigation, route}) => {
 
 	//분류
 	const select2 = async () => {
-		//console.log('cate : ',cate);
 		await Api.send('GET', 'match_cate2', {is_api:1, cate1:cate}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -278,13 +512,13 @@ const MatchWrite = ({navigation, route}) => {
 
 	//분류 체크
 	const sortChk = async () => {
-		//console.log('sort : ',sort);
-		setMatt1('');
-		setMatt1Ary([]);		
+		//setMatt1('');
+		//setMatt1Ary([]);		
 		if(sort){
 			if(sort==40 || cate==6 || cate==7){
 				console.log('재료1 X');
-
+				setMatt1('');
+				setMatt1Ary([]);
 				setMatt2('');
 				setMatt2Ary([]);
 			}else{
@@ -294,9 +528,9 @@ const MatchWrite = ({navigation, route}) => {
 	}
 
 	//재료1
-	const select3 = async () => {
-		setMatt2('');
-		setMatt2Ary([]);
+	const select3 = async () => {		
+		//setMatt2('');
+		//setMatt2Ary([]);
 		await Api.send('GET', 'match_cate3', {is_api:1, cate2:sort}, (args)=>{
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
@@ -313,7 +547,7 @@ const MatchWrite = ({navigation, route}) => {
 
 	//재료1 체크
 	const matt1Chk = async () => {
-		console.log(cate+"//"+matt1);
+		//console.log("matt1Chk : ",cate+"//"+matt1);
 		if(matt1){
 			if(matt1==10 || matt1==20 || matt1==30 || matt1==40 || matt1==50 || cate==2 || cate==4 || cate==5 || cate==6 || cate==7 || (cate==3 && matt1==73) || (cate==3 && matt1==76) || (cate==3 && matt1==79) || (cate==3 && matt1==83) || (cate==3 && matt1==162)){
 				console.log('재료2 X');
@@ -333,7 +567,7 @@ const MatchWrite = ({navigation, route}) => {
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
 			if(responseJson.result === 'success' && responseJson){
-				console.log("재료2 : ",responseJson);
+				//console.log("재료2 : ",responseJson);
 				setMatt2Ary(responseJson.data);
 			}else{
 				//console.log("재료2 err : ",responseJson.result_text);
@@ -902,6 +1136,7 @@ const MatchWrite = ({navigation, route}) => {
 			<TouchableOpacity
 				style={styles.transitStorage}
 				activeOpacity={opacityVal}
+				onPress={() => saveUpdate('stay')}
 			>
 				<Text style={styles.transitStorageText}>임시저장</Text>
 			</TouchableOpacity>
@@ -1082,7 +1317,7 @@ const MatchWrite = ({navigation, route}) => {
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
-										//placeholder: {color: '#8791A1'},
+										placeholder: {color: '#8791A1'},
 										inputAndroid: styles.input,
 										inputAndroidContainer: styles.inputContainer,
 										inputIOS: styles.input,
@@ -1159,8 +1394,11 @@ const MatchWrite = ({navigation, route}) => {
 										onValueChange={(value) => {
 											Keyboard.dismiss();
 											setMatt2(value);
-											if(value==12 || value==22 || value==32 || value==40 || value==47 || value==59 || value==62 || value==65 || value==70){ 
-												setMatt2Direct(''); 
+											if (value == 12 || value == 22 || value == 32 || value == 40 || value == 47 || value == 59 || value == 62 || value == 65 || value == 70) { 
+												if (matt2Direct2 == '') {
+													console.log('matt2Direct2 :::::: ', matt2Direct2);
+													setMatt2Direct(''); 
+												}
 											}
 											if(value){setState5(true);}
 										}}
@@ -1178,7 +1416,7 @@ const MatchWrite = ({navigation, route}) => {
 										fixAndroidTouchableBug={true}
 										useNativeAndroidPickerStyle={false}
 										style={{
-											//placeholder: {color: '#8791A1'},
+											placeholder: {color: '#8791A1'},
 											inputAndroid: styles.input,
 											inputAndroidContainer: styles.inputContainer,
 											inputIOS: styles.input,
@@ -1776,6 +2014,43 @@ const MatchWrite = ({navigation, route}) => {
               onPress={() => {eventBack('save');}}
             >
               <Text style={styles.avatarBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+				</View>
+			</Modal>
+			
+			<Modal
+        visible={saveModal}
+				transparent={true}
+				onRequestClose={() => {setSaveModal(false)}}
+      >
+				<Pressable 
+					style={styles.modalBack}
+					onPress={() => {setSaveModal(false)}}
+				></Pressable>
+				<View style={styles.modalCont3}>
+					<View style={styles.avatarTitle}>
+            <Text style={styles.avatarTitleText}>임시저장</Text>
+          </View>
+          <View style={styles.avatarDesc}>
+            <Text style={styles.avatarDescText}>기존에 작성한 페이지가 있습니다.</Text>
+            <Text style={styles.avatarDescText}>이어서 하시겠습니까?</Text>
+          </View>
+          <View style={styles.avatarBtnBox}>
+            <TouchableOpacity 
+              style={styles.avatarBtn}
+              onPress={() => {setSaveModal(false);}}
+            >
+              <Text style={styles.avatarBtnText}>아니오</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.avatarBtn, styles.avatarBtn2]}
+							onPress={() => {
+								setSaveModal(false);
+								getSaveState2();
+							}}
+            >
+              <Text style={styles.avatarBtnText}>예</Text>
             </TouchableOpacity>
           </View>
 				</View>
