@@ -77,6 +77,7 @@ const Write2 = ({navigation, route}) => {
 	const [period, setPeriod] = useState(''); //입찰기간
 	const [isLoading, setIsLoading] = useState(true);
 	const [c3Etc, setC3Etc] = useState('');
+	const [c3Etc2, setC3Etc2] = useState('');
 	const [confirm, setConfirm] = useState(false);
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
@@ -195,6 +196,7 @@ const Write2 = ({navigation, route}) => {
 	}, [navigationUse, preventBack]);
 
 	const eventBack = (v) => {
+		setConfirm(false);
 		if (v == 'save') {
 			//임시 저장 프로세스
 			saveUpdate();
@@ -229,40 +231,40 @@ const Write2 = ({navigation, route}) => {
 
 	const getSaveState2 = async () => {
 		setIsLoading(false);
-		await Api.send('GET', 'get_temp_product', {'is_api': 1, c1_idx:2}, (args)=>{
+		await Api.send('GET', 'get_temp_product', { 'is_api': 1, c1_idx: 2 }, (args) => {
 			let resultItem = args.resultItem;
 			let responseJson = args.responseJson;
 			let arrItems = args.arrItems;
 			//console.log('args ', responseJson);
-			if(responseJson.result === 'success' && responseJson){
+			if (responseJson.result === 'success' && responseJson) {
 				//console.log("get_temp_product2 : ", responseJson);
-				const imgList = responseJson.pf_data;				
-				if(imgList.length > 0){
+				const imgList = responseJson.pf_data;
+				if (imgList.length > 0) {
 					//let selectCon = fileList.map((item,index) => {					
-					let selectCon = imgList.map((item,index) => {					
-						if(imgList[index]){
-							return {...item, idx: (index+1), path: imgList[index].pf_name, pf_idx:imgList[index].pf_idx, signature:imgList[index].pf_signature};
-						}else{
-							return {...item, idx: (index+1), path: item.path, pf_idx:'', signature:0};
+					let selectCon = imgList.map((item, index) => {
+						if (imgList[index]) {
+							return { ...item, idx: (index + 1), path: imgList[index].pf_name, pf_idx: imgList[index].pf_idx, signature: imgList[index].pf_signature };
+						} else {
+							return { ...item, idx: (index + 1), path: item.path, pf_idx: '', signature: 0 };
 						}
 					});
 					setFileList(selectCon);
 					getFileCount(selectCon);
 				}
 
-				if(responseJson.pd_name) { setSubject(responseJson.pd_name); }
-				select1();				
-				if(responseJson.c2_idx != 0){ setSort((responseJson.c2_idx).toString()); }
-				if(responseJson.c2_idx == 9){
-					if(responseJson.c4_idx != 0){
-						select3(responseJson.c2_idx, (responseJson.c4_idx).toString());
-					}	
-				}else{
-					if(responseJson.c2_idx != 0 && responseJson.c3_idx != 0){
-						select2(responseJson.c2_idx, (responseJson.c3_idx).toString());				
+				if (responseJson.pd_name) { setSubject(responseJson.pd_name); }
+				select1();
+				if (responseJson.c2_idx != 0) { setSort((responseJson.c2_idx).toString()); }
+				if (responseJson.c2_idx == 9) {
+					if (responseJson.c4_idx != 0) {
+						select3(responseJson.c2_idx, (responseJson.c4_idx).toString());						
 					}
-					if(responseJson.c3_idx != 0 && responseJson.c4_idx != 0){
-						select3(responseJson.c3_idx, (responseJson.c4_idx).toString());
+				} else {
+					if (responseJson.c2_idx != 0 && responseJson.c3_idx != 0) {
+						select2(responseJson.c2_idx, (responseJson.c3_idx).toString(), responseJson.c3_etc);						
+					}
+					if (responseJson.c3_idx != 0 && responseJson.c4_idx != 0) {
+						select3(responseJson.c3_idx, (responseJson.c4_idx).toString());						
 					}
 				}
 				
@@ -471,9 +473,10 @@ const Write2 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v, z) => {
+	const select2 = async (v, z, etc) => {
 		if(!z || z==''){ setIngred(''); }
 		setIngreAry([]);
+		if(etc){ setC3Etc2(etc); }
 
 		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
 			let resultItem = args.resultItem;
@@ -488,11 +491,16 @@ const Write2 = ({navigation, route}) => {
 				console.log("성분 err :",responseJson.result_text);
 			}
 		}); 
+		
 	}
 
 	//등급(형태)
-	const select3 = async (v, z) => {
-		setC3Etc('');
+	const select3 = async (v, z) => {		
+		if(c3Etc2){
+			setC3Etc(c3Etc2);
+		}else{
+			setC3Etc('');
+		}
 		setShape('');
 
 		const select3Data = {
@@ -1159,7 +1167,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1',
 									}}
-									items={sortAry}
+									items={sortAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1199,7 +1211,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={ingreAry}
+									items={ingreAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1264,7 +1280,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={shapeAry}
+									items={shapeAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1478,7 +1498,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={dealMethod2Ary}
+									items={dealMethod2Ary.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1648,7 +1672,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={periodAry}
+									items={periodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1682,7 +1710,11 @@ const Write2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={payMethodAry}
+									items={payMethodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{

@@ -11,6 +11,7 @@ import RNFetchBlob from "rn-fetch-blob";
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/HeaderView';
 
 import {connect} from 'react-redux';
@@ -80,7 +81,7 @@ const MatchView = (props) => {
       getMyData();
       getRadioList();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 
@@ -173,6 +174,7 @@ const MatchView = (props) => {
   //삭제
   function deleteItem(){
     //console.log(idx);
+    setVisible4(false);
     const formData = {
 			is_api:1,				
 			mc_idx:idx,

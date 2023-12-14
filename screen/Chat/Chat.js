@@ -6,6 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Font from "../../assets/common/Font"
 import {initializeApp} from "@react-native-firebase/app";
 import firestore, { doc, deleteDoc } from '@react-native-firebase/firestore';
+import Toast from 'react-native-toast-message';
 
 import Api from '../../Api';
 import {connect} from 'react-redux';
@@ -69,6 +70,7 @@ const Chat = (props) => {
 			}
 		}		
 
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

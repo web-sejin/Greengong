@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import {Avatar3} from '../../components/Avatar3';
 
@@ -39,7 +40,7 @@ const Profile = (props) => {
 			setPageSt(!pageSt);
       getData();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

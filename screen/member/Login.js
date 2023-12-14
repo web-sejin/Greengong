@@ -52,6 +52,7 @@ const Login = (props) => {
 			setPageSt(!pageSt);
 		}
 		setIndi(false);
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

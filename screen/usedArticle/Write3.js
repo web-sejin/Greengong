@@ -181,6 +181,7 @@ const Write3 = ({navigation, route}) => {
 	}, [navigationUse, preventBack]);
 
 	const eventBack = (v) => {
+		setConfirm(false);
 		if (v == 'save') {
 			//임시 저장 프로세스
 			saveUpdate();
@@ -1042,7 +1043,11 @@ const Write3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1',
 									}}
-									items={sortAry}
+									items={sortAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1262,7 +1267,11 @@ const Write3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={dealMethod2Ary}
+									items={dealMethod2Ary.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1389,7 +1398,11 @@ const Write3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={periodAry}
+									items={periodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1423,7 +1436,11 @@ const Write3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={payMethodAry}
+									items={payMethodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{

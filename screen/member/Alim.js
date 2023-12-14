@@ -8,6 +8,7 @@ import RNPickerSelect from 'react-native-picker-select';
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 
 import {connect} from 'react-redux';
@@ -42,7 +43,7 @@ const Alim = (props) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import PushChk from "../../components/Push";
 
@@ -47,7 +48,7 @@ const MatchOrder = ({navigation, route}) => {
       setNowPage2(1);
 			getData2();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

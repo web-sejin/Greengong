@@ -8,6 +8,7 @@ import {Swipeable, GestureHandlerRootView} from 'react-native-gesture-handler';
 import Api from '../Api';
 import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../components/Header';
 
 const widnowWidth = Dimensions.get('window').width;
@@ -39,7 +40,7 @@ const AlimList = ({navigation, route}) => {
 			setPageSt(!pageSt);
       getData();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

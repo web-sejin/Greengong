@@ -911,7 +911,7 @@ const Modify3 = ({navigation, route}) => {
 														<TouchableOpacity
 															style={styles.photoDel}
 															activeOpacity={opacityVal}
-															onPress={() => {deleteFile((index))}}
+															onPress={() => {deleteFile(index)}}
 														>
 															<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
 														</TouchableOpacity>
@@ -974,7 +974,11 @@ const Modify3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={sortAry}
+									items={sortAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1174,7 +1178,11 @@ const Modify3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={dealMethod2Ary}
+									items={dealMethod2Ary.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1299,7 +1307,11 @@ const Modify3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={periodAry}
+									items={periodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1333,7 +1345,11 @@ const Modify3 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={payMethodAry}
+									items={payMethodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{

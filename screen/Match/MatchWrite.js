@@ -236,6 +236,7 @@ const MatchWrite = ({navigation, route}) => {
 	}, [navigationUse, preventBack]);
 
 	const eventBack = (v) => {
+		setConfirm(false);
 		if (v == 'save') {
 			//임시 저장 프로세스
 			saveUpdate();
@@ -326,6 +327,7 @@ const MatchWrite = ({navigation, route}) => {
 					setUseInfo(parseInt(responseJson.mc_use_type));
 					select8();
 					setIndCate(parseInt(responseJson.mc_use_type2))
+					setIndCateDirect(responseJson.mc_use_type_etc);
 					setEndDateMethod(responseJson.mc_option2);
 					if (responseJson.mc_option2 == 2) {
 						const endDate = (responseJson.mc_end_date).split('.').join('-');
@@ -1200,7 +1202,7 @@ const MatchWrite = ({navigation, route}) => {
 														<TouchableOpacity
 															style={styles.photoDel}
 															activeOpacity={opacityVal}
-															onPress={() => {deleteFile((index+1))}}
+															onPress={() => {deleteFile(index)}}
 														>
 															<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
 														</TouchableOpacity>

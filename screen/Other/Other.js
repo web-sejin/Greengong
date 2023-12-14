@@ -8,6 +8,7 @@ import Postcode from '@actbase/react-daum-postcode';
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/HeaderView';
 import PushChk from "../../components/Push";
 
@@ -51,7 +52,7 @@ const Other = ({navigation, route}) => {
 			setPageSt(!pageSt);
       getOtherData();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

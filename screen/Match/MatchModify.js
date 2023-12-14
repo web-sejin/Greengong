@@ -371,22 +371,22 @@ const MatchModify = ({navigation, route}) => {
 		setState0(true);
   };
 
-	function deleteFile(v){
-		let selectCon = fileList.map((item) => {		
-			if(item.idx === v){				
-				return {...item, path: '', mf_idx:'', del:1, del_idx:item.mf_idx};
-			}else{
-				let val = ''
-				if(item.mf_idx != ''){
-					val = item.mf_idx;
-				}
-				return {...item, path: item.path, mf_idx:val, del:0, del_idx:item.mf_idx};
-			}
-		});
-		console.log("delete selectCon : ",selectCon);
-		setFileList(selectCon);
-		getFileCount(selectCon, 'del');
-	}
+	// function deleteFile(v){
+	// 	let selectCon = fileList.map((item) => {		
+	// 		if(item.idx === v){				
+	// 			return {...item, path: '', mf_idx:'', del:1, del_idx:item.mf_idx};
+	// 		}else{
+	// 			let val = ''
+	// 			if(item.mf_idx != ''){
+	// 				val = item.mf_idx;
+	// 			}
+	// 			return {...item, path: item.path, mf_idx:val, del:0, del_idx:item.mf_idx};
+	// 		}
+	// 	});
+	// 	console.log("delete selectCon : ",selectCon);
+	// 	setFileList(selectCon);
+	// 	getFileCount(selectCon, 'del');
+	// }
 
 	const openPicker = async () => {
 		console.log(DocumentPicker.types)
@@ -903,7 +903,8 @@ const MatchModify = ({navigation, route}) => {
         setProjectName(responseJson.mc_project_name);        
         setUseInfo(parseInt(responseJson.mc_use_type_org));
         select8();
-        setIndCate(parseInt(responseJson.mc_use_type2_org))        
+				setIndCate(parseInt(responseJson.mc_use_type2_org))        
+				setIndCateDirect(responseJson.mc_use_type_etc);
         setEndDateMethod(responseJson.mc_option2_org);
         if(responseJson.mc_option2_org == 2){
           const endDate = (responseJson.mc_end_date).split('.').join('-');
@@ -1106,7 +1107,7 @@ const MatchModify = ({navigation, route}) => {
 														<TouchableOpacity
 															style={styles.photoDel}
 															activeOpacity={opacityVal}
-															onPress={() => {deleteFile((index+1))}}
+															onPress={() => {deleteFile(index)}}
 														>
 															<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
 														</TouchableOpacity>

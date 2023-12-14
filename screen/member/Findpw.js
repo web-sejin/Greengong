@@ -9,6 +9,7 @@ import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '.
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import PushChk from "../../components/Push";
 
@@ -69,7 +70,7 @@ const Find_pw = ({navigation, route}) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

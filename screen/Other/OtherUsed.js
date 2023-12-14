@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/HeaderView';
 import { getProfileData } from 'react-native-calendars/src/Profiler';
 import PushChk from "../../components/Push";
@@ -54,7 +55,7 @@ const OtherUsed = ({navigation, route}) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);      
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

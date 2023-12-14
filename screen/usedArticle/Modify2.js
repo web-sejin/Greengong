@@ -74,6 +74,7 @@ const Modify2 = ({navigation, route}) => {
 	const [content, setContent] = useState(''); //내용
 	const [isLoading, setIsLoading] = useState(false);
 	const [c3Etc, setC3Etc] = useState('');
+	const [c3Etc2, setC3Etc2] = useState('');
 
 	const [sortAry, setSortAry] = useState([]); //분류 리스트
 	const [ingreAry, setIngreAry] = useState([]); //성분 리스트
@@ -158,9 +159,10 @@ const Modify2 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v, z) => {
+	const select2 = async (v, z, etc) => {
 		if(!z || z==''){ setIngred(''); }
 		setIngreAry([]);
+		if(etc){ setC3Etc2(etc); }
 
 		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
 			let resultItem = args.resultItem;
@@ -179,7 +181,11 @@ const Modify2 = ({navigation, route}) => {
 
 	//등급(형태)
 	const select3 = async (v, z) => {
-		setC3Etc('');
+		if(c3Etc2){
+			setC3Etc(c3Etc2);
+		}else{
+			setC3Etc('');
+		}
 		setShape('');
 
 		const select3Data = {
@@ -770,7 +776,7 @@ const Modify2 = ({navigation, route}) => {
 				if(responseJson.c2_idx == 9){
 					select3(responseJson.c2_idx, (responseJson.c4_idx).toString());
 				}else{
-					select2(responseJson.c2_idx, (responseJson.c3_idx).toString());				
+					select2(responseJson.c2_idx, (responseJson.c3_idx).toString(), responseJson.c3_etc);				
 					select3(responseJson.c3_idx, (responseJson.c4_idx).toString());
 				}
 				
@@ -989,7 +995,7 @@ const Modify2 = ({navigation, route}) => {
 														<TouchableOpacity
 															style={styles.photoDel}
 															activeOpacity={opacityVal}
-															onPress={() => {deleteFile((index))}}
+															onPress={() => {deleteFile(index)}}
 														>
 															<AutoHeightImage width={21} source={require("../../assets/img/icon_delete.png")} />
 														</TouchableOpacity>
@@ -1059,7 +1065,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={sortAry}
+									items={sortAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1099,7 +1109,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={ingreAry}
+									items={ingreAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1164,7 +1178,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={shapeAry}
+									items={shapeAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1378,7 +1396,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={dealMethod2Ary}
+									items={dealMethod2Ary.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1544,7 +1566,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={periodAry}
+									items={periodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1578,7 +1604,11 @@ const Modify2 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={payMethodAry}
+									items={payMethodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{

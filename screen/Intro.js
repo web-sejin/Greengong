@@ -13,6 +13,7 @@ import PushNotificationIOS from "@react-native-community/push-notification-ios";
 
 import Font from "../assets/common/Font";
 import ToastMessage from "../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../components/Header';
 
 const widnowWidth = Dimensions.get('window').width;

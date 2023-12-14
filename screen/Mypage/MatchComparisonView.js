@@ -9,6 +9,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
@@ -53,7 +54,7 @@ const MatchComparisonView = (props) => {
       setNowPage(1);
       getItemList();
 		}
-
+    Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

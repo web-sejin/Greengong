@@ -9,6 +9,7 @@ import Postcode from '@actbase/react-daum-postcode';
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import {Avatar} from '../../components/Avatar';
 import {connect} from 'react-redux';
@@ -79,7 +80,7 @@ const MyCompany = (props) => {
 			getData();
 			//getData2();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

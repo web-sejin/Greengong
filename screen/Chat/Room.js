@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/HeaderView';
 
 import Api from '../../Api';
@@ -88,7 +89,7 @@ const Room = (props) => {
 			}
 			getRoomData();
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

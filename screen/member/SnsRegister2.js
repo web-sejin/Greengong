@@ -137,7 +137,7 @@ const SnsRegister2 = ({navigation, route}) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

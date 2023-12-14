@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import {phoneFormat, pwd_check, randomNumber, validateDate, email_check} from '../../components/DataFunc';
 import PushChk from "../../components/Push";
@@ -61,7 +62,7 @@ const Find_id = ({navigation, route}) => {
 			setRouteLoad(true);
 			setPageSt(!pageSt);
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

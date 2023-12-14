@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Api from '../../Api';
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-community/async-storage';
 import PushChk from "../../components/Push";
@@ -40,7 +41,7 @@ const MatchEstimate = (props) => {
 			getItemList();
 			delete params?.isSubmit
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

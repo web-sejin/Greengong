@@ -8,6 +8,7 @@ import DocumentPicker from 'react-native-document-picker'
 
 import Font from "../../assets/common/Font";
 import ToastMessage from "../../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import Header from '../../components/Header';
 
 import Api from '../../Api';
@@ -107,7 +108,7 @@ const Estimate = ({navigation, route}) => {
 			setPageSt(!pageSt);
 			getData();			
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;
 	}, [isFocused]);
 

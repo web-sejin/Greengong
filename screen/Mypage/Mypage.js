@@ -6,6 +6,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Font from "../../assets/common/Font"
 import ToastMessage from "../../components/ToastMessage"
+import Toast from 'react-native-toast-message';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../../redux/module/action/UserAction';
 import Api from '../../Api';
@@ -45,7 +46,7 @@ const Mypage = (props) => {
 				}
 			}
 		}
-
+		Toast.hide();
 		return () => isSubscribed = false;		
 	}, [isFocused]);
 

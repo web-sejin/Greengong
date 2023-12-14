@@ -8,6 +8,7 @@ import Api from '../Api';
 import AsyncStorage from '@react-native-community/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import ToastMessage from "../components/ToastMessage";
+import Toast from 'react-native-toast-message';
 import {connect} from 'react-redux';
 import { actionCreators as UserAction } from '../redux/module/action/UserAction';
 
@@ -54,6 +55,8 @@ const Home = (props) => {
 
 	const isFocused = useIsFocused();
 	useEffect(()=>{
+		let isSubscribed = true;
+		
 		getMyInfo();
 		//console.log("initLoading : ",initLoading);
 		//console.log("isSubmit : ",params?.isSubmit);
@@ -82,6 +85,9 @@ const Home = (props) => {
 		if(isFocused){
 			getAlimCnt();
 		}
+
+		Toast.hide();
+		return () => isSubscribed = false;
 	},[isFocused]);
 	
 	//알림 카운트

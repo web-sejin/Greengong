@@ -183,6 +183,7 @@ const Write1 = ({navigation, route}) => {
 	}, [navigationUse, preventBack]);
 
 	const eventBack = (v) => {
+		setConfirm(false);
 		if (v == 'save') {
 			//임시 저장 프로세스
 			saveUpdate();
@@ -1083,8 +1084,12 @@ const Write1 = ({navigation, route}) => {
 										label: '분류를 선택해 주세요.',										
 										value: '',
 										color: '#8791A1'
-									}}
-									items={sortAry}
+									}}									
+									items={sortAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1125,7 +1130,11 @@ const Write1 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={ingreAry}
+									items={ingreAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									onOpen={()=>{console.log('1')}}
@@ -1166,7 +1175,11 @@ const Write1 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={shapeAry}
+									items={shapeAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1281,8 +1294,12 @@ const Write1 = ({navigation, route}) => {
 										label: '거래방식2를 선택해 주세요.',
 										value: '',
 										color: '#8791A1'
-									}}
-									items={dealMethod2Ary}
+									}}									
+									items={dealMethod2Ary.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1409,7 +1426,7 @@ const Write1 = ({navigation, route}) => {
 							<View style={styles.typingTitle}>
 								<Text style={styles.typingTitleText}>입찰 기간</Text>
 							</View>
-							{!state10 ? (
+							
 							<View style={[styles.typingInputBox]}>
 								<RNPickerSelect
 									value={period}
@@ -1423,7 +1440,11 @@ const Write1 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={periodAry}
+									items={periodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
@@ -1435,8 +1456,7 @@ const Write1 = ({navigation, route}) => {
 									}}
 								/>
 								<AutoHeightImage width={12} source={require("../../assets/img/icon_arrow3.png")} style={styles.selectArr} />
-							</View>
-							) : null}
+							</View>							
 						</View>
 						) : null}
 
@@ -1459,7 +1479,11 @@ const Write1 = ({navigation, route}) => {
 										value: '',
 										color: '#8791A1'
 									}}
-									items={payMethodAry}
+									items={payMethodAry.map(item => ({
+										label: item.label,
+										value: item.value,
+										color: '#000',
+								 	}))}
 									fixAndroidTouchableBug={true}
 									useNativeAndroidPickerStyle={false}
 									style={{
