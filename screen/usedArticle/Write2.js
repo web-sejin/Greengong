@@ -257,14 +257,18 @@ const Write2 = ({navigation, route}) => {
 				if (responseJson.c2_idx != 0) { setSort((responseJson.c2_idx).toString()); }
 				if (responseJson.c2_idx == 9) {
 					if (responseJson.c4_idx != 0) {
-						select3(responseJson.c2_idx, (responseJson.c4_idx).toString());						
+						select3(responseJson.c2_idx, (responseJson.c4_idx).toString());												
 					}
 				} else {
 					if (responseJson.c2_idx != 0 && responseJson.c3_idx != 0) {
-						select2(responseJson.c2_idx, (responseJson.c3_idx).toString(), responseJson.c3_etc);						
+						//console.log("aaaaaaaaaaaaaaaaaa : ", responseJson.c3_etc);
+						select2(responseJson.c2_idx, (responseJson.c3_idx).toString());
+						select3(responseJson.c3_idx, (responseJson.c4_idx).toString(), responseJson.c3_etc);
+						console.log('11');
 					}
 					if (responseJson.c3_idx != 0 && responseJson.c4_idx != 0) {
-						select3(responseJson.c3_idx, (responseJson.c4_idx).toString());						
+						select3(responseJson.c3_idx, (responseJson.c4_idx).toString(), responseJson.c3_etc);						
+						console.log('22');
 					}
 				}
 				
@@ -473,10 +477,9 @@ const Write2 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v, z, etc) => {
+	const select2 = async (v, z) => {
 		if(!z || z==''){ setIngred(''); }
 		setIngreAry([]);
-		if(etc){ setC3Etc2(etc); }
 
 		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
 			let resultItem = args.resultItem;
@@ -495,10 +498,19 @@ const Write2 = ({navigation, route}) => {
 	}
 
 	//등급(형태)
-	const select3 = async (v, z) => {		
-		if(c3Etc2){
-			setC3Etc(c3Etc2);
+	const select3 = async (v, z, etc) => {						
+		if(etc){
+			console.log('etc1 :::: ',etc);
+			setC3Etc(etc);
+			setC3Etc2(etc);
 		}else{
+			if(c3Etc2){
+				setC3Etc(c3Etc2);
+			}else{
+				setC3Etc('');	
+			}	
+		}
+		if (v != 76) {
 			setC3Etc('');
 		}
 		setShape('');

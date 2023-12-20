@@ -904,7 +904,11 @@ const MatchModify = ({navigation, route}) => {
         setUseInfo(parseInt(responseJson.mc_use_type_org));
         select8();
 				setIndCate(parseInt(responseJson.mc_use_type2_org))        
-				setIndCateDirect(responseJson.mc_use_type_etc);
+				if (responseJson.mc_use_type_etc) {
+					setTimeout(function(){
+						setIndCateDirect(responseJson.mc_use_type_etc);
+					},1000);
+				}
         setEndDateMethod(responseJson.mc_option2_org);
         if(responseJson.mc_option2_org == 2){
           const endDate = (responseJson.mc_end_date).split('.').join('-');

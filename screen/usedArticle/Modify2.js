@@ -159,10 +159,9 @@ const Modify2 = ({navigation, route}) => {
 	}
 
 	//성분
-	const select2 = async (v, z, etc) => {
+	const select2 = async (v, z) => {
 		if(!z || z==''){ setIngred(''); }
-		setIngreAry([]);
-		if(etc){ setC3Etc2(etc); }
+		setIngreAry([]);		
 
 		await Api.send('GET', 'product_cate3', {is_api:1, cate2:v}, (args)=>{
 			let resultItem = args.resultItem;
@@ -180,12 +179,22 @@ const Modify2 = ({navigation, route}) => {
 	}
 
 	//등급(형태)
-	const select3 = async (v, z) => {
-		if(c3Etc2){
-			setC3Etc(c3Etc2);
+	const select3 = async (v, z, etc) => {
+		if(etc){
+			console.log('etc1 :::: ',etc);
+			setC3Etc(etc);
+			setC3Etc2(etc);
 		}else{
+			if(c3Etc2){
+				setC3Etc(c3Etc2);
+			}else{
+				setC3Etc('');	
+			}	
+		}
+		if (v != 76) {
 			setC3Etc('');
 		}
+
 		setShape('');
 
 		const select3Data = {
@@ -233,9 +242,9 @@ const Modify2 = ({navigation, route}) => {
 					chkMetAry.push(subAry);
 				});
 
-        if(testList.length > 0){
+        if(chkMetAry.length > 0){
 					//console.log("testList : ",testList);
-					testList.map((item) => {
+					chkMetAry.map((item) => {
 						const id = (item.val)-1;
 						chkMetAry[id].isChecked=true;
 					});
@@ -776,8 +785,8 @@ const Modify2 = ({navigation, route}) => {
 				if(responseJson.c2_idx == 9){
 					select3(responseJson.c2_idx, (responseJson.c4_idx).toString());
 				}else{
-					select2(responseJson.c2_idx, (responseJson.c3_idx).toString(), responseJson.c3_etc);				
-					select3(responseJson.c3_idx, (responseJson.c4_idx).toString());
+					select2(responseJson.c2_idx, (responseJson.c3_idx).toString());									
+					select3(responseJson.c3_idx, (responseJson.c4_idx).toString(), responseJson.c3_etc);
 				}
 				
 				const testList = responseJson.pd_test;

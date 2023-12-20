@@ -327,7 +327,11 @@ const MatchWrite = ({navigation, route}) => {
 					setUseInfo(parseInt(responseJson.mc_use_type));
 					select8();
 					setIndCate(parseInt(responseJson.mc_use_type2))
-					setIndCateDirect(responseJson.mc_use_type_etc);
+					if (responseJson.mc_use_type_etc) {
+						setTimeout(function(){
+							setIndCateDirect(responseJson.mc_use_type_etc);
+						},1000);
+					}
 					setEndDateMethod(responseJson.mc_option2);
 					if (responseJson.mc_option2 == 2) {
 						const endDate = (responseJson.mc_end_date).split('.').join('-');
