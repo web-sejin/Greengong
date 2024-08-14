@@ -382,6 +382,7 @@ const StackNavigator = () => {
 }
 
 const Main = () => {  
+  console.log('???');
   usePermissions(CALL_PERMISSIONS_NOTI);  
   const toastConfig = {
 		custom_type: (internalState) => (

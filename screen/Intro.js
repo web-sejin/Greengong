@@ -47,7 +47,7 @@ const Intro = (props) => {
 			await messaging()
 			.getToken()
 			.then(token => {
-				//console.log("appToken", token);
+				console.log("appToken", token);
 				if(token) {
 					AsyncStorage.setItem('appToken', token);
 					setAppToken(token);
